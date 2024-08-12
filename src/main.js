@@ -1,26 +1,61 @@
-import { createApp } from 'vue'
-import App from './App.vue'
-import './main.css';
-import * as VueRouter from 'vue-router'
+import { createApp } from 'vue';
+import App from './App.vue';
+import * as VueRouter from 'vue-router';
+
+//import './main.css';
+
+// Vuetify styles 
+import 'vuetify/styles'
+import { createVuetify } from 'vuetify'
+import * as components from 'vuetify/components'
+import * as directives from 'vuetify/directives'
+
+// Import components
 import ShoppingCartPage from './pages/ShoppingCartPage.vue';
 import ProductsPage from './pages/ProductsPage.vue';
 import ProductDetailPage from './pages/ProductDetailPage.vue';
+import AddProduct from './pages/AddProduct.vue'; // Ensure correct casing
 
+// Define routes
+const routes = [
+  {
+    path: '/cart',
+    component: ShoppingCartPage,
+  },
+  {
+    path: '/AddProduct', // Path should be consistent
+    component: AddProduct,
+  },
+  {
+    path: '/products',
+    component: ProductsPage,
+  },
+  {
+    path: '/products/:productId',
+    name: 'ProductDetailPage',
+    component: ProductDetailPage,
+    props: true // This ensures route params are passed as props
+  },
+  {
+    path: '/',
+    redirect: '/ProductsPage', // Redirect root path to ImageCarousel
+  }
+];
+
+// Components
+const vuetify = createVuetify({
+  components,
+  directives,
+})
+
+// Create router instance
+const router = VueRouter.createRouter({
+  history: VueRouter.createWebHistory(process.env.BASE_URL),
+  routes,
+});
+
+// Create and mount the app
 createApp(App)
-.use(VueRouter.createRouter({
-    history: VueRouter.createWebHistory(process.env.BASE_URL),
-    routes: [{
-        path: '/cart',
-        component: ShoppingCartPage,
-
-    },{
-        path: '/products',
-        component: ProductsPage,
-
-    },{
-        path: '/products/:productId',
-        component: ProductDetailPage,
-
-    }]
-}))
-.mount('#app')
+  .use(router)
+  .use(vuetify)
+  .mount('#app');

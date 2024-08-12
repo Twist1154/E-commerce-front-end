@@ -1,14 +1,15 @@
-* {
+/* * {
   box-sizing: border-box;
   font-family: Arial;
 }
 
 .page-wrap {
   margin: auto;
-  max-width: 800px;
-  min-height: 100vh;
+  /* max-width: 800px;
+  min-height: 100vh; */
+  /* border-style: dotted; 
 }
-
+/*
 button {
   background-color: black;
   border: none;
@@ -19,15 +20,17 @@ button {
   font-weight: bold;
   outline: 0;
   padding: 16px;
+  margin-right: 10px;
 }
 
 h1 {
   text-align: center;
   text-shadow: 1px 1px 2px black; /* header animations*/
-  border-bottom: 1px solid black;
+  /*border-bottom: 5px solid #162836;
   margin: 0;
   margin-top: 16px;
   padding: 16px;
+  background-color: #ad815c;
 }
 
 .total-price {
@@ -41,7 +44,7 @@ h1 {
 
 .product-container {
   align-content: 'center';
-  border-bottom: 1px solid #ddd;
+  border-bottom: 10px solid #e01414;
   display: flex;
   padding: 16px;
   width: 100%;
@@ -88,7 +91,7 @@ h1 {
 }
 
 .price {
-  /* Position the price below the product name */
+  /* Position the price below the product name *
   display: block;
   text-align: center;
   margin-top: 16px;
@@ -104,7 +107,7 @@ h1 {
 }
 
 .nav-bar {
-  border-bottom: 1px solid #ddd;
+  border-bottom: 5px solid #162836;
   height: 75px;
   width: 100%;
 }
@@ -147,6 +150,7 @@ h1 {
   top: 16px;
 }
 
+
 .grid-wrap {
   display: flex;
   justify-content: flex-start;
@@ -186,7 +190,7 @@ h1 {
 
 .product-container {
   align-content: 'center';
-  border-bottom: 1px solid #ddd;
+  border-bottom: 10px solid #df1111;
   display: flex;
   padding: 16px;
   width: 100%;
@@ -206,4 +210,4 @@ h1 {
 .remove-button {
   flex: 1;
   margin: auto;
-}
+} */
