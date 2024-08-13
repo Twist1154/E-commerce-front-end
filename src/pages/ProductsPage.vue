@@ -1,5 +1,6 @@
 <template>
   <div>
+    <navigation/>
     <!-- Page title -->
     <h1>Home</h1>
 
@@ -27,9 +28,11 @@
 </template>
 
 <script>
+import navigation from '@/components/NavG.vue';
 import productsService from '@/services/productsService';
 
 export default {
+  components: {navigation},
   name: "ProductsPage",
   data() {
     return {

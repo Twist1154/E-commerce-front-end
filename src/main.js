@@ -15,6 +15,8 @@ import ShoppingCartPage from './pages/ShoppingCartPage.vue';
 import ProductsPage from './pages/ProductsPage.vue';
 import ProductDetailPage from './pages/ProductDetailPage.vue';
 import AddProduct from './pages/AddProduct.vue'; // Ensure correct casing
+import LoginPage from './pages/LoginPage.vue'
+import RegisterPage from './pages/RegisterPage.vue'
 
 // Define routes
 const routes = [
@@ -38,7 +40,17 @@ const routes = [
   },
   {
     path: '/',
-    redirect: '/ProductsPage', // Redirect root path to ImageCarousel
+    redirect: '/Products', // Redirect root path to ImageCarousel
+  },
+  {
+    path: '/loginPage',
+    name: 'login',
+    component: LoginPage
+  },
+  {
+    path: '/register',
+    name: 'register',
+    component: RegisterPage
   }
 ];
 
