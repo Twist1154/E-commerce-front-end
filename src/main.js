@@ -5,7 +5,7 @@ import * as VueRouter from 'vue-router';
 //import './main.css';
 
 // Vuetify styles 
-import 'vuetify/styles'
+
 import { createVuetify } from 'vuetify'
 import * as components from 'vuetify/components'
 import * as directives from 'vuetify/directives'
@@ -14,16 +14,20 @@ import * as directives from 'vuetify/directives'
 import ShoppingCartPage from './pages/ShoppingCartPage.vue';
 import ProductsPage from './pages/ProductsPage.vue';
 import ProductDetailPage from './pages/ProductDetailPage.vue';
-import AddProduct from './pages/AddProduct.vue'; // Ensure correct casing
-
+import AddProduct from './pages/AddProduct.vue';
+import ProductUpdateForm from './pages/ProductUpdateForm.vue';
 // Define routes
 const routes = [
+  {
+    path: '/updateForm',
+    component: ProductUpdateForm,
+  },
   {
     path: '/cart',
     component: ShoppingCartPage,
   },
   {
-    path: '/AddProduct', // Path should be consistent
+    path: '/AddProduct',
     component: AddProduct,
   },
   {

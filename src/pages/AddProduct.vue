@@ -6,9 +6,12 @@
       <div class="form-group">
         <label for="imagePath">Upload Image</label>
         <input type="file" id="imagePath" @change="handleImageUpload" />
-        <div class="img-preview" v-if="product.imagePath">
-          <img :src="product.imagePath" alt="Product Image" />
+      
+        <div class="img-preview">
+          <!-- Display the image or a placeholder if no image is selected -->
+          <img :src="product.imagePath || 'https://placehold.co/400x400/png'" alt="Product Image" />
         </div>
+        
       </div>
       <div class="form-group">
         <label for="name">Name</label>
@@ -42,9 +45,10 @@
 </template>
 
 <script>
+import { uploadFileToS3 } from '@/services/awsService'; // Import the updated service function
 import { getAllCategories } from '@/services/categoriesService'; // Import the service functions
 import productsService from '@/services/productsService'; // Adjust the path as necessary
-
+import { Upload } from '@element-plus/icons-vue'
 
 export default {
   name: "ProductForm",
@@ -57,86 +61,62 @@ export default {
         price: '',
         stockQuantity: '',
         categoryId: '',
-        imagePath: '',
+        imagePath: 'https://placehold.co/400x400/png', // Default placeholder
         createdAt: '',
-        updatedAt: ''
+        updatedAt: '',
+        Upload
       },
       categories: []
     };
   },
   methods: {
     resetForm() {
-    // Reset each property of the product object individually
-    this.$set(this.product, 'productId', '');
-    this.$set(this.product, 'name', '');
-    this.$set(this.product, 'description', '');
-    this.$set(this.product, 'price', '');
-    this.$set(this.product, 'stockQuantity', '');
-    this.$set(this.product, 'categoryId', '');
-    this.$set(this.product, 'imagePath', '');
-    this.$set(this.product, 'createdAt', '');
-    this.$set(this.product, 'updatedAt', '');
-  },
+      // Reset each property of the product object individually
+      this.$set(this.product, 'productId', '');
+      this.$set(this.product, 'name', '');
+      this.$set(this.product, 'description', '');
+      this.$set(this.product, 'price', '');
+      this.$set(this.product, 'stockQuantity', '');
+      this.$set(this.product, 'categoryId', '');
+      this.$set(this.product, 'imagePath', 'https://placehold.co/400x400/png'); // Reset to placeholder
+      this.$set(this.product, 'createdAt', '');
+      this.$set(this.product, 'updatedAt', '');
+    },
     async handleSubmit() {
       try {
         this.setCreationDate();
         this.setUpdateDate();
-        console.log(this.product);
+
+        // Handle image upload
+        if (this.product.imageFile) {
+          const file = this.product.imageFile;
+          const uploadedImageUrl = await uploadFileToS3(file);
+          this.product.imagePath = uploadedImageUrl; // Set the uploaded image URL
+        }
+
         // Create new product
         const response = await productsService.createProduct(this.product);
         console.log('Product saved:', response);
 
         // Show success message
-      alert('Product added successfully!');
-      // Clear the form by resetting the product object
-      this.resetForm();
-
-      
+        alert('Product added successfully!');
+        // Clear the form by resetting the product object
+        this.resetForm();
       } catch (error) {
         console.error('Error during product creation:', error);
-        // Optionally, show an error message to the user
       }
     },
     handleImageUpload(event) {
-  const file = event.target.files[0];
-  if (file) {
-    const reader = new FileReader();
-    const image = new Image();
-
-    reader.onload = (e) => {
-      image.src = e.target.result;
-    };
-
-    image.onload = () => {
-      const canvas = document.createElement('canvas');
-      const ctx = canvas.getContext('2d');
-      const MAX_WIDTH = 800; // Set your max width
-      const MAX_HEIGHT = 800; // Set your max height
-      let width = image.width;
-      let height = image.height;
-
-      if (width > height) {
-        if (width > MAX_WIDTH) {
-          height *= MAX_WIDTH / width;
-          width = MAX_WIDTH;
-        }
-      } else {
-        if (height > MAX_HEIGHT) {
-          width *= MAX_HEIGHT / height;
-          height = MAX_HEIGHT;
-        }
+      const file = event.target.files[0];
+      if (file) {
+        this.product.imageFile = file; // Store the file for upload
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          this.product.imagePath = e.target.result; // Preview the selected image
+        };
+        reader.readAsDataURL(file);
       }
-
-      canvas.width = width;
-      canvas.height = height;
-      ctx.drawImage(image, 0, 0, width, height);
-      this.product.imagePath = canvas.toDataURL('image/jpeg');
-    };
-
-    reader.readAsDataURL(file);
-  }
-}
-,
+    },
     generateProductId() {
       this.product.productId = 0; // Generate a random product ID because on my server side the product ID autoincre
     },
@@ -165,7 +145,7 @@ export default {
 
 <style scoped>
 .form-container {
-  max-width: auto;
+  max-width: 70%;
   margin: auto;
   padding: 20px;
   border: 1px solid #ccc;
@@ -195,7 +175,7 @@ label {
 }
 
 input, textarea, select {
-  width: 100%;
+  width: 70%;
   padding: 8px;
   box-sizing: border-box;
   border: 1px solid #ccc;
