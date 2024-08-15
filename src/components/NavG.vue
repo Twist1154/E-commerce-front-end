@@ -14,13 +14,12 @@
   <transition name="slide">
     <aside v-if="mobileNav" class="sidebar">
       <div class="sidebar-branding">
-        <!-- Removed the image element -->
         <h1 class="title"><span class="first-letter">A</span>frican_<span>Arts</span></h1>
       </div>
       <ul class="sidebar-links">
         <li><router-link class="link" :to="{ path: '/' }">Home</router-link></li>
         <li><router-link class="link" :to="{ path: '/products' }">About</router-link></li>
-        <li><router-link class="link" :to="{ name: 'register' }">SignUp</router-link></li>
+        <li><router-link class="link" :to="{ name: 'registerpage' }">SignUp</router-link></li>
       </ul>
     </aside>
   </transition>
@@ -37,35 +36,34 @@ export default {
     };
   },
   methods: {
-  toggleMobileNav() {
-    this.mobileNav = !this.mobileNav;
-    console.log('Mobile Nav toggled:', this.mobileNav);
-  },
-  handleScroll() {
-    this.scrollPosition = window.scrollY;
-    console.log('Scroll position:', this.scrollPosition);
-  },
-  handleResize() {
-    this.windowWidth = window.innerWidth;
-    console.log('Window width:', this.windowWidth);
-    if (this.windowWidth > 768) {
-      this.mobileNav = false; // Close sidebar on large screens
-      console.log('Mobile nav closed due to resize');
+    toggleMobileNav() {
+      this.mobileNav = !this.mobileNav;
+      console.log('Mobile Nav toggled:', this.mobileNav);
+    },
+    handleScroll() {
+      this.scrollPosition = window.scrollY;
+      console.log('Scroll position:', this.scrollPosition);
+    },
+    handleResize() {
+      this.windowWidth = window.innerWidth;
+      console.log('Window width:', this.windowWidth);
+      if (this.windowWidth > 768) {
+        this.mobileNav = false; // Close sidebar on large screens
+        console.log('Mobile nav closed due to resize');
+      }
     }
+  },
+  mounted() {
+    console.log('Component mounted');
+    window.addEventListener('scroll', this.handleScroll);
+    window.addEventListener('resize', this.handleResize);
+    this.handleResize(); // Initialize mobileNav based on initial window size
+  },
+  beforeUnmount() {
+    console.log('Component before unmount');
+    window.removeEventListener('scroll', this.handleScroll);
+    window.removeEventListener('resize', this.handleResize);
   }
-},
-mounted() {
-  console.log('Component mounted');
-  window.addEventListener('scroll', this.handleScroll);
-  window.addEventListener('resize', this.handleResize);
-  this.handleResize(); // Initialize mobileNav based on initial window size
-},
-beforeUnmount() {
-  console.log('Component before unmount');
-  window.removeEventListener('scroll', this.handleScroll);
-  window.removeEventListener('resize', this.handleResize);
-}
-
 };
 </script>
 
@@ -74,11 +72,13 @@ beforeUnmount() {
 
 header {
   background-color: rgba(22, 40, 54, 0.3);
-  z-index: 99;
+  z-index: 1000; /* Increased z-index to ensure header is above all content */
   width: 100%;
-  position: fixed;
+  position: fixed; /* Fixed position to stay at the top of the page */
+  top: 0; /* Align at the top */
+  left: 0;
   transition: 0.5s ease all;
-  
+
   &.scrolled-nav {
     background-color: rgba(22, 40, 54, 0.8);
   }
@@ -152,7 +152,7 @@ header {
   position: fixed;
   left: 0;
   top: 0;
-  z-index: 1000;
+  z-index: 999;
 
   .sidebar-branding {
     margin-bottom: 40px;

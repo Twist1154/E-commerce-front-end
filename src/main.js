@@ -21,6 +21,16 @@ import RegisterPage from './pages/RegisterPage.vue'
 // This array contains all the route definitions for the application.
 const routes = [
   {
+    path: '/registerpage', // Path to the page where products can be updated
+    name: 'registerpage',
+    component: RegisterPage,
+  },
+  {
+    path: '/loginpage', // Path to the page where products can be updated
+    name: 'loginpage',
+    component: LoginPage,
+  },
+  {
     path: '/updateProductsPage', // Path to the page where products can be updated
     name: 'updateProductsPage',
     component: UpdateProductsPage,
