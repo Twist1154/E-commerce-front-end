@@ -22,7 +22,7 @@ const productsService = {
         throw error;
       });
   },
-
+  //needs some attention 
   // Update existing product
   updateProduct(id, product) {
     return axios.put(`${BASE_URL}/update/${id}`, product)
@@ -35,10 +35,10 @@ const productsService = {
 
   // Delete product by ID
   deleteProduct(id) {
-    return axios.delete(`${BASE_URL}/${id}`)
+    return axios.delete(`${BASE_URL}/delete/${id}`)
       .then(response => response)
       .catch(error => {
-        console.error(`Error deleting product with ID ${id}:`, error);
+        console.error(`Error deleting product with ID ${id}:`, error.response || error.message || error);
         throw error;
       });
   },

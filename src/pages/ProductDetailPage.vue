@@ -16,10 +16,12 @@
         <h3 class="description">{{ product.description }}</h3>
       </div>
       <div class="button-group">
-      <!-- Button to add product to the cart -->
-      <button class="add-to-cart" @click="addToCart">Add to cart</button>
+        <!-- Button to add product to the cart -->
+        <button class="add-to-cart" @click="addToCart">Add to cart</button>
 
-      <button class="add-to-wish" @click="addToWish"><img :src="heart" alt="Heart Icon" /></button>
+        <button class="add-to-wish" @click="addToWish">
+          <img :src="heart" alt="Heart Icon" />
+        </button>
       </div>
     </div>
     <div v-else>
@@ -30,15 +32,15 @@
 </template>
 
 <script>
-import productsService from '@/services/productsService'; // Import the products service
-import heart from '@/assets/heart.svg';
+import productsService from "@/services/productsService"; // Import the products service
+import heart from "@/assets/heart.svg";
 
 export default {
   name: "ProductDetailPage",
   data() {
     return {
       product: null, // Initialize product as null to handle loading state
-      heart
+      heart,
     };
   },
   methods: {
@@ -49,7 +51,7 @@ export default {
         const response = await productsService.getProductById(productId); // Fetch product details
         this.product = response.data; // Set the product data from the response
       } catch (error) {
-        console.error('Failed to fetch product details:', error); // Handle any errors
+        console.error("Failed to fetch product details:", error); // Handle any errors
       }
     },
     // Method to handle adding the product to the cart
@@ -58,13 +60,13 @@ export default {
       // Logic for adding product to the cart would go here
     },
     //addWish list methods here
-    addToWish(){
-      alert.apply(`${this.product.name} added to Wish List`)
-    }
+    addToWish() {
+      alert.apply(`${this.product.name} added to Wish List`);
+    },
   },
   mounted() {
     this.fetchProductDetails(); // Fetch product details when the component is mounted
-  }
+  },
 };
 </script>
 
@@ -95,9 +97,9 @@ h1 {
   position: relative;
 }
 
-.product-description{
-  padding-right:30%;
-  padding-left:30%;
+.product-description {
+  padding-right: 30%;
+  padding-left: 30%;
 }
 
 /* Center-align the price */

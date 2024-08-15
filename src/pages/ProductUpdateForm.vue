@@ -1,18 +1,17 @@
 <template>
-  <div class="form-container" v-if="product"> <!-- Conditionally render the form when product is defined -->
+  <div class="form-container" v-if="product">
+    <!-- Conditionally render the form when product is defined -->
     <h1>Update Product</h1>
     <form @submit.prevent="handleSubmit">
-
       <div class="form-group">
         <label for="imagePath">Upload Image</label>
         <input type="file" id="imagePath" @change="handleImageUpload" />
-
         <div class="img-preview">
           <!-- Use optional chaining to safely access imagePath -->
           <img :src="product?.imagePath || placeholderImage" alt="Product Image" />
         </div>
       </div>
-      
+
       <div class="form-group">
         <label for="name">Name</label>
         <input type="text" id="name" v-model="product.name" required />
@@ -21,7 +20,7 @@
         <label for="description">Description</label>
         <textarea id="description" v-model="product.description" required></textarea>
       </div>
-      
+
       <div class="form-row">
         <div class="form-group">
           <label for="price">Price</label>
@@ -29,66 +28,87 @@
         </div>
         <div class="form-group">
           <label for="stockQuantity">Stock Quantity</label>
-          <input type="number" id="stockQuantity" v-model="product.stockQuantity" required />
+          <input
+            type="number"
+            id="stockQuantity"
+            v-model="product.stockQuantity"
+            required
+          />
         </div>
       </div>
-      
+
       <div class="form-group">
         <label for="categoryId">Category</label>
         <select id="categoryId" v-model="product.categoryId" required>
-          <option v-for="category in categories" :key="category.category_id" :value="category.category_id">
+          <option
+            v-for="category in categories"
+            :key="category.category_id"
+            :value="category.category_id"
+          >
             {{ category.name }}
           </option>
         </select>
       </div>
-      <div class="form-row">
-      <!-- Button to add product to the cart -->
-      <button type="submit" class="submit-button">Update</button>
 
-      <button class="delete-button" @click="addToWish"><img :src="deleted" alt="delete Icon" /></button>
+      <div class="form-row">
+        <!-- Button to update the product -->
+        <button type="submit" class="submit-button">Update</button>
+        <!-- Back Button -->
+        <button class="back-button" @click="goBack">
+          <img :src="backIcon" alt="Back Icon" />
+        </button>
+        <!-- Button to delete the product -->
+        <button type="button" class="delete-button" @click="deleteProduct">
+          <img :src="deleted" alt="delete Icon" />
+        </button>
       </div>
     </form>
   </div>
 </template>
 
 <script>
-import { uploadFileToS3 } from '@/services/awsService';
-import productsService from '@/services/productsService';
-import { getAllCategories } from '@/services/categoriesService';
-import deleted from '@/assets/deleted.svg';
+import { uploadFileToS3 } from "@/services/awsService";
+import productsService from "@/services/productsService";
+import { getAllCategories } from "@/services/categoriesService";
+import deleted from "@/assets/deleted.svg";
+import backIcon from "@/assets/back.svg";
 
 export default {
   name: "updateForm",
   data() {
     return {
-      product: { // Ensure the product object is always defined
-        productId: '',
-        name: '',
-        description: '',
-        price: '',
-        stockQuantity: '',
-        categoryId: '',
-        imagePath: '',
-        createdAt: '',
-        updatedAt: ''
+      product: {
+        productId: "",
+        name: "",
+        description: "",
+        price: "",
+        stockQuantity: "",
+        categoryId: "",
+        imagePath: "",
+        createdAt: "",
+        updatedAt: "",
       },
       categories: [],
-      placeholderImage: 'https://placehold.co/400x400/png',
-      deleted
+      placeholderImage: "https://placehold.co/400x400/png",
+      deleted,
+      backIcon,
     };
   },
   methods: {
+    goBack() {
+      this.$router.push({ name: "updateProductsPage" }); // Navigate to the updateProductsPage
+    },
     resetForm() {
       this.product = {
-        productId: '',
-        name: '',
-        description: '',
-        price: '',
-        stockQuantity: '',
-        categoryId: '',
-        imagePath: '',
-        createdAt: '',
-        updatedAt: ''
+        productId: "",
+        name: "",
+        description: "",
+        price: "",
+        stockQuantity: "",
+        categoryId: "",
+        imagePath: "",
+        createdAt: "",
+        updatedAt: "",
       };
     },
     async handleSubmit() {
@@ -102,14 +122,18 @@ export default {
         }
 
         // Update the product using the specified method
-        const response = await productsService.updateProduct(this.product.productId, this.product);
+        const response = await productsService.updateProduct(
+          this.product.productId,
+          this.product
+        );
         this.product = response.data; // Update the product data with the response from the backend
 
-        console.log('Product updated:', this.product);
-        alert('Product updated successfully!');
+        console.log("Product updated:", this.product);
+        alert("Product updated successfully!");
         this.resetForm(); // Reset the form after a successful update
       } catch (error) {
-        console.error('Error during product update:', error);
+        console.error("Error during product update:", error);
+        alert("There was an error updating the product. Please try again.");
       }
     },
     handleImageUpload(event) {
@@ -132,9 +156,9 @@ export default {
         await this.fetchCategories(); // Fetch categories after product data is available
 
         // Ensure the categoryId is set
-        this.product.categoryId = this.product.categoryId || '';
+        this.product.categoryId = this.product.categoryId || "";
       } catch (error) {
-        console.error('Error fetching product:', error);
+        console.error("Error fetching product:", error);
       }
     },
     async fetchCategories() {
@@ -142,22 +166,37 @@ export default {
         const response = await getAllCategories();
         this.categories = response || []; // Ensure categories is an array
       } catch (error) {
-        console.error('Error fetching categories:', error);
+        console.error("Error fetching categories:", error);
       }
     },
     setUpdateDate() {
       this.product.updatedAt = new Date().toISOString();
-    }
+    },
+    async deleteProduct() {
+      if (confirm("Are you sure you want to delete this product?")) {
+        try {
+          const response = await productsService.deleteProduct(this.product.productId);
+          console.log("Product deleted successfully:", response);
+          alert("Product deleted successfully!");
+          this.$router.push({ name: "updateProductsPage" });
+        } catch (error) {
+          console.error(
+            `Error deleting product with ID ${this.product.productId}:`,
+            error.response || error.message || error
+          );
+          alert("There was an error deleting the product. Please try again.");
+        }
+      }
+    },
   },
   async mounted() {
     const productId = this.$route.params.productId;
     await this.fetchProduct(productId); // Fetch the product details using the productId
-  }
-}
+  },
+};
 </script>
 
-
-/<!---------------------------------------------------------------------------------------------------------------->
+<!---------------------------------------------------------------------------------------------------------------->
 
 <style scoped>
 .form-container {
@@ -191,7 +230,9 @@ label {
   font-weight: bold;
 }
 
-input, textarea, select {
+input,
+textarea,
+select {
   width: 70%;
   padding: 8px;
   box-sizing: border-box;
@@ -213,8 +254,6 @@ textarea {
   height: auto;
 }
 
-
-
 .submit-button {
   width: 70%;
   padding: 10px;
@@ -226,15 +265,45 @@ textarea {
   margin-top: 10px;
   background-color: #0631f0;
 }
-.delete-button {
-  background-color: black ;
-  border-radius: 15px;
-}
 
-.delete-button:hover{
-  background-color: red;
-}
 .submit-button:hover {
   background-color: #4cae4c;
+}
+
+
+.back-button {
+  background-color: #413f3f; /* Red background for  back button */
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 16px;
+  margin-top: 10px;
+}
+
+.back-button img {
+  width: 24px; /* Adjust the size as needed */
+  height: 24px;
+}
+
+.delete-button {
+  background-color: #e74c3c; /* Red background for delete button */
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 16px;
+  margin-top: 10px;
+}
+
+.delete-button img {
+  width: 24px; /* Adjust icon size */
+  height: 24px;
+}
+
+.delete-button:hover {
+  background-color: #c0392b; /* Darker red on hover */
 }
 </style>

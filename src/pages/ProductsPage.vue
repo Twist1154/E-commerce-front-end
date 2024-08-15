@@ -1,7 +1,7 @@
 <template>
   <div>
     <!-- Page title -->
-    <h1>Home</h1>
+    <h1>African Art & Crafts</h1>
 
     <!-- Grid container for displaying products -->
     <div class="grid-wrap">

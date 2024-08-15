@@ -1,28 +1,17 @@
 <template>
   <div>
-        <div class="page-wrap">
-          <router-view></router-view>
-        </div>
-    <AppFooter/>
+    <router-view></router-view>
+    <AppFooter />
   </div>
 </template>
 
 <script>
-import AppFooter from '@/components/AppFooter.vue';
+import AppFooter from "@/components/AppFooter.vue";
 
 export default {
   name: "App",
   components: {
-    AppFooter
-    },
+    AppFooter,
+  },
 };
 </script>
-
-<style scoped>
-
-.page-wrap {
-  margin: auto;
-  border: 2px solid #337ee0;
-  border-radius: 5px;
-}
-</style>

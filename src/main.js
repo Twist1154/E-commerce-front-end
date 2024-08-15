@@ -20,27 +20,33 @@ import UpdateProductsPage from './pages/UpdateProductsPage.vue';
 const routes = [
   {
     path: '/updateProductsPage', // Path to the page where products can be updated
+    name: 'updateProductsPage',
     component: UpdateProductsPage,
   },
   {
     path: '/updateForm/:productId', // Path to the form for updating a specific product
+    name: 'updateForm',
     component: ProductUpdateForm,
+    props: true // This ensures that route params (e.g., productId) are passed as props to the component
   },
   {
     path: '/cart', // Path to the shopping cart page
+    name: 'cart',
     component: ShoppingCartPage,
   },
   {
     path: '/AddProduct', // Path to the page for adding a new product
+    name: 'addProduct',
     component: AddProduct,
   },
   {
     path: '/products', // Path to the products page that lists all products
+    name: 'products',
     component: ProductsPage,
   },
   {
     path: '/products/:productId', // Path to the product detail page for a specific product
-    name: 'ProductDetailPage',
+    name: 'productDetailPage',
     component: ProductDetailPage,
     props: true // This ensures that route params (e.g., productId) are passed as props to the component
   },
