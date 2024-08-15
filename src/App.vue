@@ -1,6 +1,7 @@
 <template>
-  <div>
+  <div> 
     <router-view></router-view>
+    <AppFooter />
   </div>
 </template>
 
@@ -10,7 +11,4 @@ export default {
 };
 </script>
 
-<style scoped>
-/* No styles applied */
-</style>
-
+<style scoped></style>

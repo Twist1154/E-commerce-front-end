@@ -1,18 +1,18 @@
 <template>
-  <div class="form-container">
-    <h1>Add Product</h1>
+  <div class="form-container" v-if="product"> <!-- Conditionally render the form when product is defined -->
+    <h1>Update Product</h1>
     <form @submit.prevent="handleSubmit">
-  
+
       <div class="form-group">
         <label for="imagePath">Upload Image</label>
         <input type="file" id="imagePath" @change="handleImageUpload" />
-      
+
         <div class="img-preview">
-          <!-- Display the image or a placeholder if no image is selected -->
-          <img :src="product.imagePath || 'https://placehold.co/400x400/png'" alt="Product Image" />
+          <!-- Use optional chaining to safely access imagePath -->
+          <img :src="product?.imagePath || placeholderImage" alt="Product Image" />
         </div>
-        
       </div>
+      
       <div class="form-group">
         <label for="name">Name</label>
         <input type="text" id="name" v-model="product.name" required />
@@ -21,6 +21,7 @@
         <label for="description">Description</label>
         <textarea id="description" v-model="product.description" required></textarea>
       </div>
+      
       <div class="form-row">
         <div class="form-group">
           <label for="price">Price</label>
@@ -31,6 +32,7 @@
           <input type="number" id="stockQuantity" v-model="product.stockQuantity" required />
         </div>
       </div>
+      
       <div class="form-group">
         <label for="categoryId">Category</label>
         <select id="categoryId" v-model="product.categoryId" required>
@@ -39,109 +41,123 @@
           </option>
         </select>
       </div>
-      <button type="submit" class="submit-button">Create</button>
+      <div class="form-row">
+      <!-- Button to add product to the cart -->
+      <button type="submit" class="submit-button">Update</button>
+
+      <button class="delete-button" @click="addToWish"><img :src="deleted" alt="delete Icon" /></button>
+      </div>
     </form>
   </div>
 </template>
 
 <script>
-import { uploadFileToS3 } from '@/services/awsService'; // Import the updated service function
-import { getAllCategories } from '@/services/categoriesService'; // Import the service functions
-import productsService from '@/services/productsService'; // Adjust the path as necessary
-import { Upload } from '@element-plus/icons-vue'
+import { uploadFileToS3 } from '@/services/awsService';
+import productsService from '@/services/productsService';
+import { getAllCategories } from '@/services/categoriesService';
+import deleted from '@/assets/deleted.svg';
 
 export default {
-  name: "ProductForm",
+  name: "updateForm",
   data() {
     return {
-      product: {
+      product: { // Ensure the product object is always defined
         productId: '',
         name: '',
         description: '',
         price: '',
         stockQuantity: '',
         categoryId: '',
-        imagePath: 'https://placehold.co/400x400/png', // Default placeholder
+        imagePath: '',
         createdAt: '',
-        updatedAt: '',
-        Upload
+        updatedAt: ''
       },
-      categories: []
+      categories: [],
+      placeholderImage: 'https://placehold.co/400x400/png',
+      deleted
     };
   },
   methods: {
     resetForm() {
-      // Reset each property of the product object individually
-      this.$set(this.product, 'productId', '');
-      this.$set(this.product, 'name', '');
-      this.$set(this.product, 'description', '');
-      this.$set(this.product, 'price', '');
-      this.$set(this.product, 'stockQuantity', '');
-      this.$set(this.product, 'categoryId', '');
-      this.$set(this.product, 'imagePath', 'https://placehold.co/400x400/png'); // Reset to placeholder
-      this.$set(this.product, 'createdAt', '');
-      this.$set(this.product, 'updatedAt', '');
+      this.product = {
+        productId: '',
+        name: '',
+        description: '',
+        price: '',
+        stockQuantity: '',
+        categoryId: '',
+        imagePath: '',
+        createdAt: '',
+        updatedAt: ''
+      };
     },
     async handleSubmit() {
       try {
-        this.setCreationDate();
         this.setUpdateDate();
 
-        // Handle image upload
         if (this.product.imageFile) {
           const file = this.product.imageFile;
           const uploadedImageUrl = await uploadFileToS3(file);
-          this.product.imagePath = uploadedImageUrl; // Set the uploaded image URL
+          this.product.imagePath = uploadedImageUrl;
         }
 
-        // Create new product
-        const response = await productsService.createProduct(this.product);
-        console.log('Product saved:', response);
+        // Update the product using the specified method
+        const response = await productsService.updateProduct(this.product.productId, this.product);
+        this.product = response.data; // Update the product data with the response from the backend
 
-        // Show success message
-        alert('Product added successfully!');
-        // Clear the form by resetting the product object
-        this.resetForm();
+        console.log('Product updated:', this.product);
+        alert('Product updated successfully!');
+        this.resetForm(); // Reset the form after a successful update
       } catch (error) {
-        console.error('Error during product creation:', error);
+        console.error('Error during product update:', error);
       }
     },
     handleImageUpload(event) {
       const file = event.target.files[0];
       if (file) {
-        this.product.imageFile = file; // Store the file for upload
+        this.product.imageFile = file;
         const reader = new FileReader();
         reader.onload = (e) => {
-          this.product.imagePath = e.target.result; // Preview the selected image
+          this.product.imagePath = e.target.result;
         };
         reader.readAsDataURL(file);
       }
     },
-    generateProductId() {
-      this.product.productId = 0; // Generate a random product ID because on my server side the product ID autoincre
+    async fetchProduct(productId) {
+      try {
+        // Fetch product details using the provided method
+        const response = await productsService.getProductById(productId);
+        this.product = response.data; // Update the product data with the response from the backend
+
+        await this.fetchCategories(); // Fetch categories after product data is available
+
+        // Ensure the categoryId is set
+        this.product.categoryId = this.product.categoryId || '';
+      } catch (error) {
+        console.error('Error fetching product:', error);
+      }
     },
     async fetchCategories() {
       try {
-        const response = await getAllCategories(); // Fetch categories from the backend
-        console.log('Fetched categories:', response);
-        this.categories = response;
+        const response = await getAllCategories();
+        this.categories = response || []; // Ensure categories is an array
       } catch (error) {
         console.error('Error fetching categories:', error);
       }
     },
-    setCreationDate() {
-      this.product.createdAt = new Date().toISOString(); // Set the creation date to current date
-    },
     setUpdateDate() {
-      this.product.updatedAt = new Date().toISOString(); // Set the update date to current date
+      this.product.updatedAt = new Date().toISOString();
     }
   },
-  mounted() {
-    this.generateProductId(); // This generates a product ID when the component is mounted
-    this.fetchCategories(); // Fetches categories when the component is mounted
+  async mounted() {
+    const productId = this.$route.params.productId;
+    await this.fetchProduct(productId); // Fetch the product details using the productId
   }
 }
 </script>
+
+
+/<!---------------------------------------------------------------------------------------------------------------->
 
 <style scoped>
 .form-container {
@@ -164,6 +180,7 @@ h1 {
 }
 
 .form-row {
+  width: 70%;
   display: flex;
   justify-content: space-between;
 }
@@ -196,8 +213,10 @@ textarea {
   height: auto;
 }
 
+
+
 .submit-button {
-  width: 100%;
+  width: 70%;
   padding: 10px;
   border: none;
   border-radius: 4px;
@@ -207,7 +226,14 @@ textarea {
   margin-top: 10px;
   background-color: #0631f0;
 }
+.delete-button {
+  background-color: black ;
+  border-radius: 15px;
+}
 
+.delete-button:hover{
+  background-color: red;
+}
 .submit-button:hover {
   background-color: #4cae4c;
 }
