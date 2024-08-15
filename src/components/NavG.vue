@@ -18,13 +18,13 @@
         <h1 class="title"><span class="first-letter">A</span>frican_<span>Arts</span></h1>
       </div>
       <ul class="sidebar-links">
-        <li><router-link class="link" :to="{ name: 'home' }">Home</router-link></li>
-        <li><router-link class="link" :to="{ name: 'about' }">About</router-link></li>
+        <li><router-link class="link" :to="{ path: '/' }">Home</router-link></li>
+        <li><router-link class="link" :to="{ path: '/products' }">About</router-link></li>
+        <li><router-link class="link" :to="{ name: 'register' }">SignUp</router-link></li>
       </ul>
     </aside>
   </transition>
 </template>
-
 
 <script>
 export default {
@@ -37,28 +37,35 @@ export default {
     };
   },
   methods: {
-    toggleMobileNav() {
-      this.mobileNav = !this.mobileNav;
-    },
-    handleScroll() {
-      this.scrollPosition = window.scrollY;
-    },
-    handleResize() {
-      this.windowWidth = window.innerWidth;
-      if (this.windowWidth > 768) {
-        this.mobileNav = false; // Close sidebar on large screens
-      }
+  toggleMobileNav() {
+    this.mobileNav = !this.mobileNav;
+    console.log('Mobile Nav toggled:', this.mobileNav);
+  },
+  handleScroll() {
+    this.scrollPosition = window.scrollY;
+    console.log('Scroll position:', this.scrollPosition);
+  },
+  handleResize() {
+    this.windowWidth = window.innerWidth;
+    console.log('Window width:', this.windowWidth);
+    if (this.windowWidth > 768) {
+      this.mobileNav = false; // Close sidebar on large screens
+      console.log('Mobile nav closed due to resize');
     }
-  },
-  mounted() {
-    window.addEventListener('scroll', this.handleScroll);
-    window.addEventListener('resize', this.handleResize);
-    this.handleResize(); // Initialize mobileNav based on initial window size
-  },
-  beforeUnmount() {
-    window.removeEventListener('scroll', this.handleScroll);
-    window.removeEventListener('resize', this.handleResize);
   }
+},
+mounted() {
+  console.log('Component mounted');
+  window.addEventListener('scroll', this.handleScroll);
+  window.addEventListener('resize', this.handleResize);
+  this.handleResize(); // Initialize mobileNav based on initial window size
+},
+beforeUnmount() {
+  console.log('Component before unmount');
+  window.removeEventListener('scroll', this.handleScroll);
+  window.removeEventListener('resize', this.handleResize);
+}
+
 };
 </script>
 
@@ -77,14 +84,14 @@ header {
   }
 
   nav {
-    position: relative;
     display: flex;
-    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
     padding: 12px 0;
     width: 90%;
     margin: 0 auto;
 
-    @media (min-width: 110px) {
+    @media (min-width: 1100px) {
       max-width: 1140px;
     }
   }
@@ -94,28 +101,28 @@ header {
     align-items: center;
 
     img {
-      width: 70px; /* Image size */
+      width: 70px;
       height: auto;
-      margin-right: 10px; /* Space between image and title */
+      margin-right: 10px;
       transition: .5s ease all;
     }
 
     .title {
       font-family: 'Inter', sans-serif;
-      font-size: 24px; /* General title size */
+      font-size: 24px;
       color: #C8915F;
       font-weight: 400;
       display: flex;
       align-items: center;
 
       .first-letter {
-        font-size: 70px; /* Match the image size */
-        font-weight: 700; /* Make the first letter bold */
+        font-size: 70px;
+        font-weight: 700;
         line-height: 1;
       }
 
       span {
-        font-size: 24px; /* Smaller size for the rest of the text */
+        font-size: 24px;
         font-weight: 400;
       }
     }
@@ -124,10 +131,6 @@ header {
   .icon {
     display: flex;
     align-items: center;
-    position: absolute;
-    top: 0;
-    right: 24px;
-    height: 100%;
 
     i {
       cursor: pointer;
@@ -141,46 +144,35 @@ header {
   }
 }
 
-/* Sidebar Styles */
 .sidebar {
-  background-color: #162836; /* Dark navy blue background */
+  background-color: #162836;
   width: 250px;
   height: 100vh;
   padding: 20px;
-  display: flex;
-  flex-direction: column;
   position: fixed;
   left: 0;
   top: 0;
   z-index: 1000;
 
   .sidebar-branding {
-    display: flex;
-    align-items: center;
     margin-bottom: 40px;
-
-    img {
-      width: 70px; /* Image size */
-      height: auto;
-      margin-right: 10px; /* Space between image and title */
-    }
 
     .title {
       font-family: 'Inter', sans-serif;
-      font-size: 24px; /* General title size */
+      font-size: 24px;
       color: #C8915F;
       font-weight: 400;
       display: flex;
       align-items: center;
 
       .first-letter {
-        font-size: 70px; /* Match the image size */
-        font-weight: 700; /* Make the first letter bold */
+        font-size: 70px;
+        font-weight: 700;
         line-height: 1;
       }
 
       span {
-        font-size: 24px; /* Smaller size for the rest of the text */
+        font-size: 24px;
         font-weight: 400;
       }
     }

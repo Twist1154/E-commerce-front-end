@@ -22,8 +22,10 @@
     </section>
     <footer>
       <ul class="footer-links">
-        <li><router-link class="link" :to="{ name: 'home' }">Home</router-link></li>
-        <li><router-link class="link" :to="{ name: 'about' }">About</router-link></li>
+        <li><router-link class="link" to="/">Home</router-link></li>
+        <li><router-link class="link" to="/about">About</router-link></li>
+        <li><router-link class="link" to="/register">SignUp</router-link></li>
+        <li><router-link class="link" to="/product-detail">ProductDetailPage</router-link></li>
       </ul>
       <div class="social-icons">
         <a href="https://facebook.com" target="_blank" class="icon"><i class="fab fa-facebook-f"></i></a>
@@ -37,7 +39,7 @@
 <script>
 import navigation from '@/components/NavG.vue';
 import { useRouter } from 'vue-router';
-import userService from '@/service/userService.js';
+import userService from '@/services/userService.js';
 
 export default {
   components: { navigation },
@@ -53,22 +55,14 @@ export default {
     async validateUser() {
       if (!this.loginData.email || !this.loginData.password) {
         alert('Email and password are required');
-        console.log('Validation error: Missing email or password');
         return;
       }
 
       try {
-        console.log('Attempting to validate user with email:', this.loginData.email);
-        const response = await userService.validateUser(this.loginData.email, this.loginData.password);
-        console.log('User validated successfully:', response);
+        await userService.validateUser(this.loginData.email, this.loginData.password);
         alert('Login successful');
         this.$router.push('/');
       } catch (error) {
-        console.error('Error validating user:', error);
-        if (error.response) {
-          console.error('Error response data:', error.response.data);
-          console.error('Error response status:', error.response.status);
-        }
         if (error.response && error.response.status === 401) {
           alert('Invalid email or password');
         } else if (error.response && error.response.status === 400) {
@@ -92,6 +86,8 @@ export default {
 .forms {
   display: flex;
   min-height: 100vh;
+  justify-content: center; /* Centering form horizontally */
+  align-items: center; /* Centering form vertically */
 }
 
 form {
@@ -99,8 +95,8 @@ form {
   padding: 8rem 1rem 1rem;
 }
 
-form.login {
-  color: #2c3e50;
+form.register {
+  color: #FFF;
   background-color: #162836;
   background-image: linear-gradient(
     to bottom right,
@@ -113,6 +109,7 @@ h2 {
   font-size: 2rem;
   text-transform: uppercase;
   margin-bottom: 2rem;
+  text-align: center; /* Center the heading */
 }
 
 input {
@@ -125,7 +122,7 @@ input {
   max-width: 400px;
   margin: 0 auto;
   font-size: 1.5rem;
-  margin-bottom: 2rem;
+  margin-bottom: 1rem; /* Adjusted for spacing */
   padding: 0.5rem 0;
 }
 
@@ -142,6 +139,11 @@ input::placeholder {
   color: inherit;
 }
 
+form.register input:not([type="submit"]) {
+  color: #FFF;
+  border-bottom: 2px solid #FFF;
+}
+
 form.login input:not([type="submit"]) {
   color: #2c3e50;
   border-bottom: 2px solid #2c3e50;
@@ -155,15 +157,27 @@ form.login input[type="submit"] {
   border-radius: 0.5rem;
   cursor: pointer;
   text-transform: uppercase;
+  margin-bottom: 1rem; /* Space below button */
+}
+
+form.register input[type="submit"] {
+  background-color: #FFF;
+  color: #162836;
+  font-weight: 700;
+  padding: 1rem 2rem;
+  border-radius: 0.5rem;
+  cursor: pointer;
+  text-transform: uppercase;
+  margin-bottom: 1rem; /* Space below button */
 }
 
 .custom-link {
-  color: #162836; 
-  text-decoration: none; 
-}
-
-.custom-link:hover {
-  color: #A67245; 
+  display: block;
+  text-align: center;
+  color: #A67245;
+  text-decoration: none;
+  font-size: 1rem;
+  margin-top: 1rem; /* Space above the link */
 }
 
 /* Footer Styles */
@@ -211,4 +225,7 @@ footer {
 .social-icons .icon:hover {
   color: #C8915F;
 }
+
+
+
 </style>

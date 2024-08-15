@@ -2,13 +2,6 @@ import { createApp } from 'vue';
 import App from './App.vue';
 import * as VueRouter from 'vue-router';
 
-//import './main.css';
-
-// Vuetify styles 
-import 'vuetify/styles'
-import { createVuetify } from 'vuetify'
-import * as components from 'vuetify/components'
-import * as directives from 'vuetify/directives'
 
 // Import components
 import ShoppingCartPage from './pages/ShoppingCartPage.vue';
@@ -22,6 +15,7 @@ import RegisterPage from './pages/RegisterPage.vue'
 const routes = [
   {
     path: '/cart',
+    name: 'cart',
     component: ShoppingCartPage,
   },
   {
@@ -54,11 +48,7 @@ const routes = [
   }
 ];
 
-// Components
-const vuetify = createVuetify({
-  components,
-  directives,
-})
+
 
 // Create router instance
 const router = VueRouter.createRouter({
@@ -69,5 +59,4 @@ const router = VueRouter.createRouter({
 // Create and mount the app
 createApp(App)
   .use(router)
-  .use(vuetify)
   .mount('#app');

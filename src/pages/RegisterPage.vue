@@ -20,7 +20,7 @@
           type="submit" 
           value="SignUp" 
         />
-        <router-link to="/login" class="custom-link">Login</router-link>
+        <router-link to="/loginPage" class="custom-link">Login</router-link>
       </form>
     </section>
   </main>
@@ -28,7 +28,7 @@
 
 <script>
 import navigation from '@/components/NavG.vue';
-import userService from '@/service/userService.js';
+import userService from '@/services/userService.js';
 
 export default {
   components: { navigation },
@@ -65,7 +65,8 @@ export default {
 <style>
 .forms {
   display: flex;
-  min-height: 100vh;
+  max-width:100%;
+  min-height: 100vhs;
 }
 
 form {
