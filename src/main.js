@@ -14,6 +14,8 @@ import ProductDetailPage from './pages/ProductDetailPage.vue';
 import AddProduct from './pages/AddProduct.vue';
 import ProductUpdateForm from './pages/ProductUpdateForm.vue';
 import UpdateProductsPage from './pages/UpdateProductsPage.vue';
+import LoginPage from './pages/LoginPage.vue'
+import RegisterPage from './pages/RegisterPage.vue'
 
 // Define routes
 // This array contains all the route definitions for the application.
