@@ -59,12 +59,8 @@ export default {
 /* Style for the page title */
 h1 {
   text-align: center;
-  text-shadow: 1px 1px 2px black;
-  border-bottom: 5px solid #162836;
-  margin: 0;
-  margin-top: 16px;
-  padding: 16px;
-  background-color: #337ee0;
+  -webkit-text-fill-color:  #C8915F;
+  text-shadow: 1px 1px 2px #7e5e41;
 }
 
 /* Style for the grid container */
