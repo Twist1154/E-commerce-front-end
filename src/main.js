@@ -43,6 +43,7 @@ const routes = [
     path: '/product-card',
     name: 'ProductCard',
     component: ProductCard,
+    meta: { requiresAuth: true } // Add this to routes that require authentication
   },
   {
     path: '/register',
@@ -83,7 +84,6 @@ const routes = [
     path: '/products',
     name: 'products',
     component: ProductsPage,
-    meta: { requiresAuth: true }
   },
   {
     path: '/products/:productId',
