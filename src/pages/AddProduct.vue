@@ -2,7 +2,7 @@
   <div class="form-container">
     <h1>Add Product</h1>
     <form @submit.prevent="handleSubmit">
-  
+
       <div class="form-group">
         <label for="imagePath">Upload Image</label>
         <input type="file" id="imagePath" @change="handleImageUpload" />
@@ -45,17 +45,15 @@
 </template>
 
 <script>
-import { uploadFileToS3 } from '@/services/awsService'; // Import the updated service function
-import { getAllCategories } from '@/services/categoriesService'; // Import the service functions
-import productsService from '@/services/productsService'; // Adjust the path as necessary
-import { Upload } from '@element-plus/icons-vue'
+import { uploadFileToS3 } from '@/services/awsService';
+import { getAllCategories } from '@/services/categoriesService';
+import productsService from '@/services/productsService';
 
 export default {
   name: "ProductForm",
   data() {
     return {
       product: {
-        productId: '',
         name: '',
         description: '',
         price: '',
@@ -64,7 +62,7 @@ export default {
         imagePath: 'https://placehold.co/400x400/png', // Default placeholder
         createdAt: '',
         updatedAt: '',
-        Upload
+        imageFile: null // Store the uploaded file
       },
       categories: []
     };
@@ -72,7 +70,6 @@ export default {
   methods: {
     resetForm() {
       // Reset each property of the product object individually
-      this.$set(this.product, 'productId', '');
       this.$set(this.product, 'name', '');
       this.$set(this.product, 'description', '');
       this.$set(this.product, 'price', '');
@@ -81,6 +78,7 @@ export default {
       this.$set(this.product, 'imagePath', 'https://placehold.co/400x400/png'); // Reset to placeholder
       this.$set(this.product, 'createdAt', '');
       this.$set(this.product, 'updatedAt', '');
+      this.product.imageFile = null; // Reset the file
     },
     async handleSubmit() {
       try {
@@ -89,9 +87,8 @@ export default {
 
         // Handle image upload
         if (this.product.imageFile) {
-          const file = this.product.imageFile;
-          const uploadedImageUrl = await uploadFileToS3(file);
-          this.product.imagePath = uploadedImageUrl; // Set the uploaded image URL
+          const uploadedImageUrl = await uploadFileToS3(this.product.imageFile);
+          this.product.imagePath = uploadedImageUrl;
         }
 
         // Create new product
@@ -100,8 +97,7 @@ export default {
 
         // Show success message
         alert('Product added successfully!');
-        // Clear the form by resetting the product object
-        this.resetForm();
+        this.resetForm(); // Clear the form
       } catch (error) {
         console.error('Error during product creation:', error);
       }
@@ -117,9 +113,6 @@ export default {
         reader.readAsDataURL(file);
       }
     },
-    generateProductId() {
-      this.product.productId = 0; // Generate a random product ID because on my server side the product ID autoincre
-    },
     async fetchCategories() {
       try {
         const response = await getAllCategories(); // Fetch categories from the backend
@@ -130,15 +123,14 @@ export default {
       }
     },
     setCreationDate() {
-      this.product.createdAt = new Date().toISOString(); // Set the creation date to current date
+      this.product.createdAt = new Date().toISOString(); // Set the creation date
     },
     setUpdateDate() {
-      this.product.updatedAt = new Date().toISOString(); // Set the update date to current date
+      this.product.updatedAt = new Date().toISOString(); // Set the update date
     }
   },
   mounted() {
-    this.generateProductId(); // This generates a product ID when the component is mounted
-    this.fetchCategories(); // Fetches categories when the component is mounted
+    this.fetchCategories(); // Fetch categories when the component is mounted
   }
 }
 </script>

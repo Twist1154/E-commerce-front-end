@@ -1,6 +1,7 @@
 import { createApp } from 'vue';
 import App from './App.vue';
 import * as VueRouter from 'vue-router';
+import 'vuetify/styles'; // Ensure Vuetify styles are imported
 
 // Import Vuetify and necessary components/directives
 import { createVuetify } from 'vuetify';
@@ -14,76 +15,92 @@ import ProductDetailPage from './pages/ProductDetailPage.vue';
 import AddProduct from './pages/AddProduct.vue';
 import ProductUpdateForm from './pages/ProductUpdateForm.vue';
 import UpdateProductsPage from './pages/UpdateProductsPage.vue';
-import LoginPage from './pages/LoginPage.vue'
-import RegisterPage from './pages/RegisterPage.vue'
+import LoginPage from './pages/LoginPage.vue';
+import RegisterPage from './pages/RegisterPage.vue';
+import ProductCard from './components/ProductCard.vue';
+
+/* import the fontawesome core */
+import { library } from '@fortawesome/fontawesome-svg-core';
+
+/* import font awesome icon component */
+import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
+
+/* import specific icons */
+import { faShoppingCart, faPlus, faEdit, faTags} from '@fortawesome/free-solid-svg-icons'; // Example icons
+
+/* add icons to the library */
+library.add(faShoppingCart, faPlus, faEdit,faTags);
 
 // Define routes
-// This array contains all the route definitions for the application.
 const routes = [
   {
-    path: '/registerpage', // Path to the page where products can be updated
-    name: 'registerpage',
+    path: '/product-card',
+    name: 'ProductCard',
+    component: ProductCard,
+  },
+  {
+    path: '/register',
+    name: 'RegisterPage',
     component: RegisterPage,
   },
   {
-    path: '/loginpage', // Path to the page where products can be updated
-    name: 'loginpage',
+    path: '/login',
+    name: 'LoginPage',
     component: LoginPage,
   },
   {
-    path: '/updateProductsPage', // Path to the page where products can be updated
-    name: 'updateProductsPage',
+    path: '/updateProducts',
+    name: 'UpdateProductsPage',
     component: UpdateProductsPage,
   },
   {
-    path: '/updateForm/:productId', // Path to the form for updating a specific product
-    name: 'updateForm',
+    path: '/updateform/:productId',
+    name: 'UpdateForm',
     component: ProductUpdateForm,
-    props: true // This ensures that route params (e.g., productId) are passed as props to the component
+    props: true,
   },
   {
-    path: '/cart', // Path to the shopping cart page
-    name: 'cart',
+    path: '/cart',
+    name: 'Cart',
     component: ShoppingCartPage,
   },
   {
-    path: '/AddProduct', // Path to the page for adding a new product
-    name: 'addProduct',
+    path: '/addProduct',
+    name: 'AddProduct',
     component: AddProduct,
   },
   {
-    path: '/products', // Path to the products page that lists all products
-    name: 'products',
+    path: '/products',
+    name: 'ProductsPage',
     component: ProductsPage,
   },
   {
-    path: '/products/:productId', // Path to the product detail page for a specific product
-    name: 'productDetailPage',
+    path: '/products/:productId',
+    name: 'ProductDetailPage',
     component: ProductDetailPage,
-    props: true // This ensures that route params (e.g., productId) are passed as props to the component
+    props: true,
   },
   {
-    path: '/', // Root path of the application
-    redirect: '/products' // Redirects the root path to the products page
-  }
+    path: '/',
+    redirect: '/products',
+  },
 ];
 
-// Initialize Vuetify with imported components and directives
+// Initialize Vuetify
 const vuetify = createVuetify({
   components,
   directives,
 });
 
 // Create router instance
-// This function creates a Vue Router instance that handles navigation between the routes defined above.
 const router = VueRouter.createRouter({
-  history: VueRouter.createWebHistory(process.env.BASE_URL), // Enables history mode for clean URLs
-  routes, // Pass the defined routes to the router instance
+  history: VueRouter.createWebHistory(process.env.BASE_URL),
+  routes,
 });
 
 // Create and mount the app
-// This function initializes the Vue app, applies the router and Vuetify, and mounts the app to the HTML element with the ID "app".
-createApp(App)
-  .use(router) // Integrates the Vue Router with the app
-  .use(vuetify) // Integrates Vuetify with the app for UI components and styling
-  .mount('#app'); // Mounts the app to the DOM
+const app = createApp(App);
+app.component('font-awesome-icon', FontAwesomeIcon); // Register FontAwesomeIcon component globally
+app.use(router);
+app.use(vuetify);
+app.mount('#app');
