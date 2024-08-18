@@ -17,54 +17,65 @@ import UpdateProductsPage from './pages/UpdateProductsPage.vue';
 import LoginPage from './pages/LoginPage.vue'
 import RegisterPage from './pages/RegisterPage.vue'
 
+// Authentication check function
+function isAuthenticated() {
+  // Replace this with your actual authentication check logic
+  return localStorage.getItem('authToken') !== null;
+}
+
 // Define routes
-// This array contains all the route definitions for the application.
 const routes = [
   {
-    path: '/registerpage', // Path to the page where products can be updated
+    path: '/registerpage',
     name: 'registerpage',
     component: RegisterPage,
   },
   {
-    path: '/loginpage', // Path to the page where products can be updated
+    path: '/loginpage',
     name: 'loginpage',
     component: LoginPage,
   },
   {
-    path: '/updateProductsPage', // Path to the page where products can be updated
+    path: '/updateProductsPage',
     name: 'updateProductsPage',
     component: UpdateProductsPage,
+    meta: { requiresAuth: true } // Add this to routes that require authentication
   },
   {
-    path: '/updateForm/:productId', // Path to the form for updating a specific product
+    path: '/updateForm/:productId',
     name: 'updateForm',
     component: ProductUpdateForm,
-    props: true // This ensures that route params (e.g., productId) are passed as props to the component
+    props: true,
+    meta: { requiresAuth: true }
   },
   {
-    path: '/cart', // Path to the shopping cart page
+    path: '/cart',
     name: 'cart',
     component: ShoppingCartPage,
+    meta: { requiresAuth: true }
   },
   {
-    path: '/AddProduct', // Path to the page for adding a new product
+    path: '/AddProduct',
     name: 'addProduct',
     component: AddProduct,
+    meta: { requiresAuth: true }
   },
   {
-    path: '/products', // Path to the products page that lists all products
+    path: '/products',
     name: 'products',
     component: ProductsPage,
+    meta: { requiresAuth: true }
   },
   {
-    path: '/products/:productId', // Path to the product detail page for a specific product
+    path: '/products/:productId',
     name: 'productDetailPage',
     component: ProductDetailPage,
-    props: true // This ensures that route params (e.g., productId) are passed as props to the component
+    props: true,
+    meta: { requiresAuth: true }
   },
   {
-    path: '/', // Root path of the application
-    redirect: '/products' // Redirects the root path to the products page
+    path: '/',
+    redirect: '/products'
   }
 ];
 
@@ -75,15 +86,24 @@ const vuetify = createVuetify({
 });
 
 // Create router instance
-// This function creates a Vue Router instance that handles navigation between the routes defined above.
 const router = VueRouter.createRouter({
-  history: VueRouter.createWebHistory(process.env.BASE_URL), // Enables history mode for clean URLs
-  routes, // Pass the defined routes to the router instance
+  history: VueRouter.createWebHistory(process.env.BASE_URL),
+  routes,
+});
+
+// Navigation guard to check for authentication
+router.beforeEach((to, from, next) => {
+  if (to.meta.requiresAuth && !isAuthenticated()) {
+    // Redirect to login page if not authenticated
+    next({ name: 'loginpage' });
+  } else {
+    next(); // Proceed to the route
+  }
 });
 
 // Create and mount the app
-// This function initializes the Vue app, applies the router and Vuetify, and mounts the app to the HTML element with the ID "app".
 createApp(App)
-  .use(router) // Integrates the Vue Router with the app
-  .use(vuetify) // Integrates Vuetify with the app for UI components and styling
-  .mount('#app'); // Mounts the app to the DOM
+  .use(router)
+  .use(vuetify)
+  .mount('#app');
+

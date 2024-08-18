@@ -156,7 +156,7 @@ export default {
 h1 {
   text-align: center;
   margin-bottom: 20px;
-  background-color: aqua;
+  background-color: #C8915F;
 }
 
 .form-group {
@@ -205,10 +205,10 @@ textarea {
   font-size: 16px;
   cursor: pointer;
   margin-top: 10px;
-  background-color: #0631f0;
+  background-color: #162836;
 }
 
 .submit-button:hover {
-  background-color: #4cae4c;
+  background-color: #C8915F;
 }
 </style>

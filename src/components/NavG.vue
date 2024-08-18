@@ -17,9 +17,10 @@
         <h1 class="title"><span class="first-letter">A</span>frican_<span>Arts</span></h1>
       </div>
       <ul class="sidebar-links">
-        <li><router-link class="link" :to="{ path: '/' }">Home</router-link></li>
-        <li><router-link class="link" :to="{ path: '/products' }">About</router-link></li>
-        <li><router-link class="link" :to="{ name: 'registerpage' }">SignUp</router-link></li>
+        <!-- Use a method to handle the click event directly -->
+        <li><router-link class="link" :to="{ path: '/' }" @click="closeMobileNav">Home</router-link></li>
+        <li><router-link class="link" :to="{ path: '/products' }" @click="closeMobileNav">About</router-link></li>
+        <li><router-link class="link" :to="{ name: 'registerpage' }" @click="closeMobileNav">SignUp</router-link></li>
       </ul>
     </aside>
   </transition>
@@ -39,6 +40,10 @@ export default {
     toggleMobileNav() {
       this.mobileNav = !this.mobileNav;
       console.log('Mobile Nav toggled:', this.mobileNav);
+    },
+    closeMobileNav() {
+      this.mobileNav = false; // Close the sidebar
+      console.log('Mobile nav closed on link click');
     },
     handleScroll() {
       this.scrollPosition = window.scrollY;
@@ -72,10 +77,10 @@ export default {
 
 header {
   background-color: rgba(22, 40, 54, 0.3);
-  z-index: 1000; /* Increased z-index to ensure header is above all content */
+  z-index: 1000; /* Ensure the header is above other content */
   width: 100%;
   position: fixed; /* Fixed position to stay at the top of the page */
-  top: 0; /* Align at the top */
+  top: 0;
   left: 0;
   transition: 0.5s ease all;
 
@@ -152,7 +157,7 @@ header {
   position: fixed;
   left: 0;
   top: 0;
-  z-index: 999;
+  z-index: 1500; /* Increased z-index to ensure it appears on top of the header */
 
   .sidebar-branding {
     margin-bottom: 40px;
