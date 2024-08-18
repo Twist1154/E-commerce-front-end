@@ -17,22 +17,9 @@
         <input 
           type="submit"
           value="Login" />
-        <router-link to="/register" class="custom-link">SignUp</router-link>      
+        <router-link to="/registerpage" class="custom-link">SignUp</router-link>      
       </form>
     </section>
-    <footer>
-      <ul class="footer-links">
-        <li><router-link class="link" to="/">Home</router-link></li>
-        <li><router-link class="link" to="/about">About</router-link></li>
-        <li><router-link class="link" to="/register">SignUp</router-link></li>
-        <li><router-link class="link" to="/product-detail">ProductDetailPage</router-link></li>
-      </ul>
-      <div class="social-icons">
-        <a href="https://facebook.com" target="_blank" class="icon"><i class="fab fa-facebook-f"></i></a>
-        <a href="https://instagram.com" target="_blank" class="icon"><i class="fab fa-instagram"></i></a>
-        <a href="https://github.com" target="_blank" class="icon"><i class="fab fa-github"></i></a>
-      </div>
-    </footer>
   </main>
 </template>
 
@@ -52,29 +39,40 @@ export default {
     }
   },
   methods: {
-    async validateUser() {
-      if (!this.loginData.email || !this.loginData.password) {
-        alert('Email and password are required');
-        return;
-      }
+  async validateUser() {
+    if (!this.loginData.email || !this.loginData.password) {
+      alert('Email and password are required');
+      return;
+    }
 
-      try {
-        await userService.validateUser(this.loginData.email, this.loginData.password);
-        alert('Login successful');
-        this.$router.push('/');
-      } catch (error) {
-        if (error.response && error.response.status === 401) {
-          alert('Invalid email or password');
-        } else if (error.response && error.response.status === 400) {
-          alert('Bad request. Please check your input.');
-        } else if (error.response && error.response.status === 404) {
-          alert('Endpoint not found');
-        } else {
-          alert('An error occurred');
-        }
+    try {
+      // Validate user credentials
+      await userService.validateUser(this.loginData.email, this.loginData.password);
+
+      // Fetch user data by email after successful login
+      const user = await userService.getUsersByEmail(this.loginData.email);
+
+      // Store the user data in localStorage
+      localStorage.setItem('currentUser', JSON.stringify(user));
+
+      alert('Login successful');
+
+      // Redirect to the home page or any other page
+      this.$router.push('/');
+    } catch (error) {
+      if (error.response && error.response.status === 401) {
+        alert('Invalid email or password');
+      } else if (error.response && error.response.status === 400) {
+        alert('Bad request. Please check your input.');
+      } else if (error.response && error.response.status === 404) {
+        alert('Endpoint not found');
+      } else {
+        alert('An error occurred');
       }
     }
-  },
+  }
+},
+
   setup() {
     const router = useRouter();
     return { router };
@@ -178,52 +176,6 @@ form.register input[type="submit"] {
   text-decoration: none;
   font-size: 1rem;
   margin-top: 1rem; /* Space above the link */
-}
-
-/* Footer Styles */
-footer {
-  background-color: #162836;
-  color: white;
-  padding: 20px;
-  text-align: center;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  margin-top: auto;
-}
-
-.footer-links {
-  list-style: none;
-  padding: 0;
-  margin: 0 0 10px;
-  display: flex;
-  gap: 20px;
-}
-
-.footer-links .link {
-  color: white;
-  text-decoration: none;
-  font-size: 1.2rem;
-  transition: color 0.3s;
-}
-
-.footer-links .link:hover {
-  color: #C8915F;
-}
-
-.social-icons {
-  display: flex;
-  gap: 15px;
-}
-
-.social-icons .icon {
-  font-size: 1.5rem;
-  color: white;
-  transition: color 0.3s;
-}
-
-.social-icons .icon:hover {
-  color: #C8915F;
 }
 
 

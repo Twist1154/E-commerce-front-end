@@ -31,6 +31,12 @@ import { faShoppingCart, faPlus, faEdit, faTags} from '@fortawesome/free-solid-s
 /* add icons to the library */
 library.add(faShoppingCart, faPlus, faEdit,faTags);
 
+// Authentication check function
+function isAuthenticated() {
+  // Replace this with your actual authentication check logic
+  return localStorage.getItem('authToken') !== null;
+}
+
 // Define routes
 const routes = [
   {
@@ -44,46 +50,52 @@ const routes = [
     component: RegisterPage,
   },
   {
-    path: '/login',
-    name: 'LoginPage',
+    path: '/loginpage',
+    name: 'loginpage',
     component: LoginPage,
   },
   {
     path: '/updateProducts',
     name: 'UpdateProductsPage',
     component: UpdateProductsPage,
+    meta: { requiresAuth: true } // Add this to routes that require authentication
   },
   {
     path: '/updateform/:productId',
     name: 'UpdateForm',
     component: ProductUpdateForm,
     props: true,
+    meta: { requiresAuth: true }
   },
   {
     path: '/cart',
-    name: 'Cart',
+    name: 'cart',
     component: ShoppingCartPage,
+    meta: { requiresAuth: true }
   },
   {
-    path: '/addProduct',
-    name: 'AddProduct',
+    path: '/AddProduct',
+    name: 'addProduct',
     component: AddProduct,
+    meta: { requiresAuth: true }
   },
   {
     path: '/products',
-    name: 'ProductsPage',
+    name: 'products',
     component: ProductsPage,
+    meta: { requiresAuth: true }
   },
   {
     path: '/products/:productId',
-    name: 'ProductDetailPage',
+    name: 'productDetailPage',
     component: ProductDetailPage,
     props: true,
+    meta: { requiresAuth: true }
   },
   {
     path: '/',
-    redirect: '/products',
-  },
+    redirect: '/products'
+  }
 ];
 
 // Initialize Vuetify
@@ -96,6 +108,16 @@ const vuetify = createVuetify({
 const router = VueRouter.createRouter({
   history: VueRouter.createWebHistory(process.env.BASE_URL),
   routes,
+});
+
+// Navigation guard to check for authentication
+router.beforeEach((to, from, next) => {
+  if (to.meta.requiresAuth && !isAuthenticated()) {
+    // Redirect to login page if not authenticated
+    next({ name: 'loginpage' });
+  } else {
+    next(); // Proceed to the route
+  }
 });
 
 // Create and mount the app
