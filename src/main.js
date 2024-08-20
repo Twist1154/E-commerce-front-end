@@ -1,6 +1,7 @@
 import { createApp } from 'vue';
 import App from './App.vue';
 import * as VueRouter from 'vue-router';
+import 'vuetify/styles'; // Ensure Vuetify styles are imported
 
 // Import Vuetify and necessary components/directives
 import { createVuetify } from 'vuetify';
@@ -16,8 +17,25 @@ import ProductUpdateForm from './pages/ProductUpdateForm.vue';
 import UpdateProductsPage from './pages/UpdateProductsPage.vue';
 import LoginPage from './pages/LoginPage.vue'
 import RegisterPage from './pages/RegisterPage.vue'
+import ProductCard from './components/ProductCard.vue';
 import NotAuthorizedPage from './pages/NotAuthorizedPage.vue'
 import AdminPage from './pages/AdminPage.vue'
+
+
+
+/* import the fontawesome core */
+import { library } from '@fortawesome/fontawesome-svg-core';
+
+/* import font awesome icon component */
+import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
+
+/* import specific icons */
+import { faShoppingCart, faPlus, faEdit, faTags} from '@fortawesome/free-solid-svg-icons'; // Example icons
+
+/* add icons to the library */
+library.add(faShoppingCart, faPlus, faEdit,faTags);
+
+
 
 function getUser() {
   const user = localStorage.getItem('currentUser');
@@ -37,8 +55,14 @@ function getUserRole() {
 // Define routes
 const routes = [
   {
-    path: '/registerpage',
-    name: 'registerpage',
+    path: '/product-card',
+    name: 'ProductCard',
+    component: ProductCard,
+    meta: { requiresAuth: true } // Add this to routes that require authentication
+  },
+  {
+    path: '/register',
+    name: 'RegisterPage',
     component: RegisterPage,
   },
   {
@@ -47,14 +71,14 @@ const routes = [
     component: LoginPage,
   },
   {
-    path: '/updateProductsPage',
-    name: 'updateProductsPage',
+    path: '/updateProducts',
+    name: 'UpdateProductsPage',
     component: UpdateProductsPage,
     meta: { requiresAuth: true, role: 'admin' } // Admin only
   },
   {
-    path: '/updateForm/:productId',
-    name: 'updateForm',
+    path: '/updateform/:productId',
+    name: 'UpdateForm',
     component: ProductUpdateForm,
     props: true,
     meta: { requiresAuth: true, role: 'admin' } // Admin only
@@ -99,7 +123,7 @@ const routes = [
   }
 ];
 
-// Initialize Vuetify with imported components and directives
+// Initialize Vuetify
 const vuetify = createVuetify({
   components,
   directives,
@@ -131,8 +155,8 @@ router.beforeEach((to, from, next) => {
 
 
 // Create and mount the app
-createApp(App)
-  .use(router)
-  .use(vuetify)
-  .mount('#app');
-
+const app = createApp(App);
+app.component('font-awesome-icon', FontAwesomeIcon); // Register FontAwesomeIcon component globally
+app.use(router);
+app.use(vuetify);
+app.mount('#app');
