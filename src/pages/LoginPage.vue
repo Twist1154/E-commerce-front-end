@@ -8,15 +8,18 @@
           type="email" 
           placeholder="Email Address" 
           v-model="loginData.email" 
-          required />
+          required 
+        />
         <input 
           type="password"
           placeholder="Password"
           v-model="loginData.password" 
-          required />
+          required 
+        />
         <input 
           type="submit"
-          value="Login" />
+          value="Login" 
+        />
         <router-link to="/registerpage" class="custom-link">SignUp</router-link>      
       </form>
     </section>
@@ -35,44 +38,59 @@ export default {
       loginData: {
         email: '',
         password: ''
+      },
+      isLoading: false,  // State to track loading status
+    };
+  },
+  methods: {
+    async validateUser() {
+      if (!this.loginData.email || !this.loginData.password) {
+        alert('Email and password are required');
+        return;
+      }
+
+      //this.isLoading = true;  // Start loading indicator
+
+      try {
+        // Validate user credentials
+       await userService.validateUser(this.loginData.email, this.loginData.password);
+
+        // Fetch user data by email after successful login
+         const user = await userService.getUsersByEmail(this.loginData.email);
+
+        // Store the user data in localStorage (never store passwords)
+        localStorage.setItem('currentUser', JSON.stringify(user));
+        localStorage.setItem('currentUser', JSON.stringify({
+         authToken: 'some-token',
+         role: 'customer',
+         }));        alert('Login successful');
+
+        // Redirect to the home page or any other page
+        this.$router.push('/'); 
+      } catch (error) {
+        if (error.response) {
+          switch (error.response.status) {
+            case 401:
+              alert('Invalid email or password');
+              break;
+            case 400:
+              alert('Bad request. Please check your input.');
+              break;
+            case 404:
+              alert('Endpoint not found');
+              break;
+            default:
+              alert('An error occurred');
+          }
+        } else {
+          console.error('Error:', error);
+          alert('An error occurred');
+        }
+      } finally {
+        this.isLoading = false;  // End loading indicator
       }
     }
   },
-  methods: {
-  async validateUser() {
-    if (!this.loginData.email || !this.loginData.password) {
-      alert('Email and password are required');
-      return;
-    }
-
-    try {
-      // Validate user credentials
-      await userService.validateUser(this.loginData.email, this.loginData.password);
-
-      // Fetch user data by email after successful login
-      const user = await userService.getUsersByEmail(this.loginData.email);
-
-      // Store the user data in localStorage
-      localStorage.setItem('currentUser', JSON.stringify(user));
-
-      alert('Login successful');
-
-      // Redirect to the home page or any other page
-      this.$router.push('/');
-    } catch (error) {
-      if (error.response && error.response.status === 401) {
-        alert('Invalid email or password');
-      } else if (error.response && error.response.status === 400) {
-        alert('Bad request. Please check your input.');
-      } else if (error.response && error.response.status === 404) {
-        alert('Endpoint not found');
-      } else {
-        alert('An error occurred');
-      }
-    }
-  }
-},
-
   setup() {
     const router = useRouter();
     return { router };
@@ -177,7 +195,4 @@ form.register input[type="submit"] {
   font-size: 1rem;
   margin-top: 1rem; /* Space above the link */
 }
-
-
-
 </style>

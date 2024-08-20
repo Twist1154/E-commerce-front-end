@@ -8,7 +8,7 @@
       <div class="icon">
         <i @click="toggleMobileNav" class="far fa-bars" :class="{'icon-active': mobileNav}"></i>
       </div>
-    </nav>     
+    </nav>
   </header>
 
   <transition name="slide">
@@ -17,14 +17,25 @@
         <h1 class="title"><span class="first-letter">A</span>frican_<span>Arts</span></h1>
       </div>
       <ul class="sidebar-links">
-        <!-- Use a method to handle the click event directly -->
         <li><router-link class="link" :to="{ path: '/' }" @click="closeMobileNav">Home</router-link></li>
         <li><router-link class="link" :to="{ path: '/products' }" @click="closeMobileNav">About</router-link></li>
         <li><router-link class="link" :to="{ name: 'registerpage' }" @click="closeMobileNav">SignUp</router-link></li>
       </ul>
+      
+      <!-- Icons are only displayed if the current route is not login, signup, or admin -->
+      <div v-if="showIcons" class="sidebar-icons">
+        <router-link to="/profile" class="icon-link"><i class="far fa-user"></i></router-link>
+        <router-link to="/cart" class="icon-link"><i class="fas fa-shopping-cart"></i></router-link>
+        <router-link to="/wishlist" class="icon-link"><i class="fas fa-heart"></i></router-link>
+      </div>
+
+      <button v-if="showIcons" @click="logout" class="logout-button">Logout</button>
     </aside>
   </transition>
 </template>
+
+
+
 
 <script>
 export default {
@@ -36,50 +47,61 @@ export default {
       windowWidth: window.innerWidth,
     };
   },
+  computed: {
+    showIcons() {
+      const hiddenPages = ['loginpage', 'registerpage', 'admin'];
+      return !hiddenPages.includes(this.$route.name);
+    }
+  },
   methods: {
     toggleMobileNav() {
       this.mobileNav = !this.mobileNav;
-      console.log('Mobile Nav toggled:', this.mobileNav);
     },
     closeMobileNav() {
       this.mobileNav = false; // Close the sidebar
-      console.log('Mobile nav closed on link click');
     },
     handleScroll() {
       this.scrollPosition = window.scrollY;
-      console.log('Scroll position:', this.scrollPosition);
     },
     handleResize() {
       this.windowWidth = window.innerWidth;
-      console.log('Window width:', this.windowWidth);
       if (this.windowWidth > 768) {
         this.mobileNav = false; // Close sidebar on large screens
-        console.log('Mobile nav closed due to resize');
       }
+    },
+    logout() {
+      // Clear user data from localStorage
+      localStorage.removeItem('currentUser');
+      
+      // Redirect to login page
+      this.$router.push({ name: 'loginpage' });
+      
+      // Optionally, close the mobile nav if it's open
+      this.closeMobileNav();
     }
   },
   mounted() {
-    console.log('Component mounted');
     window.addEventListener('scroll', this.handleScroll);
     window.addEventListener('resize', this.handleResize);
     this.handleResize(); // Initialize mobileNav based on initial window size
   },
   beforeUnmount() {
-    console.log('Component before unmount');
     window.removeEventListener('scroll', this.handleScroll);
     window.removeEventListener('resize', this.handleResize);
   }
 };
 </script>
 
+
+
 <style lang="scss" scoped>
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap');
 
 header {
   background-color: rgba(22, 40, 54, 0.3);
-  z-index: 1000; /* Ensure the header is above other content */
+  z-index: 1000;
   width: 100%;
-  position: fixed; /* Fixed position to stay at the top of the page */
+  position: fixed;
   top: 0;
   left: 0;
   transition: 0.5s ease all;
@@ -157,7 +179,27 @@ header {
   position: fixed;
   left: 0;
   top: 0;
-  z-index: 1500; /* Increased z-index to ensure it appears on top of the header */
+  z-index: 1500;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between; 
+
+  .logout-button {
+    margin: 20px 0;
+    padding: 10px 20px;
+    background-color: #C8915F;
+    color: white;
+    border: none;
+    cursor: pointer;
+    font-size: 1rem;
+    border-radius: 5px;
+    transition: background-color 0.3s;
+
+    &:hover {
+      background-color: darken(#C8915F, 10%);
+    }
+  }
 
   .sidebar-branding {
     margin-bottom: 40px;
@@ -200,6 +242,27 @@ header {
 
     .link:hover {
       color: #C8915F;
+    }
+  }
+
+  .sidebar-icons {
+    display: flex;
+    justify-content: space-between;
+    padding: 0 20px;
+    margin-bottom: 20px;  /* Added margin-bottom to move the icons away from the bottom */
+
+    .icon-link {
+      color: white;
+      font-size: 1.5rem;
+      transition: color 0.3s;
+    }
+
+    .icon-link:hover {
+      color: #C8915F;
+    }
+
+    i {
+      font-size: 24px;
     }
   }
 }
