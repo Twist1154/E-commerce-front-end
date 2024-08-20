@@ -16,11 +16,22 @@ import ProductUpdateForm from './pages/ProductUpdateForm.vue';
 import UpdateProductsPage from './pages/UpdateProductsPage.vue';
 import LoginPage from './pages/LoginPage.vue'
 import RegisterPage from './pages/RegisterPage.vue'
+import NotAuthorizedPage from './pages/NotAuthorizedPage.vue'
+import AdminPage from './pages/AdminPage.vue'
 
-// Authentication check function
+function getUser() {
+  const user = localStorage.getItem('currentUser');
+  return user ? JSON.parse(user) : null;
+}
+
 function isAuthenticated() {
-  // Replace this with your actual authentication check logic
-  return localStorage.getItem('authToken') !== null;
+  const user = getUser();
+  return user && user.authToken;
+}
+
+function getUserRole() {
+  const user = getUser();
+  return user ? user.role : null;
 }
 
 // Define routes
@@ -39,40 +50,49 @@ const routes = [
     path: '/updateProductsPage',
     name: 'updateProductsPage',
     component: UpdateProductsPage,
-    meta: { requiresAuth: true } // Add this to routes that require authentication
+    meta: { requiresAuth: true, role: 'admin' } // Admin only
   },
   {
     path: '/updateForm/:productId',
     name: 'updateForm',
     component: ProductUpdateForm,
     props: true,
-    meta: { requiresAuth: true }
+    meta: { requiresAuth: true, role: 'admin' } // Admin only
   },
   {
     path: '/cart',
     name: 'cart',
     component: ShoppingCartPage,
-    meta: { requiresAuth: true }
+    meta: { requiresAuth: true, role: 'customer' } // Customer only
   },
   {
     path: '/AddProduct',
     name: 'addProduct',
     component: AddProduct,
-    meta: { requiresAuth: true }
+    meta: { requiresAuth: true, role: 'admin' } // Admin only
   },
   {
     path: '/products',
     name: 'products',
     component: ProductsPage,
-    meta: { requiresAuth: true }
   },
   {
     path: '/products/:productId',
     name: 'productDetailPage',
     component: ProductDetailPage,
     props: true,
-    meta: { requiresAuth: true }
+    meta: { requiresAuth: true, role: 'customer' } // Customer only
   },
+  {
+    path: '/not-authorized',
+    name: 'notAuthorized',
+    component: NotAuthorizedPage,
+  },
+  {
+    path: '/Admin',
+    name: 'admin',
+    component: AdminPage,
+  },  
   {
     path: '/',
     redirect: '/products'
@@ -91,15 +111,24 @@ const router = VueRouter.createRouter({
   routes,
 });
 
-// Navigation guard to check for authentication
+
 router.beforeEach((to, from, next) => {
-  if (to.meta.requiresAuth && !isAuthenticated()) {
-    // Redirect to login page if not authenticated
+  const isAuthenticatedUser = isAuthenticated();
+  const userRole = getUserRole();
+  
+  console.log('isAuthenticatedUser:', isAuthenticatedUser);
+  console.log('userRole:', userRole);
+
+  if (to.meta.requiresAuth && !isAuthenticatedUser) {
     next({ name: 'loginpage' });
+  } else if (to.meta.role && to.meta.role !== userRole) {
+    next({ name: 'notAuthorized' });  // Redirect to Not Authorized page
   } else {
-    next(); // Proceed to the route
+    next();
   }
 });
+
+
 
 // Create and mount the app
 createApp(App)
