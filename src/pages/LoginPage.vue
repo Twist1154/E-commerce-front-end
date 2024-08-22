@@ -20,7 +20,7 @@
           type="submit"
           value="Login" 
         />
-        <router-link to="/registerpage" class="custom-link">SignUp</router-link>      
+        <router-link to="/register" class="custom-link">SignUp</router-link>      
       </form>
     </section>
   </main>
