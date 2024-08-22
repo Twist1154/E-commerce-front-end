@@ -19,7 +19,7 @@
       <ul class="sidebar-links">
         <li><router-link class="link" :to="{ path: '/' }" @click="closeMobileNav">Home</router-link></li>
         <li><router-link class="link" :to="{ path: '/products' }" @click="closeMobileNav">About</router-link></li>
-        <li><router-link class="link" :to="{ name: 'registerpage' }" @click="closeMobileNav">SignUp</router-link></li>
+        <li><router-link class="link" :to="{ name: 'RegisterPage' }" @click="closeMobileNav">SignUp</router-link></li>
       </ul>
       
       <!-- Icons are only displayed if the current route is not login, signup, or admin -->
