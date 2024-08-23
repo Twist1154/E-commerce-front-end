@@ -42,53 +42,64 @@
       };
     },
     methods: {
-      async validateUser() {
-        if (!this.loginData.user || !this.loginData.password) {
-          alert('username and password are required');
-          return;
-        }
-  
-        try {
-          const user = this.loginData.user
-          const password = this.loginData.password
-          if(user == 'admin' && password == 'password'){
-            localStorage.setItem('currentUser', JSON.stringify({
-             authToken: 'some-token',
-             role: 'admin',  
-             }));
-            alert('Login successful');
-  
-          
-           this.$router.push('/AddProduct'); 
-          }
-  
-    
-          
-        } catch (error) {
-          if (error.response) {
-            switch (error.response.status) {
-              case 401:
-                alert('Invalid username or password');
-                break;
-              case 400:
-                alert('Bad request. Please check your input.');
-                break;
-              case 404:
-                alert('Endpoint not found');
-                break;
-              default:
-                alert('An error occurred');
-            }
-          } else {
-            console.error('Error:', error);
-            alert('An error occurred');
-          }
-        } finally {
-          this.isLoading = false;  // End loading indicator
-        }
+  async validateUser() {
+    if (!this.loginData.user || !this.loginData.password) {
+      alert('Username and password are required');
+      return;
+    }
+
+    this.isLoading = true;  // Start loading indicator
+
+    try {
+      const user = this.loginData.user;
+      const password = this.loginData.password;
+      
+      // Debug: Logging user credentials (do NOT do this in production!)
+      console.log('Attempting login with user:', user);
+
+      // Hardcoded admin check
+      if (user === 'admin' && password === 'password') {
+        localStorage.setItem('currentUser', JSON.stringify({
+          authToken: 'some-token',
+          role: 'admin',
+        }));
+        alert('Login successful');
+
+        // Clear the fields
+        this.loginData.user = '';
+        this.loginData.password = '';
+        
+        // Redirect to AddProduct
+        this.$router.push('/AddProduct');
+      } else {
+        alert('Invalid username or password');
       }
-    },
-    setup() {
+
+    } catch (error) {
+      if (error.response) {
+        switch (error.response.status) {
+          case 401:
+            alert('Invalid username or password');
+            break;
+          case 400:
+            alert('Bad request. Please check your input.');
+            break;
+          case 404:
+            alert('Endpoint not found');
+            break;
+          default:
+            alert('An error occurred');
+        }
+      } else {
+        console.error('Error:', error);
+        alert('An error occurred');
+      }
+    } finally {
+      this.isLoading = false;  // End loading indicator
+    }
+  }
+},
+      setup() {
       const router = useRouter();
       return { router };
     }

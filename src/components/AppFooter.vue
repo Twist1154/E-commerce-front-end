@@ -1,23 +1,33 @@
 <template>
   <footer>
-      <ul class="footer-links">
-        <li><router-link class="link" to="/">Home</router-link></li>
-        <li><router-link class="link" to="/about">About</router-link></li>
-        <li><router-link class="link" to="/register">SignUp</router-link></li>
-        <li><router-link class="link" to="/product-detail">ProductDetailPage</router-link></li>
-      </ul>
-      <div class="social-icons">
-        <a href="https://facebook.com" target="_blank" class="icon"><i class="fab fa-facebook-f"></i></a>
-        <a href="https://instagram.com" target="_blank" class="icon"><i class="fab fa-instagram"></i></a>
-        <a href="https://github.com" target="_blank" class="icon"><i class="fab fa-github"></i></a>
-      </div>
-    </footer>
+    <ul class="footer-links">
+      <li><router-link class="link" to="/">Home</router-link></li>
+      <li><router-link class="link" to="/about">About</router-link></li>
+      <li><router-link class="link" to="/register">SignUp</router-link></li>
+      <li v-if="isLoginPage"><router-link class="link" to="/admin">Admin</router-link></li>
+      <li v-if="isAdminPage"><router-link class="link" to="/loginpage">Login</router-link></li>
+    </ul>
+    <div class="social-icons">
+      <a href="https://facebook.com" target="_blank" class="icon"><i class="fab fa-facebook-f"></i></a>
+      <a href="https://instagram.com" target="_blank" class="icon"><i class="fab fa-instagram"></i></a>
+      <a href="https://github.com" target="_blank" class="icon"><i class="fab fa-github"></i></a>
+    </div>
+  </footer>
 </template>
+
 <script>
-  export default {
-    
+export default {
+  computed: {
+    isLoginPage() {
+      return this.$route.path === '/loginPage';
+    },
+    isAdminPage() {
+      return this.$route.path === '/admin';
+    }
   }
+}
 </script>
+
 <style scoped>
 /* Footer Styles */
 footer {
