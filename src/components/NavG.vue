@@ -50,7 +50,7 @@ export default {
   },
   computed: {
     showIcons() {
-      const hiddenPages = ['loginpage', 'registerpage', 'admin'];
+      const hiddenPages = ['loginpage', 'register', 'admin'];
       return !hiddenPages.includes(this.$route.name);
     }
   },
