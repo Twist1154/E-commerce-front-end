@@ -1,18 +1,13 @@
 <template>
   <div>
     <navigation />
-    <!-- Page title -->
-    <v-divider></v-divider> <!-- divider re-useable everywhere -->
+    <v-divider></v-divider>
     <h1>African Art & Crafts</h1>
 
     <!-- Grid container for displaying products -->
     <v-container>
-      <v-row no-gutters>
-
-        <RangeSlider />
-      </v-row>
+      <!-- Display Products -->
       <v-row>
-        <!-- Iterate over products and display each one -->
         <v-col
           v-for="product in products"
           :key="product.productId"
@@ -33,25 +28,30 @@
           />
         </v-col>
       </v-row>
+
+      <!-- Display error message if products fail to load -->
+      <v-row v-if="errorMessage" class="error-message">
+        <v-col>
+          <v-alert type="error">{{ errorMessage }}</v-alert>
+        </v-col>
+      </v-row>
     </v-container>
   </div>
 </template>
 
-
 <script>
 import ProductCard from "@/components/ProductCard.vue";
 import productsService from "@/services/productsService";
-import RangeSlider from "@/components/RangeSlider.vue";
 
 export default {
   components: {
     ProductCard,
-    RangeSlider,
   },
   name: "ProductsPage",
   data() {
     return {
       products: [],
+      errorMessage: null,
     };
   },
   created() {
@@ -62,8 +62,10 @@ export default {
       try {
         const response = await productsService.getAllProducts();
         this.products = response.data;
+        this.errorMessage = null;
       } catch (error) {
         console.error("There was an error fetching the products!", error);
+        this.errorMessage = "Failed to load products. Please try again later.";
       }
     },
     handleViewDetails(productId) {
@@ -77,10 +79,12 @@ export default {
 </script>
 
 <style scoped>
-/* Style for the page title */
 h1 {
   text-align: center;
-  -webkit-text-fill-color:  #C8915F;
+  -webkit-text-fill-color: #C8915F;
   text-shadow: 1px 1px 2px #7e5e41;
+}
+.error-message {
+  margin-top: 20px;
 }
 </style>
