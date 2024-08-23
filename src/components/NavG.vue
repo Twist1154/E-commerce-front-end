@@ -30,10 +30,13 @@
         <router-link to="/wishlist" class="icon-link"><i class="fas fa-heart"></i></router-link>
       </div>
 
-      <button v-if="showIcons" @click="logout" class="logout-button">Logout</button>
+      <!-- Conditional login/logout button -->
+      <button v-if="isAuthenticated" @click="logout" class="logout-button">Logout</button>
+      <button v-else @click="redirectToLogin" class="login-button">Login</button>
     </aside>
   </transition>
 </template>
+
 
 
 
@@ -52,7 +55,11 @@ export default {
     showIcons() {
       const hiddenPages = ['loginpage', 'register', 'admin'];
       return !hiddenPages.includes(this.$route.name);
-    }
+    },
+    isAuthenticated() {
+      // Check if the user is authenticated based on the presence of a token or user data in localStorage
+      return !!localStorage.getItem('currentUser');
+    },
   },
   methods: {
     toggleMobileNav() {
@@ -79,6 +86,13 @@ export default {
       
       // Optionally, close the mobile nav if it's open
       this.closeMobileNav();
+    },
+    redirectToLogin() {
+      // Redirect to the login page
+      this.$router.push({ name: 'loginpage' });
+
+      // Close mobile nav if open
+      this.closeMobileNav();
     }
   },
   mounted() {
@@ -92,6 +106,7 @@ export default {
   }
 };
 </script>
+
 
 
 
@@ -186,21 +201,22 @@ header {
   flex-direction: column;
   justify-content: space-between; 
 
-  .logout-button {
-    margin: 20px 0;
-    padding: 10px 20px;
-    background-color: #C8915F;
-    color: white;
-    border: none;
-    cursor: pointer;
-    font-size: 1rem;
-    border-radius: 5px;
-    transition: background-color 0.3s;
+  .login-button {
+  margin: 20px 0;
+  padding: 10px 20px;
+  background-color: #C8915F;
+  color: white;
+  border: none;
+  cursor: pointer;
+  font-size: 1rem;
+  border-radius: 5px;
+  transition: background-color 0.3s;
 
-    &:hover {
-      background-color: darken(#C8915F, 10%);
-    }
+  &:hover {
+    background-color: darken(#C8915F, 10%);
   }
+}
+
 
   .sidebar-branding {
     margin-bottom: 40px;
