@@ -7,13 +7,16 @@
     <!-- Price Range Filter Component -->
     <v-row>
       <v-col cols="12" sm="6">
-        <v-range-slider
+        <v-slider
           v-model="priceRange"
+          :min="0"
           :max="maxPrice"
+          :step="10"
           label="Price Range"
+          range
           hide-details
           @change="fetchProductsByPriceRange"
-        ></v-range-slider>
+        ></v-slider>
       </v-col>
     </v-row>
 
@@ -51,7 +54,7 @@
 
 <script>
 import ProductCard from "@/components/ProductCard.vue";
-import productsService from "@/services/productsService";
+import axios from 'axios';
 
 export default {
   components: {
@@ -59,28 +62,43 @@ export default {
   },
   data() {
     return {
-      priceRange: [0, 10000],
-      maxPrice: 10000,
-      products: [],
-      errorMessage: null,
+      priceRange: [100.0, 10000.0], // Default price range
+      maxPrice: 10000.0, // Maximum price for the slider
+      products: [], // Array to hold fetched products
+      errorMessage: null, // Error message to display
     };
   },
+  created() {
+    this.fetchProductsByPriceRange(); // Fetch products on component creation
+  },
   methods: {
-    async fetchProductsByPriceRange() {
-      try {
-        const response = await productsService.findProductByPriceRange(this.priceRange[0], this.priceRange[1]);
-        this.products = response.data || [];
-        this.errorMessage = null;
-      } catch (error) {
-        console.error("Failed to fetch products!", error);
-        this.errorMessage = "Failed to load products. Please try again later.";
-      }
-    },
-    handleViewDetails(productId) {
-      this.$router.push(`/products/${productId}`);
+  async fetchProductsByPriceRange() {
+    console.log("Fetching products for price range:", this.priceRange);
+    const url = `http://localhost:8080/store/product/price`;
+    console.log("Request URL:", url, "Params:", {
+      minPrice: this.priceRange[0],
+      maxPrice: this.priceRange[1]
+    });
+    try {
+      const response = await axios.get(url, {
+        params: {
+          minPrice: this.priceRange[0],
+          maxPrice: this.priceRange[1]
+        }
+      });
+      console.log("Received products:", response.data);
+      this.products = response.data || []; // Update products array
+      this.errorMessage = null; // Clear error message
+    } catch (error) {
+      console.error("Failed to fetch products!", error);
+      this.errorMessage = "Failed to load products. Please try again later."; // Set error message
+    }
+
+  },handleViewDetails(productId) {
+      this.$router.push(`/products/${productId}`); // Navigate to product details page
     },
     handleAddToCart(productId) {
-      console.log(`Adding product ${productId} to cart`);
+      console.log(`Adding product ${productId} to cart`); // Handle adding product to cart
     }
   }
 };
@@ -89,9 +107,10 @@ export default {
 <style scoped>
 h1 {
   text-align: center;
-  -webkit-text-fill-color: #C8915F;
+  color: #C8915F;
   text-shadow: 1px 1px 2px #7e5e41;
 }
+
 .error-message {
   margin-top: 20px;
 }

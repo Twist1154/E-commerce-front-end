@@ -98,7 +98,13 @@ export default {
         console.error("Failed to fetch products:", error);
         this.errorMessage = "Failed to load products. Please try again later.";
       }
-    }
+    },
+    handleViewDetails(productId) {
+      this.$router.push(`/products/${productId}`);
+    },
+    handleAddToCart(productId) {
+      console.log(`Adding product ${productId} to cart`);
+    },
   },
   async created() {
     try {

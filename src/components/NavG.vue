@@ -17,7 +17,7 @@
         <h1 class="title"><span class="first-letter">A</span>frican_<span>Arts</span></h1>
       </div>
       <ul class="sidebar-links">
-        <li><router-link class="link" :to="{ path: '/RangeSlider' }" @click="closeMobileNav">Search</router-link></li>
+        <li><router-link class="link" :to="{ path: '/CategorySearch' }" @click="closeMobileNav">Search</router-link></li>
         <li><router-link class="link" :to="{ path: '/' }" @click="closeMobileNav">Home</router-link></li>
         <li><router-link class="link" :to="{ path: '/products' }" @click="closeMobileNav">About</router-link></li>
         <li><router-link class="link" :to="{ name: 'RegisterPage' }" @click="closeMobileNav">SignUp</router-link></li>
