@@ -42,8 +42,8 @@
         <select id="categoryId" v-model="product.categoryId" required>
           <option
             v-for="category in categories"
-            :key="category.category_id"
-            :value="category.category_id"
+            :key="category.categoryId"
+            :value="category.categoryId"
           >
             {{ category.name }}
           </option>
@@ -255,7 +255,7 @@ textarea {
 }
 
 .submit-button {
-  width: 70%;
+  width: 100%;
   padding: 10px;
   border: none;
   border-radius: 4px;
@@ -263,11 +263,11 @@ textarea {
   font-size: 16px;
   cursor: pointer;
   margin-top: 10px;
-  background-color: #0631f0;
+  background-color: #162836;
 }
 
 .submit-button:hover {
-  background-color: #4cae4c;
+  background-color: #C8915F;
 }
 
 

@@ -1,3 +1,5 @@
+does the send categoryid back to my serve? :
+
 <template>
   <div class="form-container">
     <h1>Add Product</h1>
@@ -34,7 +36,7 @@
       <div class="form-group">
         <label for="categoryId">Category</label>
         <select id="categoryId" v-model="product.categoryId" required>
-          <option v-for="category in categories" :key="category.category_id" :value="category.category_id">
+          <option v-for="category in categories" :key="category.categoryId" :value="category.categoryId">
             {{ category.name }}
           </option>
         </select>
