@@ -1,47 +1,142 @@
 <template>
-  <main class="register">
-    <navigation />
-    <section class="forms">
-      <form class="register" @submit.prevent="createUser">
-        <h2>SignUp</h2>
-        <input 
-          type="email" 
-          placeholder="Email address"
-          v-model="registerData.email" 
-          required
-        />
-        <input 
-          type="password" 
-          placeholder="Password" 
-          v-model="registerData.password" 
-          required
-        />
-        <input 
-          type="submit" 
-          value="SignUp" 
-        />
-        <router-link to="/loginPage" class="custom-link">Login</router-link>
-      </form>
-    </section>
-  </main>
+  <v-app>
+    <v-main class="register">
+      <navigation />
+      <v-container class="forms" fluid>
+        <v-row justify="center">
+          <v-col cols="12" md="6" lg="4">
+            <v-card>
+              <v-card-title class="justify-center">
+                <h2>Sign Up</h2>
+              </v-card-title>
+              <v-card-text>
+                <v-form @submit.prevent="createUser">
+                  <v-text-field
+                    label="Username"
+                    v-model="registerData.username"
+                    :rules="[rules.required]"
+                    outlined
+                    dense
+                  />
+                  <v-text-field
+                    label="First Name"
+                    v-model="registerData.firstName"
+                    :rules="[rules.required]"
+                    outlined
+                    dense
+                  />
+                  <v-text-field
+                    label="Last Name"
+                    v-model="registerData.lastName"
+                    :rules="[rules.required]"
+                    outlined
+                    dense
+                  />
+                  <v-text-field
+                    label="Email address"
+                    v-model="registerData.email"
+                    :rules="[rules.required, rules.email]"
+                    @input="validateEmail"
+                    outlined
+                    dense
+                  />
+                  <v-alert v-if="emailNote" type="error" dense outlined>{{ emailNote }}</v-alert>
+                  <v-text-field
+                    label="Password"
+                    v-model="registerData.password"
+                    :rules="[rules.required, rules.password]"
+                    type="password"
+                    @input="validatePassword"
+                    outlined
+                    dense
+                  />
+                  <v-alert v-if="passwordNote" type="error" dense outlined>{{ passwordNote }}</v-alert>
+                  <v-text-field
+                    label="Confirm Password"
+                    v-model="registerData.confirmPassword"
+                    :rules="[rules.required, confirmPasswordMatch]"
+                    type="password"
+                    outlined
+                    dense
+                  />
+                  <v-alert v-if="confirmPasswordNote" type="error" dense outlined>{{ confirmPasswordNote }}</v-alert>
+                  <v-btn
+                    class="custom-btn"
+                    :loading="isLoading"
+                    block
+                    type="submit"
+                    style="background-color: #0c0c0c; color: white;"  
+                  >
+                    {{ isLoading ? 'Signing Up...' : 'Submit' }}
+                  </v-btn>
+                </v-form>
+              </v-card-text>
+            </v-card>
+          </v-col>
+        </v-row>
+      </v-container>
+    </v-main>
+  </v-app>
 </template>
 
+
 <script>
-import navigation from '@/components/NavG.vue';
+//import navigation from '@/components/NavG.vue';
 import userService from '@/services/userService.js';
 
 export default {
-  components: { navigation },
+  //components: { navigation },
   data() {
     return {
       registerData: {
+        username: '', // Added username field
+        firstName: '',
+        lastName: '',
         email: '',
-        password: ''
+        password: '',
+        confirmPassword: '' // Confirm password field
+      },
+      emailNote: '',
+      passwordNote: '',
+      confirmPasswordNote: '', // Note for confirming passwords
+      isLoading: false, // State to track loading status
+      rules: {
+        required: value => !!value || 'Required.',
+        email: value => /.+@.+\..+/.test(value) || 'Invalid email.',
+        password: value =>
+          /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,}$/.test(value) || 'Password must be at least 8 characters long, include one uppercase letter, one lowercase letter, and one number.'
       }
     };
   },
+  computed: {
+    confirmPasswordMatch() {
+      return this.registerData.confirmPassword === this.registerData.password
+        ? ''
+        : 'Passwords do not match.';
+    }
+  },
   methods: {
+    validateEmail() {
+      const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      this.emailNote = this.registerData.email
+        ? (emailPattern.test(this.registerData.email) ? '' : 'Invalid email address.')
+        : '';
+    },
+    validatePassword() {
+      const passwordPattern = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,}$/;
+      this.passwordNote = this.registerData.password
+        ? (passwordPattern.test(this.registerData.password) ? '' : 'Password must be at least 8 characters long, include one uppercase letter, one lowercase letter, and one number.')
+        : '';
+    },
     async createUser() {
+      this.isLoading = true; // Start loading indicator
+
+      if (this.registerData.password !== this.registerData.confirmPassword) {
+        this.confirmPasswordNote = 'Passwords do not match!';
+        this.isLoading = false;
+        return;
+      }
+
       try {
         // Check if the user already exists
         const existingUser = await userService.getUsersByEmail(this.registerData.email);
@@ -52,92 +147,41 @@ export default {
           // If user does not exist, create the user
           await userService.createUser(this.registerData);
           alert('User created successfully!');
+          this.$router.push('/loginpage'); // Redirect to login page after successful registration
         }
       } catch (error) {
         alert('Error creating user');
-        console.error('Error:', error);
+        console.error('Error:', error.message || error);
+      } finally {
+        this.isLoading = false; // End loading indicator
       }
     }
   }
 };
 </script>
 
+
 <style>
 .forms {
+  min-height: 100vh;
   display: flex;
-  max-width:100%;
-  min-height: 100vhs;
-}
-
-form {
-  flex: 1 1 0%;
-  padding: 8rem 1rem 1rem;
-}
-
-form.register {
-  color: #FFF;
-  background-color: #162836;
-  background-image: linear-gradient(
-    to bottom right,
-    rgb(22, 40, 54) 0%,
-    rgb(200, 145, 95) 100%
-  );
+  justify-content: center; /* Center form horizontally */
+  align-items: center; /* Center form vertically */
 }
 
 h2 {
   font-size: 2rem;
   text-transform: uppercase;
-  margin-bottom: 2rem;
+  margin-bottom: 1rem; /* Decrease the margin to reduce the space */
+  text-align: center;
 }
 
-input {
-  appearance: none;
-  border: none;
-  outline: none;
-  background: none;
-  display: block;
-  width: 100%;
-  max-width: 400px;
-  margin: 0 auto;
-  font-size: 1.5rem;
-  margin-bottom: 2rem;
-  padding: 0.5rem 0;
+.v-alert {
+  margin-bottom: 1rem;
 }
 
-input:not([type="submit"]) {
-  opacity: 0.8;
-  transition: 0.4s;
-}
-
-input:focus:not([type="submit"]) {
-  opacity: 1;
-}
-
-input::placeholder {
-  color: inherit;
-}
-
-form.register input:not([type="submit"]) {
-  color: #FFF;
-  border-bottom: 2px solid #FFF;
-}
-
-input[type="submit"] {
-  background-color: #FFF;
-  color: #162836;
-  font-weight: 700;
-  padding: 1rem 2rem;
-  border-radius: 0.5rem;
-  cursor: pointer;
-  text-transform: uppercase;
-}
-
-.custom-link {
-  color: #162836; /* Updated color */
-  text-decoration: none; /* Remove underline */
-}
-
-.custom-link:hover {
-  color: #A67245; /* Optional: change color on hover */
+.custom-btn {
+  background-color: #0c0c0c; /* Ensure the button color is set */
+  color: white; /* Ensure text color is white */
 }
 </style>

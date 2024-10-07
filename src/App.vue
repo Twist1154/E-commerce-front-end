@@ -1,34 +1,38 @@
 <template>
-  <div>
-    <!-- Navigation Header (navG) -->
-    <navG />
+  <!-- Vuetify Layout Wrapper -->
+  <v-app>
+    <!-- Navigation Header (NavG) -->
+    <NavG />
     
     <!-- Main Content where route views are rendered -->
-    <main>
-      <router-view></router-view>
-    </main>
+    <v-main>
+      <v-container>
+        <router-view></router-view>
+      </v-container>
+    </v-main>
     
     <!-- Footer Component -->
-    <AppFooter />
-  </div>
+    <!--v-footer-->
+      <AppFooter />
+    <!--/v-footer-->
+  </v-app>
 </template>
 
 <script>
-import navG from "@/components/NavG.vue";  // Importing the navG component
+import NavG from "@/components/NavG.vue";  // Importing the NavG component
 import AppFooter from "@/components/AppFooter.vue"; // Importing the Footer component
 
 export default {
   name: "App",
   components: {
-    navG,       // Registering navG as a component
+    NavG,       // Registering NavG as a component
     AppFooter,  // Registering the Footer as a component
   },
 };
 </script>
 
 <style>
-/* Optional: Add any global styles or adjustments here */
 main {
-  margin-top: 80px; /* Adjust margin to fit the height of the navG */
+  margin-top: 80px; /* Adjust margin to fit the height of the NavG */
 }
 </style>
