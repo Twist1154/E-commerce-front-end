@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 // Base URL for InventoryController API
-const BASE_URL = 'http://localhost:8080/api/inventory';
+const BASE_URL = 'http://localhost:8080/store/inventory';
 
 const inventoryService = {
   // Create a new inventory item

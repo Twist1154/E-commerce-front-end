@@ -15,7 +15,7 @@ const productsService = {
 
   // Read product by ID
   getProductById(id) {
-    return axios.get(`${BASE_URL}/${id}`)
+    return axios.get(`${BASE_URL}/get/${id}`)
       .then(response => response)
       .catch(error => {
         console.error(`Error fetching product with ID ${id}:`, error);

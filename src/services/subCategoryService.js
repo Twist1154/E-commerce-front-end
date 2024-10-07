@@ -6,6 +6,7 @@ const BASE_URL = 'http://localhost:8080/store/subcategory';
 const subCategoryService = {
   // Create a new subcategory
   createSubCategory(subCategory) {
+    console.log('Subcategory being sent to backend:', subCategory);
     return axios.post(`${BASE_URL}/create`, subCategory)
       .then(response => response)
       .catch(error => {
@@ -50,6 +51,27 @@ const subCategoryService = {
       .then(response => response)
       .catch(error => {
         console.error('Error fetching all subcategories:', error);
+        throw error;
+      });
+  },
+
+
+  // Get subcategories by product ID
+  getSubCategoriesByProduct(id) {
+    return axios.get(`${BASE_URL}/getByProduct/${id}`)
+      .then(response => response.data) // Assuming you want the data directly
+      .catch(error => {
+        console.error(`Error fetching subcategories for product ID ${id}:`, error);
+        throw error;
+      });
+  },
+
+  // Get subcategories by category ID
+  getSubCategoriesByCategory(id) {
+    return axios.get(`${BASE_URL}/getByCategory/${id}`)
+      .then(response => response.data) // Assuming you want the data directly
+      .catch(error => {
+        console.error(`Error fetching subcategories for category ID ${id}:`, error);
         throw error;
       });
   },

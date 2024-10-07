@@ -1,183 +1,312 @@
-does the send categoryid back to my serve? :
-
 <template>
   <div class="form-container">
     <h1>Add Product</h1>
-    <form @submit.prevent="handleSubmit">
 
-      <div class="form-group">
-        <label for="imagePath">Upload Image</label>
-        <input type="file" id="imagePath" @change="handleImageUpload" />
-      
-        <div class="img-preview">
-          <!-- Display the image or a placeholder if no image is selected -->
-          <img :src="product.imagePath || 'https://placehold.co/400x400/png'" alt="Product Image" />
+    <!-- Step 1: Product Creation Form -->
+    <div v-if="currentStep === 1">
+      <h2>Step 1: Add Product</h2>
+      <form @submit.prevent="handleProductSubmit">
+        <div class="form-group">
+          <label for="imagePath">Upload Image</label>
+          <input
+            type="file"
+            id="imagePath"
+            @change="handleImageUpload"
+            accept="image/*"
+          />
+          <div class="img-preview">
+            <img
+              :src="product.imagePath || 'https://placehold.co/400x400/png'"
+              alt="Product Image"
+            />
+          </div>
         </div>
-        
-      </div>
-      <div class="form-group">
-        <label for="name">Name</label>
-        <input type="text" id="name" v-model="product.name" required />
-      </div>
-      <div class="form-group">
-        <label for="description">Description</label>
-        <textarea id="description" v-model="product.description" required></textarea>
-      </div>
-      <div class="form-row">
+
+        <div class="form-group">
+          <label for="name">Name</label>
+          <input type="text" id="name" v-model="product.name" required />
+        </div>
+
+        <div class="form-group">
+          <label for="description">Description</label>
+          <textarea id="description" v-model="product.description" required></textarea>
+        </div>
+
         <div class="form-group">
           <label for="price">Price</label>
-          <input type="number" step="0.01" id="price" v-model="product.price" required />
+          <input
+            type="number"
+            step="0.01"
+            id="price"
+            v-model.number="product.price"
+            required
+          />
         </div>
+
+        <button type="submit" class="submit-button">Create Product</button>
+      </form>
+    </div>
+
+    <!-- Step 2: Add Subcategories -->
+    <div v-if="currentStep === 2">
+      <h2>Step 2: Add Subcategories</h2>
+      <form @submit.prevent="handleSubCategorySubmit">
+        <div class="form-group">
+          <label for="category">Select Category</label>
+          <select id="category" v-model="selectedCategoryId" required>
+            <option disabled value="">Select a category</option>
+            <option
+              v-for="category in categories"
+              :key="category.id"
+              :value="category.id"
+            >
+              {{ category.name }}
+            </option>
+          </select>
+        </div>
+
+        <button type="submit" class="submit-button">Add Subcategory</button>
+      </form>
+
+      <div class="subcategory-list" v-if="safeSubCategories.length">
+        <h3>Subcategories Added:</h3>
+        <ul>
+          <li v-for="subCategory in safeSubCategories" :key="subCategory.id">
+            {{ subCategory.category?.name || "Unknown Category" }}
+          </li>
+        </ul>
+      </div>
+
+      <div class="navigation-buttons">
+        <button
+          @click="nextStep"
+          class="next-button"
+          :disabled="!safeSubCategories.length"
+        >
+          Next: Add Inventory
+        </button>
+      </div>
+    </div>
+
+    <!-- Step 3: Inventory Management -->
+    <div v-if="currentStep === 3">
+      <h2>Step 3: Add Inventory</h2>
+      <form @submit.prevent="handleInventorySubmit">
         <div class="form-group">
           <label for="stockQuantity">Stock Quantity</label>
-          <input type="number" id="stockQuantity" v-model="product.stockQuantity" required />
+          <input
+            type="number"
+            id="stockQuantity"
+            v-model.number="stockQuantity"
+            required
+            min="0"
+          />
         </div>
-      </div>
-      <div class="form-group">
-        <label for="categoryId">Category</label>
-        <select id="categoryId" v-model="product.categoryId" required>
-          <option v-for="category in categories" :key="category.categoryId" :value="category.categoryId">
-            {{ category.name }}
-          </option>
-        </select>
-      </div>
-      <button type="submit" class="submit-button">Create</button>
-    </form>
+
+        <div class="form-group">
+          <label for="vendorLocation">Vendor Location</label>
+          <input type="text" id="vendorLocation" v-model="vendorLocation" required />
+        </div>
+
+        <button type="submit" class="submit-button">Create Inventory and Complete</button>
+      </form>
+    </div>
   </div>
 </template>
 
 <script>
-import { uploadFileToS3 } from '@/services/awsService';
-import { getAllCategories } from '@/services/categoriesService';
-import productsService from '@/services/productsService';
+import { uploadFileToS3 } from "@/services/awsService";
+import { getAllCategories } from "@/services/categoriesService";
+import productsService from "@/services/productsService";
+import subCategoryService from "@/services/subCategoryService";
+import inventoryService from "@/services/inventoryService";
 
 export default {
   name: "ProductForm",
   data() {
     return {
+      currentStep: 1,
       product: {
-        name: '',
-        description: '',
-        price: '',
-        stockQuantity: '',
-        categoryId: '',
-        imagePath: 'https://placehold.co/400x400/png', // Default placeholder
-        createdAt: '',
-        updatedAt: '',
-        imageFile: null // Store the uploaded file
+        name: "",
+        description: "",
+        price: 0,
+        imagePath: "",
+        imageFile: null,
       },
-      categories: []
+      categories: [],
+      selectedCategoryId: "", // Holds the selected category ID
+      stockQuantity: 0,
+      vendorLocation: "",
+      subCategories: [], // Separate array for subcategories
     };
   },
-  methods: {
-    resetForm() {
-      // Reset each property of the product object individually
-      this.$set(this.product, 'name', '');
-      this.$set(this.product, 'description', '');
-      this.$set(this.product, 'price', '');
-      this.$set(this.product, 'stockQuantity', '');
-      this.$set(this.product, 'categoryId', '');
-      this.$set(this.product, 'imagePath', 'https://placehold.co/400x400/png'); // Reset to placeholder
-      this.$set(this.product, 'createdAt', '');
-      this.$set(this.product, 'updatedAt', '');
-      this.product.imageFile = null; // Reset the file
+  computed: {
+    safeSubCategories() {
+      return this.subCategories || [];
     },
-    async handleSubmit() {
+  },
+  methods: {
+    async handleProductSubmit() {
       try {
-        this.setCreationDate();
-        this.setUpdateDate();
-
-        // Handle image upload
         if (this.product.imageFile) {
           const uploadedImageUrl = await uploadFileToS3(this.product.imageFile);
           this.product.imagePath = uploadedImageUrl;
         }
 
-        // Create new product
+        // Create the product on the backend
         const response = await productsService.createProduct(this.product);
-        console.log('Product saved:', response);
+        this.product = response.data; // Update product with response (includes ID)
 
-        // Show success message
-        alert('Product added successfully!');
-        this.resetForm(); // Clear the form
+        alert("Product created successfully!");
+        this.currentStep = 2; // Move to the next step
       } catch (error) {
-        console.error('Error during product creation:', error);
+        console.error("Error during product creation:", error);
+        alert("Failed to create product. Please try again.");
+      }
+    },
+    async handleSubCategorySubmit() {
+      try {
+        if (!this.selectedCategoryId) {
+          alert("Please select a category.");
+          return;
+        }
+
+        const selectedCategory = this.categories.find(
+          (cat) => cat.id === this.selectedCategoryId
+        );
+
+        // Create the subcategory DTO
+        const newSubCategory = {
+          id: null,
+          category: selectedCategory, // Ensure the category object is included
+          product: { id: this.product.id }, // Send only the product ID
+        };
+
+        const createdSubCategory = await subCategoryService.createSubCategory(
+          newSubCategory
+        );
+
+        // **Manually attach the category object to the createdSubCategory**
+        const subCategoryWithCategory = {
+          ...createdSubCategory,
+          category: selectedCategory, // Attach the category object
+        };
+
+        this.subCategories.push(subCategoryWithCategory); // Add to the local subCategories array
+
+        alert("Subcategory added successfully!");
+
+        this.selectedCategoryId = ""; // Reset the selected category
+      } catch (error) {
+        console.error("Error adding subcategory:", error);
+        alert("Failed to add subcategory. Please try again.");
+      }
+    },
+    async handleInventorySubmit() {
+      try {
+        const inventoryData = {
+          product: {
+            id: this.product.id, // Include the product object with its ID
+          },
+          quantity: this.stockQuantity,
+          vendorLocation: this.vendorLocation,
+          lastUpdated: new Date().toISOString(),
+        };
+
+        await inventoryService.createInventoryItem(inventoryData); // Send the updated inventoryData
+
+        alert("Inventory created successfully!");
+        this.resetForm();
+        this.currentStep = 1;
+      } catch (error) {
+        console.error("Error creating inventory:", error);
+        alert("Failed to create inventory. Please try again.");
       }
     },
     handleImageUpload(event) {
       const file = event.target.files[0];
       if (file) {
-        this.product.imageFile = file; // Store the file for upload
+        this.product.imageFile = file;
         const reader = new FileReader();
         reader.onload = (e) => {
-          this.product.imagePath = e.target.result; // Preview the selected image
+          this.product.imagePath = e.target.result;
         };
         reader.readAsDataURL(file);
       }
     },
     async fetchCategories() {
       try {
-        const response = await getAllCategories(); // Fetch categories from the backend
-        console.log('Fetched categories:', response);
+        const response = await getAllCategories();
         this.categories = response;
       } catch (error) {
-        console.error('Error fetching categories:', error);
+        console.error("Error fetching categories:", error);
+        alert("Failed to load categories. Please refresh the page.");
       }
     },
-    setCreationDate() {
-      this.product.createdAt = new Date().toISOString(); // Set the creation date
+    nextStep() {
+      this.currentStep++;
     },
-    setUpdateDate() {
-      this.product.updatedAt = new Date().toISOString(); // Set the update date
-    }
+    resetForm() {
+      this.product = {
+        name: "",
+        description: "",
+        price: 0,
+        imagePath: "",
+        imageFile: null,
+      };
+      this.subCategories = [];
+      this.stockQuantity = 0;
+      this.vendorLocation = "";
+      this.currentStep = 1;
+      this.selectedCategoryId = "";
+    },
+    getCategoryName(categoryId) {
+      const category = this.categories.find((cat) => cat.id === categoryId);
+      return category ? category.name : "N/A";
+    },
   },
   mounted() {
-    this.fetchCategories(); // Fetch categories when the component is mounted
-  }
-}
+    this.fetchCategories();
+  },
+};
 </script>
 
 <style scoped>
 .form-container {
-  max-width: 70%;
-  margin: auto;
-  padding: 20px;
-  border: 1px solid #ccc;
-  border-radius: 8px;
-  background-color: #f9f9f9;
+  max-width: 700px;
+  margin: 40px auto;
+  padding: 30px;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  background-color: #ffffff;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
-h1 {
+h1,
+h2 {
   text-align: center;
-  margin-bottom: 20px;
-  background-color: #C8915F;
+  color: #333;
 }
 
 .form-group {
-  margin-bottom: 15px;
+  margin-bottom: 20px;
 }
 
-.form-row {
-  display: flex;
-  justify-content: space-between;
-}
-
-label {
+.form-group label {
   display: block;
-  margin-bottom: 5px;
   font-weight: bold;
+  margin-bottom: 8px;
 }
 
-input, textarea, select {
-  width: 70%;
-  padding: 8px;
-  box-sizing: border-box;
+.form-group input[type="text"],
+.form-group input[type="number"],
+.form-group textarea,
+.form-group select,
+.form-group input[type="file"] {
+  width: 100%;
+  padding: 10px;
   border: 1px solid #ccc;
   border-radius: 4px;
-}
-
-textarea {
-  resize: vertical;
 }
 
 .img-preview {
@@ -188,21 +317,44 @@ textarea {
 .img-preview img {
   max-width: 100%;
   height: auto;
+  border-radius: 8px;
 }
 
-.submit-button {
+.submit-button,
+.next-button {
   width: 100%;
-  padding: 10px;
+  padding: 12px;
+  background-color: #007bff;
   border: none;
-  border-radius: 4px;
-  color: white;
+  border-radius: 6px;
+  color: #fff;
   font-size: 16px;
   cursor: pointer;
   margin-top: 10px;
-  background-color: #162836;
+  transition: background-color 0.3s ease;
 }
 
-.submit-button:hover {
-  background-color: #C8915F;
+.submit-button:hover,
+.next-button:hover {
+  background-color: #0056b3;
+}
+
+.subcategory-list {
+  margin-top: 25px;
+}
+
+.subcategory-list ul {
+  list-style-type: disc;
+  padding-left: 20px;
+}
+
+.navigation-buttons {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 20px;
+}
+
+.navigation-buttons .next-button {
+  width: 48%;
 }
 </style>

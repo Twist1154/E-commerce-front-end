@@ -61,7 +61,7 @@ const routes = [
      },
   { path: '/loginpage', name: 'loginpage', component: LoginPage },
   { path: '/updateProducts', name: 'UpdateProductsPage', component: UpdateProductsPage, meta: { requiresAuth: true, role: 'admin' } },
-  { path: '/updateform/:productId', name: 'UpdateForm', component: ProductUpdateForm, props: true, meta: { requiresAuth: true, role: 'admin' } },
+  { path: '/updateform/:id', name: 'UpdateForm', component: ProductUpdateForm, props: true, meta: { requiresAuth: true, role: 'admin' } },
   { path: '/cart', name: 'cart', component: ShoppingCartPage, meta: { requiresAuth: true, role: 'customer' } },
   { path: '/AddProduct', name: 'addProduct', component: AddProduct, meta: { requiresAuth: true, role: 'admin' } },
   { path: '/CategorySearch', name: 'categorySearch', component: CategorySearch },
