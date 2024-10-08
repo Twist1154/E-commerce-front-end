@@ -3,7 +3,6 @@ import App from './App.vue';
 import * as VueRouter from 'vue-router';
 import 'vuetify/styles'; // Import Vuetify styles
 
-// Import Vuetify and necessary components/directives
 import { createVuetify } from 'vuetify';
 import * as components from 'vuetify/components';
 import * as directives from 'vuetify/directives';
@@ -11,7 +10,6 @@ import * as directives from 'vuetify/directives';
 // Import Material Design Icons
 import '@mdi/font/css/materialdesignicons.css'; // Ensure MDI icons are available
 
-// Import components for different pages
 import ShoppingCartPage from './pages/ShoppingCartPage.vue';
 import ProductsPage from './pages/ProductsPage.vue';
 import ProductDetailPage from './pages/ProductDetailPage.vue';
@@ -44,7 +42,6 @@ const routes = [
   { path: '/', redirect: '/products' },
 ];
 
-// Initialize Vuetify
 const vuetify = createVuetify({
   components,
   directives,
@@ -53,7 +50,6 @@ const vuetify = createVuetify({
   },
 });
 
-// Create router instance
 const router = VueRouter.createRouter({
   history: VueRouter.createWebHistory(process.env.BASE_URL),
   routes,
@@ -61,11 +57,24 @@ const router = VueRouter.createRouter({
 
 // Global navigation guard without authentication checks
 router.beforeEach((to, from, next) => {
-  next(); // Allow navigation without authentication/authorization checks
+  const isAuthenticatedUser = isAuthenticated();
+  const userRole = getUserRole();
+  
+  console.log('isAuthenticatedUser:', isAuthenticatedUser);
+  console.log('userRole:', userRole);
+
+  if (to.meta.requiresAuth && !isAuthenticatedUser) {
+    next({ name: 'loginpage' });
+  } else if (to.meta.role && to.meta.role !== userRole) {
+    next({ name: 'notAuthorized' });  // Redirect to Not Authorized page
+  } else {
+    next();
+  }
 });
 
 // Create and mount the app
 const app = createApp(App);
+app.component('font-awesome-icon', FontAwesomeIcon);
 app.use(router);
 app.use(vuetify);
 app.mount('#app');
