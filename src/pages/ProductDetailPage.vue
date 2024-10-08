@@ -1,5 +1,8 @@
 <template>
   <div>
+    <navigation />
+    <v-divider></v-divider>
+    <h1>Details</h1>
     <div class="img-wrap">
       <!-- Display product image using the imagePath property -->
       <img :src="product.imagePath" alt="Product Image" v-if="product" />

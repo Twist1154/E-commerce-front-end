@@ -15,7 +15,7 @@ const productsService = {
 
   // Read product by ID
   getProductById(id) {
-    return axios.get(`${BASE_URL}/${id}`)
+    return axios.get(`${BASE_URL}/get/${id}`)
       .then(response => response)
       .catch(error => {
         console.error(`Error fetching product with ID ${id}:`, error);
@@ -103,15 +103,18 @@ const productsService = {
       });
   },
 
-  // Find products by price range
-  findProductByPriceRange(minPrice, maxPrice) {
-    return axios.get(`${BASE_URL}/price`, { params: { minPrice, maxPrice } })
-      .then(response => response)
-      .catch(error => {
-        console.error(`Error fetching products within price range ${minPrice} - ${maxPrice}:`, error);
-        throw error;
-      });
-  }
+// Find products by price range
+findProductByPriceRange(minPrice, maxPrice) {
+  return axios.get(`${BASE_URL}/price`, { params: { minPrice, maxPrice } })
+    .then(response => {
+      console.log(response); // Use console.log instead of console.alert
+      return response;
+    })
+    .catch(error => {
+      console.error(`Error fetching products within price range ${minPrice} - ${maxPrice}:`, error);
+      throw error;
+    });
+}
 };
 
 export default productsService;

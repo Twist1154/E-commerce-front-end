@@ -1,139 +1,189 @@
 <template>
   <div class="form-container" v-if="product">
-    <!-- Conditionally render the form when product is defined -->
     <h1>Update Product</h1>
-    <form @submit.prevent="handleSubmit">
-      <div class="form-group">
-        <label for="imagePath">Upload Image</label>
-        <input type="file" id="imagePath" @change="handleImageUpload" />
-        <div class="img-preview">
-          <!-- Use optional chaining to safely access imagePath -->
-          <img :src="product?.imagePath || placeholderImage" alt="Product Image" />
+
+    <!-- Step 1: Update Product Form -->
+    <div v-if="currentStep === 1">
+      <h2>Step 1: Update Product</h2>
+      <form @submit.prevent="handleProductSubmit">
+        <div class="form-group">
+          <label for="imagePath">Upload Image</label>
+          <input type="file" id="imagePath" @change="handleImageUpload" accept="image/*" />
+          <div class="img-preview">
+            <img :src="product.imagePath || 'https://placehold.co/400x400/png'" alt="Product Image" />
+          </div>
         </div>
-      </div>
 
-      <div class="form-group">
-        <label for="name">Name</label>
-        <input type="text" id="name" v-model="product.name" required />
-      </div>
-      <div class="form-group">
-        <label for="description">Description</label>
-        <textarea id="description" v-model="product.description" required></textarea>
-      </div>
+        <div class="form-group">
+          <label for="name">Name</label>
+          <input type="text" id="name" v-model="product.name" required />
+        </div>
 
-      <div class="form-row">
+        <div class="form-group">
+          <label for="description">Description</label>
+          <textarea id="description" v-model="product.description" required></textarea>
+        </div>
+
         <div class="form-group">
           <label for="price">Price</label>
-          <input type="number" step="0.01" id="price" v-model="product.price" required />
+          <input type="number" step="0.01" id="price" v-model.number="product.price" required />
         </div>
+
+        <button type="submit" class="submit-button">Update Product</button>
+      </form>
+    </div>
+
+    <!-- Step 2: Manage Subcategories -->
+    <div v-if="currentStep === 2">
+      <h2>Step 2: Manage Subcategories</h2>
+      <form @submit.prevent="handleSubCategorySubmit">
+        <div class="form-group">
+          <label for="category">Select Category</label>
+          <select id="category" v-model="selectedCategoryId" required>
+            <option disabled value="">Select a category</option>
+            <option v-for="category in categories" :key="category.id" :value="category.id">{{ category.name }}</option>
+          </select>
+        </div>
+
+        <button type="submit" class="submit-button">Update Subcategory</button>
+      </form>
+
+      <div class="subcategory-list" v-if="safeSubCategories.length">
+        <h3>Subcategories:</h3>
+        <ul>
+          <li v-for="subCategory in safeSubCategories" :key="subCategory.id">
+            {{ subCategory.category?.name || "Unknown Category" }}
+            <button @click="deleteSubCategory(subCategory.id)">Delete</button>
+          </li>
+        </ul>
+      </div>
+
+      <div class="navigation-buttons">
+        <button @click="nextStep" class="next-button" :disabled="!safeSubCategories.length">Next: Manage Inventory</button>
+      </div>
+    </div>
+
+    <!-- Step 3: Update Inventory -->
+    <div v-if="currentStep === 3">
+      <h2>Step 3: Update Inventory</h2>
+      <form @submit.prevent="handleInventorySubmit">
         <div class="form-group">
           <label for="stockQuantity">Stock Quantity</label>
-          <input
-            type="number"
-            id="stockQuantity"
-            v-model="product.stockQuantity"
-            required
-          />
+          <input type="number" id="stockQuantity" v-model.number="stockQuantity" required min="0" />
         </div>
-      </div>
 
-      <div class="form-group">
-        <label for="categoryId">Category</label>
-        <select id="categoryId" v-model="product.categoryId" required>
-          <option
-            v-for="category in categories"
-            :key="category.category_id"
-            :value="category.category_id"
-          >
-            {{ category.name }}
-          </option>
-        </select>
-      </div>
+        <div class="form-group">
+          <label for="vendorLocation">Vendor Location</label>
+          <input type="text" id="vendorLocation" v-model="vendorLocation" required />
+        </div>
 
-      <div class="form-row">
-        <!-- Button to update the product -->
-        <button type="submit" class="submit-button">Update</button>
-        <!-- Back Button -->
-        <button class="back-button" @click="goBack">
-          <img :src="backIcon" alt="Back Icon" />
-        </button>
-        <!-- Button to delete the product -->
-        <button type="button" class="delete-button" @click="deleteProduct">
-          <img :src="deleted" alt="delete Icon" />
-        </button>
-      </div>
-    </form>
+        <button type="submit" class="submit-button">Update Inventory</button>
+      </form>
+    </div>
   </div>
 </template>
 
 <script>
 import { uploadFileToS3 } from "@/services/awsService";
 import productsService from "@/services/productsService";
+import subCategoryService from "@/services/subCategoryService";
+import inventoryService from "@/services/inventoryService";
 import { getAllCategories } from "@/services/categoriesService";
-import deleted from "@/assets/deleted.svg";
-import backIcon from "@/assets/back.svg";
 
 export default {
   name: "updateForm",
   data() {
     return {
+      currentStep: 1,
       product: {
-        productId: "",
+        id: "",
         name: "",
         description: "",
-        price: "",
-        stockQuantity: "",
-        categoryId: "",
+        price: 0,
         imagePath: "",
-        createdAt: "",
-        updatedAt: "",
+        imageFile: null,
       },
       categories: [],
-      placeholderImage: "https://placehold.co/400x400/png",
-      deleted,
-      backIcon,
+      selectedCategoryId: "", // Holds the selected category ID
+      stockQuantity: 0,
+      vendorLocation: "",
+      subCategories: [], // Separate array for subcategories
     };
   },
+  computed: {
+    safeSubCategories() {
+      return this.subCategories || [];
+    },
+  },
   methods: {
-    goBack() {
-      this.$router.push({ name: "updateProductsPage" }); // Navigate to the updateProductsPage
-    },
-    resetForm() {
-      this.product = {
-        productId: "",
-        name: "",
-        description: "",
-        price: "",
-        stockQuantity: "",
-        categoryId: "",
-        imagePath: "",
-        createdAt: "",
-        updatedAt: "",
-      };
-    },
-    async handleSubmit() {
+    async handleProductSubmit() {
       try {
-        this.setUpdateDate();
-
         if (this.product.imageFile) {
-          const file = this.product.imageFile;
-          const uploadedImageUrl = await uploadFileToS3(file);
+          const uploadedImageUrl = await uploadFileToS3(this.product.imageFile);
           this.product.imagePath = uploadedImageUrl;
         }
 
-        // Update the product using the specified method
-        const response = await productsService.updateProduct(
-          this.product.productId,
-          this.product
-        );
-        this.product = response.data; // Update the product data with the response from the backend
+        // Update the product on the backend
+        const response = await productsService.updateProduct(this.product.id, this.product);
+        this.product = response.data;
 
-        console.log("Product updated:", this.product);
         alert("Product updated successfully!");
-        this.resetForm(); // Reset the form after a successful update
+        this.currentStep = 2; // Move to the next step
       } catch (error) {
-        console.error("Error during product update:", error);
-        alert("There was an error updating the product. Please try again.");
+        console.error("Error updating product:", error);
+        alert("Failed to update product. Please try again.");
+      }
+    },
+    async handleSubCategorySubmit() {
+      try {
+        if (!this.selectedCategoryId) {
+          alert("Please select a category.");
+          return;
+        }
+
+        const selectedCategory = this.categories.find(cat => cat.id === this.selectedCategoryId);
+
+        const updatedSubCategory = {
+          id: this.subCategoryId, // Assume subCategoryId is provided for the update
+          category: selectedCategory,
+          product: { id: this.product.id },
+        };
+
+        await subCategoryService.updateSubCategory(this.subCategoryId, updatedSubCategory);
+
+        alert("Subcategory updated successfully!");
+        this.selectedCategoryId = "";
+      } catch (error) {
+        console.error("Error updating subcategory:", error);
+        alert("Failed to update subcategory. Please try again.");
+      }
+    },
+    async deleteSubCategory(id) {
+      try {
+        await subCategoryService.deleteSubCategory(id);
+        this.subCategories = this.subCategories.filter(sub => sub.id !== id);
+        alert("Subcategory deleted successfully.");
+      } catch (error) {
+        console.error("Error deleting subcategory:", error);
+        alert("Failed to delete subcategory. Please try again.");
+      }
+    },
+    async handleInventorySubmit() {
+      try {
+        const inventoryData = {
+          product: { id: this.product.id },
+          quantity: this.stockQuantity,
+          vendorLocation: this.vendorLocation,
+          lastUpdated: new Date().toISOString(),
+        };
+
+        await inventoryService.updateInventoryItem(inventoryData);
+
+        alert("Inventory updated successfully!");
+        this.resetForm();
+      } catch (error) {
+        console.error("Error updating inventory:", error);
+        alert("Failed to update inventory. Please try again.");
       }
     },
     handleImageUpload(event) {
@@ -141,103 +191,124 @@ export default {
       if (file) {
         this.product.imageFile = file;
         const reader = new FileReader();
-        reader.onload = (e) => {
+        reader.onload = e => {
           this.product.imagePath = e.target.result;
         };
         reader.readAsDataURL(file);
       }
     },
-    async fetchProduct(productId) {
-      try {
-        // Fetch product details using the provided method
-        const response = await productsService.getProductById(productId);
-        this.product = response.data; // Update the product data with the response from the backend
-
-        await this.fetchCategories(); // Fetch categories after product data is available
-
-        // Ensure the categoryId is set
-        this.product.categoryId = this.product.categoryId || "";
-      } catch (error) {
-        console.error("Error fetching product:", error);
-      }
-    },
     async fetchCategories() {
       try {
         const response = await getAllCategories();
-        this.categories = response || []; // Ensure categories is an array
+        this.categories = response;
       } catch (error) {
         console.error("Error fetching categories:", error);
+        alert("Failed to load categories. Please refresh the page.");
       }
     },
-    setUpdateDate() {
-      this.product.updatedAt = new Date().toISOString();
+    async fetchProduct(id) {
+      try {
+        const response = await productsService.getProductById(id);
+        this.product = response.data;
+
+        // Fetch associated subcategories and inventory
+        this.fetchSubCategories();
+        this.fetchInventory();
+      } catch (error) {
+        console.error("Error fetching product details:", error);
+        alert("Failed to load product details. Please refresh the page.");
+      }
     },
-    async deleteProduct() {
-      if (confirm("Are you sure you want to delete this product?")) {
-        try {
-          const response = await productsService.deleteProduct(this.product.productId);
-          console.log("Product deleted successfully:", response);
-          alert("Product deleted successfully!");
-          this.$router.push({ name: "updateProductsPage" });
-        } catch (error) {
-          console.error(
-            `Error deleting product with ID ${this.product.productId}:`,
-            error.response || error.message || error
-          );
-          alert("There was an error deleting the product. Please try again.");
+    async fetchSubCategories() {
+      try {
+        const subCategories = await subCategoryService.getSubCategoriesByProduct(this.product.id);
+        this.subCategories = subCategories;
+      } catch (error) {
+        console.error("Error fetching subcategories:", error);
+        alert("Failed to load subcategories. Please try again.");
+      }
+    },
+    async fetchInventory() {
+      try {
+        const inventoryItems = await inventoryService.getInventoryItemsByProductId(this.product.id);
+        if (inventoryItems && inventoryItems.length) {
+          const latestInventory = inventoryItems[0]; // Assuming you're using the first item
+          this.stockQuantity = latestInventory.quantity;
+          this.vendorLocation = latestInventory.vendorLocation;
         }
+      } catch (error) {
+        console.error("Error fetching inventory items:", error);
+        alert("Failed to load inventory. Please try again.");
       }
+    },
+    nextStep() {
+      this.currentStep++;
+    },
+    resetForm() {
+      this.product = {
+        id: "",
+        name: "",
+        description: "",
+        price: 0,
+        imagePath: "",
+        imageFile: null,
+      };
+      this.subCategories = [];
+      this.stockQuantity = 0;
+      this.vendorLocation = "";
+      this.currentStep = 1;
+      this.selectedCategoryId = "";
     },
   },
-  async mounted() {
-    const productId = this.$route.params.productId;
-    await this.fetchProduct(productId); // Fetch the product details using the productId
+  mounted() {
+    this.fetchCategories();
+    const productId = this.$route.params.id;
+    this.fetchProduct(productId); // Fetch the product details using the productId
   },
 };
 </script>
 
-<!---------------------------------------------------------------------------------------------------------------->
-
 <style scoped>
 .form-container {
-  max-width: 70%;
-  margin: auto;
+  max-width: 600px;
+  margin: 0 auto;
   padding: 20px;
-  border: 1px solid #ccc;
-  border-radius: 8px;
   background-color: #f9f9f9;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
-h1 {
+h1, h2 {
   text-align: center;
-  margin-bottom: 20px;
-  background-color: aqua;
+  color: #333;
+}
+
+h3 {
+  color: #555;
+  margin-bottom: 10px;
 }
 
 .form-group {
-  margin-bottom: 15px;
+  margin-bottom: 20px;
 }
 
-.form-row {
-  width: 70%;
-  display: flex;
-  justify-content: space-between;
-}
-
-label {
+.form-group label {
   display: block;
+  font-weight: 600;
   margin-bottom: 5px;
-  font-weight: bold;
+  color: #333;
 }
 
-input,
-textarea,
-select {
-  width: 70%;
-  padding: 8px;
-  box-sizing: border-box;
+.form-group input[type="text"],
+.form-group input[type="number"],
+.form-group input[type="file"],
+.form-group select,
+.form-group textarea {
+  width: 100%;
+  padding: 10px;
   border: 1px solid #ccc;
   border-radius: 4px;
+  box-sizing: border-box;
 }
 
 textarea {
@@ -245,65 +316,106 @@ textarea {
 }
 
 .img-preview {
+  display: flex;
+  justify-content: center;
   margin-top: 10px;
-  text-align: center;
 }
 
 .img-preview img {
-  max-width: 100%;
-  height: auto;
+  width: 150px;
+  height: 150px;
+  object-fit: cover;
+  border-radius: 8px;
+  border: 1px solid #ddd;
 }
 
-.submit-button {
-  width: 70%;
-  padding: 10px;
+.submit-button, .next-button {
+  display: block;
+  width: 100%;
+  padding: 10px 0;
+  background-color: #007bff;
+  color: white;
+  font-size: 16px;
   border: none;
   border-radius: 4px;
-  color: white;
-  font-size: 16px;
   cursor: pointer;
-  margin-top: 10px;
-  background-color: #0631f0;
+  text-align: center;
 }
 
-.submit-button:hover {
-  background-color: #4cae4c;
+.submit-button:hover, .next-button:hover {
+  background-color: #0056b3;
 }
 
+.subcategory-list {
+  margin-top: 20px;
+}
 
-.back-button {
-  background-color: #413f3f; /* Red background for  back button */
+.subcategory-list ul {
+  list-style-type: none;
+  padding: 0;
+}
+
+.subcategory-list li {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  margin-bottom: 10px;
+  background-color: #fff;
+}
+
+.subcategory-list button {
+  padding: 5px 10px;
+  background-color: #dc3545;
   color: white;
   border: none;
-  padding: 10px 20px;
-  border-radius: 5px;
+  border-radius: 4px;
   cursor: pointer;
-  font-size: 16px;
-  margin-top: 10px;
 }
 
-.back-button img {
-  width: 24px; /* Adjust the size as needed */
-  height: 24px;
+.subcategory-list button:hover {
+  background-color: #c82333;
 }
 
-.delete-button {
-  background-color: #e74c3c; /* Red background for delete button */
+.navigation-buttons {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 20px;
+}
+
+.navigation-buttons button {
+  padding: 10px 20px;
+  background-color: #28a745;
   color: white;
   border: none;
-  padding: 10px 20px;
-  border-radius: 5px;
+  border-radius: 4px;
   cursor: pointer;
-  font-size: 16px;
-  margin-top: 10px;
 }
 
-.delete-button img {
-  width: 24px; /* Adjust icon size */
-  height: 24px;
+.navigation-buttons button:disabled {
+  background-color: #6c757d;
+  cursor: not-allowed;
 }
 
-.delete-button:hover {
-  background-color: #c0392b; /* Darker red on hover */
+.navigation-buttons button:hover:not(:disabled) {
+  background-color: #218838;
+}
+
+@media screen and (max-width: 768px) {
+  .form-container {
+    padding: 15px;
+  }
+
+  .submit-button, .next-button {
+    font-size: 14px;
+  }
+
+  .img-preview img {
+    width: 120px;
+    height: 120px;
+  }
 }
 </style>
+

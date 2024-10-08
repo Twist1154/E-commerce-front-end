@@ -9,16 +9,26 @@
       <div
         class="product-item"
         v-for="product in products"
-        :key="product.productId"
+        :key="product.id"
       >
-        <!-- Product image -->
-        <img :src="product.imagePath" alt="Product Image" />
+        <!-- Product image with fallback when imagePath is empty -->
+        <img
+          :src="product.imagePath || 'https://via.placeholder.com/200'"
+          alt="Product Image"
+        />
         <!-- Product name -->
         <h3 class="product-name">{{ product.name }}</h3>
+        <!-- Product description -->
+        <p class="product-description">{{ product.description }}</p>
         <!-- Product price -->
         <p class="product-price">{{ product.price }}</p>
+        <!-- Created and Updated times -->
+        <p class="product-timestamps">
+          <small>Created: {{ new Date(product.createdAt).toLocaleDateString() }}</small><br>
+          <small>Updated: {{ new Date(product.updatedAt).toLocaleDateString() }}</small>
+        </p>
         <!-- Button to navigate to update product form -->
-        <router-link :to="'/updateForm/' + product.productId">
+        <router-link :to="'/updateForm/' + product.id">
           <button>Update Product</button>
         </router-link>
       </div>
@@ -89,6 +99,17 @@ h1 {
 /* Style for the product name */
 .product-name {
   margin-bottom: 0;
+}
+
+/* Style for product description */
+.product-description {
+  font-style: italic;
+  margin-bottom: 8px;
+}
+
+/* Style for product timestamps */
+.product-timestamps small {
+  color: gray;
 }
 
 /* Style for product images */
