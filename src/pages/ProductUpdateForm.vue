@@ -52,7 +52,7 @@
         <h3>Subcategories:</h3>
         <ul>
           <li v-for="subCategory in safeSubCategories" :key="subCategory.id">
-            {{ subCategory.category?.name || "Unknown Category" }}
+            {{ (subCategory.category && subCategory.category.name) || "Unknown Category" }}
             <button @click="initiateDelete(subCategory.id)">Delete</button>
           </li>
         </ul>
