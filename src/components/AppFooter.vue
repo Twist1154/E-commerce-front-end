@@ -1,77 +1,39 @@
 <template>
-  <footer>
-    <ul class="footer-links">
-      <li><router-link class="link" to="/">Home</router-link></li>
-      <li><router-link class="link" to="/about">About</router-link></li>
-      <li><router-link class="link" to="/register">SignUp</router-link></li>
-      <li v-if="isLoginPage"><router-link class="link" to="/admin">Admin</router-link></li>
-      <li v-if="isAdminPage"><router-link class="link" to="/loginpage">Login</router-link></li>
-    </ul>
-    <div class="social-icons">
-      <a href="https://facebook.com" target="_blank" class="icon"><i class="fab fa-facebook-f"></i></a>
-      <a href="https://instagram.com" target="_blank" class="icon"><i class="fab fa-instagram"></i></a>
-      <a href="https://github.com" target="_blank" class="icon"><i class="fab fa-github"></i></a>
+  <v-footer
+    :style="{ background: 'linear-gradient(to top right, rgba(19,84,122,.8), rgba(128,208,199,.8))' }" 
+    class="text-center d-flex flex-column"
+  >
+    <div>
+      <v-btn
+        v-for="icon in icons"
+        :key="icon"
+        :icon="icon"
+        class="mx-4"
+        variant="text"
+      ></v-btn>
     </div>
-  </footer>
+
+    <div class="pt-0">
+      Phasellus feugiat arcu sapien, et iaculis ipsum elementum sit amet. Mauris cursus commodo interdum. Praesent ut risus eget metus luctus accumsan id ultrices nunc. Sed at orci sed massa consectetur dignissim a sit amet dui. Duis commodo vitae velit et faucibus. Morbi vehicula lacinia malesuada. Nulla placerat augue vel ipsum ultrices, cursus iaculis dui sollicitudin. Vestibulum eu ipsum vel diam elementum tempor vel ut orci. Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus.
+    </div>
+
+    <v-divider></v-divider>
+
+    <div>
+      {{ new Date().getFullYear() }} — <strong>Vuetify</strong>
+    </div>
+  </v-footer>
 </template>
 
 <script>
 export default {
-  computed: {
-    isLoginPage() {
-      return this.$route.path === '/loginPage';
-    },
-    isAdminPage() {
-      return this.$route.path === '/admin';
-    }
-  }
+  data: () => ({
+    icons: [
+      'mdi-facebook',
+      'mdi-twitter',
+      'mdi-linkedin',
+      'mdi-instagram',
+    ],
+  }),
 }
 </script>
-
-<style scoped>
-/* Footer Styles */
-footer {
-  background-color: #162836;
-  color: white;
-  padding: 20px;
-  text-align: center;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  margin-top: auto;
-}
-
-.footer-links {
-  list-style: none;
-  padding: 0;
-  margin: 0 0 10px;
-  display: flex;
-  gap: 20px;
-}
-
-.footer-links .link {
-  color: white;
-  text-decoration: none;
-  font-size: 1.2rem;
-  transition: color 0.3s;
-}
-
-.footer-links .link:hover {
-  color: #C8915F;
-}
-
-.social-icons {
-  display: flex;
-  gap: 15px;
-}
-
-.social-icons .icon {
-  font-size: 1.5rem;
-  color: white;
-  transition: color 0.3s;
-}
-
-.social-icons .icon:hover {
-  color: #C8915F;
-}
-</style>

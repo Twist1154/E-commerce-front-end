@@ -1,295 +1,101 @@
 <template>
-  <header :class="{'scrolled-nav': scrollPosition > 0}">
-    <nav>
-      <div class="branding">
-        <img src="@/assets/logo1.jpeg" alt="Logo">
-        <h1 class="title"><span class="first-letter">A</span>frican_<span>Arts</span></h1>
-      </div>
-      <div class="icon">
-        <i @click="toggleMobileNav" class="far fa-bars" :class="{'icon-active': mobileNav}"></i>
-      </div>
-    </nav>
-  </header>
+  <v-app>
+    <!-- App Bar -->
+    <v-app-bar app color="teal-darken-4">
+      <template v-slot:image>
+        <v-img gradient="to top right, rgba(19,84,122,.8), rgba(128,208,199,.8)"></v-img>
+      </template>
 
-  <transition name="slide">
-    <aside v-if="mobileNav" class="sidebar">
-      <div class="sidebar-branding">
-        <h1 class="title"><span class="first-letter">A</span>frican_<span>Arts</span></h1>
-      </div>
-      <ul class="sidebar-links">
-        <li><router-link class="link" :to="{ path: '/CategorySearch' }" @click="closeMobileNav">Search</router-link></li>
-        <li><router-link class="link" :to="{ path: '/' }" @click="closeMobileNav">Home</router-link></li>
-        <li><router-link class="link" :to="{ path: '/products' }" @click="closeMobileNav">About</router-link></li>
-        <li><router-link class="link" :to="{ name: 'RegisterPage' }" @click="closeMobileNav">SignUp</router-link></li>
-      </ul>
-      
-      <!-- Icons are only displayed if the current route is not login, signup, or admin -->
-      <div v-if="showIcons" class="sidebar-icons">
-        <router-link to="/profile" class="icon-link"><i class="far fa-user"></i></router-link>
-        <router-link to="/cart" class="icon-link"><i class="fas fa-shopping-cart"></i></router-link>
-        <router-link to="/wishlist" class="icon-link"><i class="fas fa-heart"></i></router-link>
-      </div>
+      <!-- Sidebar toggle button -->
+      <v-app-bar-nav-icon @click="toggleDrawer"></v-app-bar-nav-icon>
 
-      <!-- Conditional login/logout button -->
-      <button v-if="isAuthenticated" @click="logout" class="logout-button">Logout</button>
-      <button v-else @click="redirectToLogin" class="login-button">Login</button>
-    </aside>
-  </transition>
+      <v-app-bar-title>AfricanArts&Craft</v-app-bar-title>
+
+      <v-spacer></v-spacer>
+
+      <!-- Action buttons -->
+      <v-btn icon>
+        <v-icon>mdi-magnify</v-icon>
+      </v-btn>
+
+      <v-btn icon>
+        <v-icon>mdi-heart</v-icon>
+      </v-btn>
+
+      <v-btn icon>
+        <v-icon>mdi-cart</v-icon>
+      </v-btn>
+
+      <!-- Profile and Settings Dropdown -->
+      <v-menu offset-y>
+        <template v-slot:activator="{ props }">
+          <v-btn icon v-bind="props">
+            <v-icon>mdi-dots-vertical</v-icon>
+          </v-btn>
+        </template>
+        <v-list>
+          <v-list-item @click="goToProfile">
+            <v-list-item-title>Profile</v-list-item-title>
+          </v-list-item>
+          <v-list-item @click="goToSettings">
+            <v-list-item-title>Settings</v-list-item-title>
+          </v-list-item>
+        </v-list>
+      </v-menu>
+    </v-app-bar>
+
+    <!-- App Sidebar Component -->
+    <AppSidebar :drawer="drawer" @update:drawer="drawer = $event" />
+
+    <v-main>
+      <v-container fluid>
+        <!-- Main content goes here -->
+      </v-container>
+    </v-main>
+  </v-app>
 </template>
 
-
-
-
-
 <script>
+import AppSidebar from './AppSidebar.vue'; // Import AppSidebar component
+
 export default {
-  name: "navG",
+  name: 'NavG',
+  components: {
+    AppSidebar, // Register the AppSidebar component
+  },
   data() {
     return {
-      scrollPosition: 0,
-      mobileNav: false,
-      windowWidth: window.innerWidth,
+      drawer: false, // Drawer starts closed
     };
   },
-  computed: {
-    showIcons() {
-      const hiddenPages = ['loginpage', 'register', 'admin'];
-      return !hiddenPages.includes(this.$route.name);
-    },
-    isAuthenticated() {
-      // Check if the user is authenticated based on the presence of a token or user data in localStorage
-      return !!localStorage.getItem('currentUser');
-    },
-  },
   methods: {
-    toggleMobileNav() {
-      this.mobileNav = !this.mobileNav;
+    toggleDrawer() {
+      this.drawer = !this.drawer; // Toggle drawer open/close
     },
-    closeMobileNav() {
-      this.mobileNav = false; // Close the sidebar
+    goToProfile() {
+      console.log('Navigating to Profile');
     },
-    handleScroll() {
-      this.scrollPosition = window.scrollY;
+    goToSettings() {
+      console.log('Navigating to Settings');
     },
-    handleResize() {
-      this.windowWidth = window.innerWidth;
-      if (this.windowWidth > 768) {
-        this.mobileNav = false; // Close sidebar on large screens
-      }
-    },
-    logout() {
-      // Clear user data from localStorage
-      localStorage.removeItem('currentUser');
-      
-      // Redirect to login page
-      this.$router.push({ name: 'loginpage' });
-      
-      // Optionally, close the mobile nav if it's open
-      this.closeMobileNav();
-    },
-    redirectToLogin() {
-      // Redirect to the login page
-      this.$router.push({ name: 'loginpage' });
-
-      // Close mobile nav if open
-      this.closeMobileNav();
-    }
   },
-  mounted() {
-    window.addEventListener('scroll', this.handleScroll);
-    window.addEventListener('resize', this.handleResize);
-    this.handleResize(); // Initialize mobileNav based on initial window size
-  },
-  beforeUnmount() {
-    window.removeEventListener('scroll', this.handleScroll);
-    window.removeEventListener('resize', this.handleResize);
-  }
 };
 </script>
 
-
-
-
-<style lang="scss" scoped>
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap');
-
-header {
-  background-color: rgba(22, 40, 54, 0.3);
-  z-index: 1000;
-  width: 100%;
-  position: fixed;
-  top: 0;
-  left: 0;
-  transition: 0.5s ease all;
-
-  &.scrolled-nav {
-    background-color: rgba(22, 40, 54, 0.8);
-  }
-
-  nav {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 12px 0;
-    width: 90%;
-    margin: 0 auto;
-
-    @media (min-width: 1100px) {
-      max-width: 1140px;
-    }
-  }
-
-  .branding {
-    display: flex;
-    align-items: center;
-
-    img {
-      width: 70px;
-      height: auto;
-      margin-right: 10px;
-      transition: .5s ease all;
-    }
-
-    .title {
-      font-family: 'Inter', sans-serif;
-      font-size: 24px;
-      color: #C8915F;
-      font-weight: 400;
-      display: flex;
-      align-items: center;
-
-      .first-letter {
-        font-size: 70px;
-        font-weight: 700;
-        line-height: 1;
-      }
-
-      span {
-        font-size: 24px;
-        font-weight: 400;
-      }
-    }
-  }
-
-  .icon {
-    display: flex;
-    align-items: center;
-
-    i {
-      cursor: pointer;
-      font-size: 24px;
-      transition: .8s ease all;
-    }
-  }
-
-  .icon-active {
-    transform: rotate(180deg);
-  }
+<style>
+/* Ensuring no additional spacing in NavG */
+.v-navigation-drawer {
+  z-index: 1000; /* Ensure drawer overlays content */
 }
 
-.sidebar {
-  background-color: #162836;
-  width: 250px;
-  height: 100vh;
-  padding: 20px;
-  position: fixed;
-  left: 0;
-  top: 0;
-  z-index: 1500;
-
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between; 
-
-  .login-button {
-  margin: 20px 0;
-  padding: 10px 20px;
-  background-color: #C8915F;
-  color: white;
-  border: none;
-  cursor: pointer;
-  font-size: 1rem;
-  border-radius: 5px;
-  transition: background-color 0.3s;
-
-  &:hover {
-    background-color: darken(#C8915F, 10%);
-  }
+.v-app-bar {
+  z-index: 1001; /* App bar stays above drawer */
 }
 
-
-  .sidebar-branding {
-    margin-bottom: 40px;
-
-    .title {
-      font-family: 'Inter', sans-serif;
-      font-size: 24px;
-      color: #C8915F;
-      font-weight: 400;
-      display: flex;
-      align-items: center;
-
-      .first-letter {
-        font-size: 70px;
-        font-weight: 700;
-        line-height: 1;
-      }
-
-      span {
-        font-size: 24px;
-        font-weight: 400;
-      }
-    }
-  }
-
-  .sidebar-links {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
-
-    .link {
-      color: white;
-      text-decoration: none;
-      font-size: 1.2rem;
-      transition: color 0.3s;
-    }
-
-    .link:hover {
-      color: #C8915F;
-    }
-  }
-
-  .sidebar-icons {
-    display: flex;
-    justify-content: space-between;
-    padding: 0 20px;
-    margin-bottom: 20px;  /* Added margin-bottom to move the icons away from the bottom */
-
-    .icon-link {
-      color: white;
-      font-size: 1.5rem;
-      transition: color 0.3s;
-    }
-
-    .icon-link:hover {
-      color: #C8915F;
-    }
-
-    i {
-      font-size: 24px;
-    }
-  }
-}
-
-/* Transition for Sidebar */
-.slide-enter-active, .slide-leave-active {
-  transition: transform 0.3s ease-in-out;
-}
-
-.slide-enter, .slide-leave-to {
-  transform: translateX(-100%);
+/* Make sure no padding/margin is applied here */
+.v-main {
+  padding: 0 !important; /* Remove any padding */
+  margin: 0 !important; /* Remove any margin */
+  z-index: 0; /* Main content has the lowest z-index */
 }
 </style>
