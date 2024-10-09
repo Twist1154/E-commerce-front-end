@@ -25,6 +25,7 @@ import RegisterPage from './pages/RegisterPage.vue';
 import ProductCard from './components/ProductCard.vue';
 import NotAuthorizedPage from './pages/NotAuthorizedPage.vue';
 import AdminPage from './pages/AdminPage.vue';
+import CartPage from './pages/CartPage.vue';
 
 // Utility functions for user authentication
 function getUser() {
@@ -80,6 +81,7 @@ const routes = [
   { path: '/CategorySearch', name: 'categorySearch', component: CategorySearch },
   { path: '/PriceRange', name: 'priceRange', component: PriceRange },
   { path: '/products', name: 'products', component: ProductsPage },
+  { path: '/cart', name: 'cart', component: CartPage },
   {
     path: '/products/:productId',
     name: 'productDetailPage',
