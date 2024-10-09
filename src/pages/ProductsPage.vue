@@ -20,16 +20,17 @@
         >
           <!-- Updated ProductCard Props to match the new data structure -->
           <product-card
-            :productId="product.id"
-            :name="product.name"
-            :description="product.description"
-            :price="product.price"
-            :stockQuantity="product.stockQuantity || 'N/A'"  
-            :subCategories="product.subCategories" 
-            :imagePath="product.imagePath"
-            @view-details="handleViewDetails"  
-            @add-to-cart="handleAddToCart"  
-          />
+  :productId="product.id"
+  :name="product.name"
+  :description="product.description"
+  :price="product.price"
+  :inventoryItem="product.inventoryItem" 
+  :reviews="reviews" 
+  :subCategories="product.subCategories" 
+  :imagePath="product.imagePath"
+  @view-details="handleViewDetails"
+  @add-to-cart="handleAddToCart"
+/>
         </v-col>
       </v-row>
 
