@@ -25,10 +25,10 @@
             :description="product.description"
             :price="product.price"
             :stockQuantity="product.stockQuantity || 'N/A'"  
-            :categoryName="product.subCategories"
+            :subCategories="product.subCategories" 
             :imagePath="product.imagePath"
-            @view-details="handleViewDetails"
-            @add-to-cart="handleAddToCart(product.id)" 
+            @view-details="handleViewDetails"  
+            @add-to-cart="handleAddToCart"  
           />
         </v-col>
       </v-row>
