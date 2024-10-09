@@ -1,72 +1,96 @@
 <template>
-  <main class="login">
-    <navigation />
-    <section class="forms">
-      <form class="login" @submit.prevent="validateUser">
-        <h2>Login</h2>
-        <input 
-          type="email" 
-          placeholder="Email Address" 
-          v-model="loginData.email" 
-          required 
-        />
-        <input 
-          type="password"
-          placeholder="Password"
-          v-model="loginData.password" 
-          required 
-        />
-        <input 
-          type="submit"
-          value="Login" 
-        />
-        <router-link to="/register" class="custom-link">SignUp</router-link>      
-      </form>
-    </section>
-  </main>
+  <v-app>
+    <v-main class="login">
+      <navigation />
+      <v-container class="forms" fluid>
+        <v-row justify="center">
+          <v-col cols="12" md="6" lg="4">
+            <v-card>
+              <v-card-title class="justify-center">
+                <h2>Login</h2>
+              </v-card-title>
+              <v-card-text>
+                <v-form @submit.prevent="validateUser">
+                  <v-text-field
+                    label="Email Address"
+                    v-model="loginData.email"
+                    :rules="[rules.required, rules.email]"
+                    @input="validateEmail"
+                    outlined
+                    dense
+                  />
+                  <v-alert v-if="!emailIsValid" type="error" dense outlined>Invalid email address</v-alert>
+
+                  <v-text-field
+                    label="Password"
+                    v-model="loginData.password"
+                    :rules="[rules.required, rules.password]"
+                    type="password"
+                    @input="validatePassword"
+                    outlined
+                    dense
+                  />
+                  <v-alert v-if="!passwordIsValid" type="error" dense outlined>Password must be at least 6 characters</v-alert>
+
+                  <v-btn
+                    class="custom-btn"
+                    :loading="isLoading"
+                    block
+                    type="submit"
+                    style="background-color: #0c0c0c; color: white;"
+                  >
+                    {{ isLoading ? 'Logging in...' : 'Login' }}
+                  </v-btn>
+                </v-form>
+                <router-link to="/reset-password" class="forgot-password">Forgot Password?</router-link>
+              </v-card-text>
+            </v-card>
+          </v-col>
+        </v-row>
+      </v-container>
+    </v-main>
+  </v-app>
 </template>
 
 <script>
-import navigation from '@/components/NavG.vue';
-import { useRouter } from 'vue-router';
+//import navigation from '@/components/NavG.vue';
 import userService from '@/services/userService.js';
 
 export default {
-  components: { navigation },
+  //components: { navigation },
   data() {
     return {
       loginData: {
         email: '',
         password: ''
       },
-      isLoading: false,  // State to track loading status
+      isLoading: false,
+      emailIsValid: true,
+      passwordIsValid: true,
+      rules: {
+        required: value => !!value || 'Required.',
+        email: value => /.+@.+\..+/.test(value) || 'Invalid email.',
+        password: value => value.length >= 6 || 'Password must be at least 6 characters.'
+      }
     };
   },
   methods: {
     async validateUser() {
-      if (!this.loginData.email || !this.loginData.password) {
-        alert('Email and password are required');
+      if (!this.emailIsValid || !this.passwordIsValid) {
+        alert('Please correct the errors before submitting.');
         return;
       }
 
-      //this.isLoading = true;  // Start loading indicator
+      this.isLoading = true;
 
       try {
-        // Validate user credentials
-       await userService.validateUser(this.loginData.email, this.loginData.password);
-
-        // Fetch user data by email after successful login
-         const user = await userService.getUsersByEmail(this.loginData.email);
-
-        // Store the user data in localStorage (never store passwords)
+        await userService.validateUser(this.loginData.email, this.loginData.password);
+        const user = await userService.getUsersByEmail(this.loginData.email);
         localStorage.setItem('currentUser', JSON.stringify(user));
-        localStorage.setItem('currentUser', JSON.stringify({
-         authToken: 'some-token',
-         role: 'customer',
-         }));        alert('Login successful');
-
-        // Redirect to the home page or any other page
-        this.$router.push('/'); 
+        localStorage.setItem('authToken', 'some-token');
+        localStorage.setItem('role', 'customer');
+        alert('Login successful');
+        this.$router.push('/');
       } catch (error) {
         if (error.response) {
           switch (error.response.status) {
@@ -87,112 +111,40 @@ export default {
           alert('An error occurred');
         }
       } finally {
-        this.isLoading = false;  // End loading indicator
+        this.isLoading = false;
       }
+    },
+    validateEmail() {
+      this.emailIsValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(this.loginData.email);
+    },
+    validatePassword() {
+      this.passwordIsValid = this.loginData.password.length >= 6;
     }
-  },
-  setup() {
-    const router = useRouter();
-    return { router };
   }
 };
 </script>
 
 <style>
 .forms {
-  display: flex;
   min-height: 100vh;
-  justify-content: center; /* Centering form horizontally */
-  align-items: center; /* Centering form vertically */
-}
-
-form {
-  flex: 1 1 0%;
-  padding: 8rem 1rem 1rem;
-}
-
-form.register {
-  color: #FFF;
-  background-color: #162836;
-  background-image: linear-gradient(
-    to bottom right,
-    rgb(22, 40, 54) 0%,
-    rgb(200, 145, 95) 100%
-  );
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 h2 {
   font-size: 2rem;
   text-transform: uppercase;
-  margin-bottom: 2rem;
-  text-align: center; /* Center the heading */
+  margin-bottom: 1rem;
+  text-align: center;
 }
 
-input {
-  appearance: none;
-  border: none;
-  outline: none;
-  background: none;
-  display: block;
-  width: 100%;
-  max-width: 400px;
-  margin: 0 auto;
-  font-size: 1.5rem;
-  margin-bottom: 1rem; /* Adjusted for spacing */
-  padding: 0.5rem 0;
-}
-
-input:not([type="submit"]) {
-  opacity: 0.8;
-  transition: 0.4s;
-}
-
-input:focus:not([type="submit"]) {
-  opacity: 1;
-}
-
-input::placeholder {
-  color: inherit;
-}
-
-form.register input:not([type="submit"]) {
-  color: #FFF;
-  border-bottom: 2px solid #FFF;
-}
-
-form.login input:not([type="submit"]) {
-  color: #2c3e50;
-  border-bottom: 2px solid #2c3e50;
-}
-
-form.login input[type="submit"] {
-  background-color: #162836;
-  color: #FFF;
-  font-weight: 700;
-  padding: 1rem 2rem;
-  border-radius: 0.5rem;
-  cursor: pointer;
-  text-transform: uppercase;
-  margin-bottom: 1rem; /* Space below button */
-}
-
-form.register input[type="submit"] {
-  background-color: #FFF;
-  color: #162836;
-  font-weight: 700;
-  padding: 1rem 2rem;
-  border-radius: 0.5rem;
-  cursor: pointer;
-  text-transform: uppercase;
-  margin-bottom: 1rem; /* Space below button */
-}
-
-.custom-link {
+.forgot-password {
   display: block;
   text-align: center;
   color: #A67245;
   text-decoration: none;
   font-size: 1rem;
-  margin-top: 1rem; /* Space above the link */
+  margin-top: 1rem;
 }
 </style>
