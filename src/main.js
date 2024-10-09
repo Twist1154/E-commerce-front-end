@@ -45,7 +45,7 @@ const routes = [
   { path: '/CategorySearch', name: 'categorySearch', component: CategorySearch },
   { path: '/PriceRange', name: 'priceRange', component: PriceRange },
   { path: '/products', name: 'products', component: ProductsPage },
-  { path: '/cart', name: 'cart', component: CartPage }, // Fixed repeated `/cart` route
+  { path: '/cart', name: 'cart', component: CartPage }, 
   {
     path: '/products/:productId',
     name: 'productDetailPage',
