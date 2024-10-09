@@ -26,67 +26,19 @@ import ProductCard from './components/ProductCard.vue';
 import NotAuthorizedPage from './pages/NotAuthorizedPage.vue';
 import AdminPage from './pages/AdminPage.vue';
 
-// Utility functions for user authentication
-function getUser() {
-  const user = localStorage.getItem('currentUser');
-  return user ? JSON.parse(user) : null;
-}
-
-function isAuthenticated() {
-  const user = getUser();
-  return user && user.authToken;
-}
-
-function getUserRole() {
-  const user = getUser();
-  return user ? user.role : null;
-}
-
-// Define routes
+// Define routes without authentication metadata
 const routes = [
-  {
-    path: '/productcard',
-    name: 'ProductCard',
-    component: ProductCard,
-    meta: { requiresAuth: true },
-  },
+  { path: '/productcard', name: 'ProductCard', component: ProductCard },
   { path: '/register', name: 'RegisterPage', component: RegisterPage },
   { path: '/loginpage', name: 'loginpage', component: LoginPage },
-  {
-    path: '/updateProducts',
-    name: 'UpdateProductsPage',
-    component: UpdateProductsPage,
-    meta: { requiresAuth: true, role: 'admin' },
-  },
-  {
-    path: '/updateform/:productId',
-    name: 'UpdateForm',
-    component: ProductUpdateForm,
-    props: true,
-    meta: { requiresAuth: true, role: 'admin' },
-  },
-  {
-    path: '/cart',
-    name: 'cart',
-    component: ShoppingCartPage,
-    meta: { requiresAuth: true, role: 'customer' },
-  },
-  {
-    path: '/AddProduct',
-    name: 'addProduct',
-    component: AddProduct,
-    meta: { requiresAuth: true, role: 'admin' },
-  },
+  { path: '/updateProducts', name: 'UpdateProductsPage', component: UpdateProductsPage },
+  { path: '/updateform/:productId', name: 'UpdateForm', component: ProductUpdateForm, props: true },
+  { path: '/cart', name: 'cart', component: ShoppingCartPage },
+  { path: '/AddProduct', name: 'addProduct', component: AddProduct },
   { path: '/CategorySearch', name: 'categorySearch', component: CategorySearch },
   { path: '/PriceRange', name: 'priceRange', component: PriceRange },
   { path: '/products', name: 'products', component: ProductsPage },
-  {
-    path: '/products/:productId',
-    name: 'productDetailPage',
-    component: ProductDetailPage,
-    props: true,
-    meta: { requiresAuth: true, role: 'customer' },
-  },
+  { path: '/products/:productId', name: 'productDetailPage', component: ProductDetailPage, props: true },
   { path: '/not-authorized', name: 'notAuthorized', component: NotAuthorizedPage },
   { path: '/Admin', name: 'admin', component: AdminPage },
   { path: '/', redirect: '/products' },
@@ -94,8 +46,8 @@ const routes = [
 
 // Initialize Vuetify
 const vuetify = createVuetify({
-  components, // Automatically include Vuetify components
-  directives, // Automatically include Vuetify directives
+  components,
+  directives,
   icons: {
     iconfont: 'mdi', // Ensure Vuetify uses Material Design Icons (mdi)
   },
@@ -107,21 +59,9 @@ const router = VueRouter.createRouter({
   routes,
 });
 
-// Global navigation guards for authentication and authorization
+// Global navigation guard without authentication checks
 router.beforeEach((to, from, next) => {
-  const isAuthenticatedUser = isAuthenticated();
-  const userRole = getUserRole();
-  
-  console.log('isAuthenticatedUser:', isAuthenticatedUser);
-  console.log('userRole:', userRole);
-
-  if (to.meta.requiresAuth && !isAuthenticatedUser) {
-    next({ name: 'loginpage' });
-  } else if (to.meta.role && to.meta.role !== userRole) {
-    next({ name: 'notAuthorized' });  // Redirect to Not Authorized page
-  } else {
-    next();
-  }
+  next(); // Allow navigation without authentication/authorization checks
 });
 
 // Create and mount the app
