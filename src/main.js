@@ -33,22 +33,6 @@ import NotAuthorizedPage from './pages/NotAuthorizedPage.vue';
 import AdminPage from './pages/AdminPage.vue';
 import CartPage from './pages/CartPage.vue';
 
-// Utility functions for user authentication
-// function getUser() {
-//   const user = localStorage.getItem('currentUser');
-//   return user ? JSON.parse(user) : null;
-// }
-
-// function isAuthenticated() {
-//   const user = getUser();
-//   return user && user.authToken;
-// }
-
-// function getUserRole() {
-//   const user = getUser();
-//   return user ? user.role : null;
-// }
-
 // Define routes
 const routes = [
   { path: '/productcard', name: 'ProductCard', component: ProductCard },
@@ -61,7 +45,7 @@ const routes = [
   { path: '/CategorySearch', name: 'categorySearch', component: CategorySearch },
   { path: '/PriceRange', name: 'priceRange', component: PriceRange },
   { path: '/products', name: 'products', component: ProductsPage },
-  { path: '/cart', name: 'cart', component: CartPage },
+  { path: '/cart', name: 'cart', component: CartPage }, // Fixed repeated `/cart` route
   {
     path: '/products/:productId',
     name: 'productDetailPage',
@@ -79,26 +63,48 @@ const router = VueRouter.createRouter({
   routes,
 });
 
-// Global navigation guard without authentication checks
+// Uncommented utility functions for authentication
+function getUser() {
+  const user = localStorage.getItem('currentUser');
+  return user ? JSON.parse(user) : null;
+}
+
+function isAuthenticated() {
+  const user = getUser();
+  return user && user.authToken;
+}
+
+function getUserRole() {
+  const user = getUser();
+  return user ? user.role : null;
+}
+
+// Global navigation guard
 router.beforeEach((to, from, next) => {
   const isAuthenticatedUser = isAuthenticated();
   const userRole = getUserRole();
-  
+
   console.log('isAuthenticatedUser:', isAuthenticatedUser);
   console.log('userRole:', userRole);
 
   if (to.meta.requiresAuth && !isAuthenticatedUser) {
     next({ name: 'loginpage' });
   } else if (to.meta.role && to.meta.role !== userRole) {
-    next({ name: 'notAuthorized' });  // Redirect to Not Authorized page
-    next({ name: 'notAuthorized' });  // Redirect to Not Authorized page
+    next({ name: 'notAuthorized' });
   } else {
     next();
   }
+});
+
+// Create and configure Vuetify
+const vuetify = createVuetify({
+  components,
+  directives,
 });
 
 // Create and mount the app
 const app = createApp(App);
 app.use(router);
 app.use(vuetify);
+app.component('font-awesome-icon', FontAwesomeIcon); // Register FontAwesome component globally
 app.mount('#app');
