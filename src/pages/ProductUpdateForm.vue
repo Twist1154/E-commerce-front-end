@@ -45,15 +45,15 @@
           </select>
         </div>
 
-        <button type="submit" class="submit-button">Update Subcategory</button>
+        <button type="submit" class="submit-button">Add Subcategory</button>
       </form>
 
       <div class="subcategory-list" v-if="safeSubCategories.length">
         <h3>Subcategories:</h3>
         <ul>
           <li v-for="subCategory in safeSubCategories" :key="subCategory.id">
-            {{ subCategory.category?.name || "Unknown Category" }}
-            <button @click="deleteSubCategory(subCategory.id)">Delete</button>
+            {{ (subCategory.category && subCategory.category.name) || "Unknown Category" }}
+            <button @click="initiateDelete(subCategory.id)">Delete</button>
           </li>
         </ul>
       </div>
@@ -95,19 +95,13 @@ export default {
   data() {
     return {
       currentStep: 1,
-      product: {
-        id: "",
-        name: "",
-        description: "",
-        price: 0,
-        imagePath: "",
-        imageFile: null,
-      },
+      product: {},
       categories: [],
-      selectedCategoryId: "", // Holds the selected category ID
+      selectedCategoryId: "",
       stockQuantity: 0,
       vendorLocation: "",
-      subCategories: [], // Separate array for subcategories
+      subCategories: [],
+      deleteTimeoutId: null,
     };
   },
   computed: {
@@ -123,12 +117,10 @@ export default {
           this.product.imagePath = uploadedImageUrl;
         }
 
-        // Update the product on the backend
         const response = await productsService.updateProduct(this.product.id, this.product);
         this.product = response.data;
-
         alert("Product updated successfully!");
-        this.currentStep = 2; // Move to the next step
+        this.currentStep = 2;
       } catch (error) {
         console.error("Error updating product:", error);
         alert("Failed to update product. Please try again.");
@@ -142,26 +134,25 @@ export default {
         }
 
         const selectedCategory = this.categories.find(cat => cat.id === this.selectedCategoryId);
+        const newSubCategory = { category: selectedCategory, product: { id: this.product.id } };
 
-        const updatedSubCategory = {
-          id: this.subCategoryId, // Assume subCategoryId is provided for the update
-          category: selectedCategory,
-          product: { id: this.product.id },
-        };
-
-        await subCategoryService.updateSubCategory(this.subCategoryId, updatedSubCategory);
-
-        alert("Subcategory updated successfully!");
+        const response = await subCategoryService.createSubCategory(newSubCategory);
+        this.subCategories.push(response.data);
+        alert("Subcategory added successfully!");
         this.selectedCategoryId = "";
       } catch (error) {
-        console.error("Error updating subcategory:", error);
-        alert("Failed to update subcategory. Please try again.");
+        console.error("Error adding subcategory:", error);
+        alert("Failed to add subcategory. Please try again.");
       }
     },
-    async deleteSubCategory(id) {
+    async initiateDelete(subCategoryId) {
+      this.deleteTimeoutId = setTimeout(() => this.deleteSubCategory(subCategoryId), 30000);
+      alert("Subcategory will be deleted in 30 seconds. Click again to confirm.");
+    },
+    async deleteSubCategory(subCategoryId) {
       try {
-        await subCategoryService.deleteSubCategory(id);
-        this.subCategories = this.subCategories.filter(sub => sub.id !== id);
+        await subCategoryService.deleteSubCategory(subCategoryId);
+        this.subCategories = this.subCategories.filter(sub => sub.id !== subCategoryId);
         alert("Subcategory deleted successfully.");
       } catch (error) {
         console.error("Error deleting subcategory:", error);
@@ -176,9 +167,7 @@ export default {
           vendorLocation: this.vendorLocation,
           lastUpdated: new Date().toISOString(),
         };
-
         await inventoryService.updateInventoryItem(inventoryData);
-
         alert("Inventory updated successfully!");
         this.resetForm();
       } catch (error) {
@@ -191,9 +180,7 @@ export default {
       if (file) {
         this.product.imageFile = file;
         const reader = new FileReader();
-        reader.onload = e => {
-          this.product.imagePath = e.target.result;
-        };
+        reader.onload = e => { this.product.imagePath = e.target.result; };
         reader.readAsDataURL(file);
       }
     },
@@ -210,8 +197,6 @@ export default {
       try {
         const response = await productsService.getProductById(id);
         this.product = response.data;
-
-        // Fetch associated subcategories and inventory
         this.fetchSubCategories();
         this.fetchInventory();
       } catch (error) {
@@ -232,7 +217,7 @@ export default {
       try {
         const inventoryItems = await inventoryService.getInventoryItemsByProductId(this.product.id);
         if (inventoryItems && inventoryItems.length) {
-          const latestInventory = inventoryItems[0]; // Assuming you're using the first item
+          const latestInventory = inventoryItems[0];
           this.stockQuantity = latestInventory.quantity;
           this.vendorLocation = latestInventory.vendorLocation;
         }
@@ -245,14 +230,7 @@ export default {
       this.currentStep++;
     },
     resetForm() {
-      this.product = {
-        id: "",
-        name: "",
-        description: "",
-        price: 0,
-        imagePath: "",
-        imageFile: null,
-      };
+      this.product = {};
       this.subCategories = [];
       this.stockQuantity = 0;
       this.vendorLocation = "";
@@ -263,10 +241,11 @@ export default {
   mounted() {
     this.fetchCategories();
     const productId = this.$route.params.id;
-    this.fetchProduct(productId); // Fetch the product details using the productId
+    this.fetchProduct(productId);
   },
 };
 </script>
+
 
 <style scoped>
 .form-container {
