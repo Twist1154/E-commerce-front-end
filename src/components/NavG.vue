@@ -1,7 +1,7 @@
 <template>
-  <v-app>
-    <!-- App Bar -->
-    <v-app-bar app color="teal-darken-4">
+  <!--v-app-->
+    <!-- App Bar (Header) -->
+    <v-app-bar app color="teal-darken-4" fixed>
       <template v-slot:image>
         <v-img gradient="to top right, rgba(19,84,122,.8), rgba(128,208,199,.8)"></v-img>
       </template>
@@ -45,14 +45,10 @@
     </v-app-bar>
 
     <!-- App Sidebar Component -->
-    <AppSidebar :drawer="drawer" @update:drawer="drawer = $event" />
+    <AppSidebar v-model:drawer="drawer" />
 
-    <v-main>
-      <v-container fluid>
-        <!-- Main content goes here -->
-      </v-container>
-    </v-main>
-  </v-app>
+    
+  <!--/v-app--->
 </template>
 
 <script>
@@ -83,19 +79,37 @@ export default {
 </script>
 
 <style>
-/* Ensuring no additional spacing in NavG */
+/* Sidebar remains relative, does not overlay content */
 .v-navigation-drawer {
-  z-index: 1000; /* Ensure drawer overlays content */
+  z-index: 1000;
+  position: relative; /* Sidebar pushes content instead of overlaying */
 }
 
+/* App Bar (Header) stays fixed at the top */
 .v-app-bar {
-  z-index: 1001; /* App bar stays above drawer */
+  position: fixed; /* Header stays at the top */
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1100; /* Ensure it stays above other components */
 }
 
-/* Make sure no padding/margin is applied here */
+/* Adjust padding for the main content to account for the fixed header */
 .v-main {
-  padding: 0 !important; /* Remove any padding */
-  margin: 0 !important; /* Remove any margin */
-  z-index: 0; /* Main content has the lowest z-index */
+  padding-top: 64px; /* Adjust based on app bar height */
+  padding: 16px; /* Regular content padding */
+  margin: 0 !important;
+}
+
+/* Ensure the v-container has no padding or margins */
+.v-container {
+  padding: 0 !important; /* Remove padding */
+  margin: 0 !important; /* Remove margin */
+}
+
+/* Reset body margin and padding */
+body {
+  margin: 0 !important; /* Reset body margin */
+  padding: 0 !important; /* Reset body padding */
 }
 </style>
