@@ -23,7 +23,7 @@ import ProductsPage from './pages/ProductsPage.vue';
 import ProductDetailPage from './pages/ProductDetailPage.vue';
 import AddProduct from './pages/AddProduct.vue';
 import ProductUpdateForm from './pages/ProductUpdateForm.vue';
-import UpdateProductsPage from './pages/UpdateProductsPage.vue';
+import UpdateProducts from './pages/UpdateProducts.vue';
 import PriceRange from './pages/PriceRange.vue';
 import CategorySearch from './pages/CategorySearch.vue';
 import LoginPage from './pages/LoginPage.vue';
@@ -38,21 +38,15 @@ const routes = [
   { path: '/productcard', name: 'ProductCard', component: ProductCard },
   { path: '/register', name: 'RegisterPage', component: RegisterPage },
   { path: '/loginpage', name: 'loginpage', component: LoginPage },
-  { path: '/updateProducts', name: 'UpdateProductsPage', component: UpdateProductsPage },
-  { path: '/updateform/:productId', name: 'UpdateForm', component: ProductUpdateForm, props: true },
+  { path: '/updateProducts', name: 'UpdateProducts', component: UpdateProducts },
+  { path: '/updateform/:id', name: 'UpdateForm', component: ProductUpdateForm, props: true },
+  { path: '/products', name: 'products', component: ProductsPage },
+  { path: '/products/:productId', name: 'productDetailPage', component: ProductDetailPage, props: true  },
   { path: '/cart', name: 'cart', component: ShoppingCartPage },
   { path: '/AddProduct', name: 'addProduct', component: AddProduct },
   { path: '/CategorySearch', name: 'categorySearch', component: CategorySearch },
   { path: '/PriceRange', name: 'priceRange', component: PriceRange },
-  { path: '/products', name: 'products', component: ProductsPage },
   { path: '/cart', name: 'cart', component: CartPage }, 
-  {
-    path: '/products/:productId',
-    name: 'productDetailPage',
-    component: ProductDetailPage,
-    props: true,
-    meta: { requiresAuth: true, role: 'customer' },
-  },
   { path: '/not-authorized', name: 'notAuthorized', component: NotAuthorizedPage },
   { path: '/Admin', name: 'admin', component: AdminPage },
   { path: '/', redirect: '/products' },

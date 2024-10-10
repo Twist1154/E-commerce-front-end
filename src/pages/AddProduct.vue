@@ -1,6 +1,18 @@
 <template>
   <div class="form-container">
-    <h1>Add Product</h1>
+    <v-stepper alt-labels>
+      <v-stepper-header>
+        <v-stepper-item title="Add Product" :value="1"></v-stepper-item>
+
+        <v-divider></v-divider>
+
+        <v-stepper-item title="Add Subcategories" :value="2"></v-stepper-item>
+
+        <v-divider></v-divider>
+
+        <v-stepper-item title="Add Inventory" :value="3"></v-stepper-item>
+      </v-stepper-header>
+    </v-stepper>
 
     <!-- Step 1: Product Creation Form -->
     <div v-if="currentStep === 1">
@@ -43,7 +55,9 @@
           />
         </div>
 
-        <button type="submit" class="submit-button">Create Product</button>
+        <button type="submit" class="submit-button">
+          {{ isProductCreated ? "Update Product" : "Create Product" }}
+        </button>
       </form>
     </div>
 
@@ -126,7 +140,9 @@ export default {
   data() {
     return {
       currentStep: 1,
+      isProductCreated: false, // Track if the product is created
       product: {
+        id: null, // Track the product ID after creation
         name: "",
         description: "",
         price: 0,
@@ -134,10 +150,10 @@ export default {
         imageFile: null,
       },
       categories: [],
-      selectedCategoryId: "", // Holds the selected category ID
+      selectedCategoryId: "", 
       stockQuantity: 0,
       vendorLocation: "",
-      subCategories: [], // Separate array for subcategories
+      subCategories: [], 
     };
   },
   computed: {
@@ -153,15 +169,22 @@ export default {
           this.product.imagePath = uploadedImageUrl;
         }
 
-        // Create the product on the backend
-        const response = await productsService.createProduct(this.product);
-        this.product = response.data; // Update product with response (includes ID)
+        if (this.isProductCreated) {
+          // Update existing product
+          await productsService.updateProduct(this.product.id, this.product);
+          alert("Product updated successfully!");
+        } else {
+          // Create new product
+          const response = await productsService.createProduct(this.product);
+          this.product = response.data; // Store product with the returned ID
+          this.isProductCreated = true; // Mark product as created
+          alert("Product created successfully!");
+        }
 
-        alert("Product created successfully!");
         this.currentStep = 2; // Move to the next step
       } catch (error) {
-        console.error("Error during product creation:", error);
-        alert("Failed to create product. Please try again.");
+        console.error("Error during product creation or update:", error);
+        alert("Failed to process product. Please try again.");
       }
     },
     async handleSubCategorySubmit() {
@@ -175,28 +198,24 @@ export default {
           (cat) => cat.id === this.selectedCategoryId
         );
 
-        // Create the subcategory DTO
         const newSubCategory = {
           id: null,
-          category: selectedCategory, // Ensure the category object is included
-          product: { id: this.product.id }, // Send only the product ID
+          category: selectedCategory,
+          product: { id: this.product.id }, 
         };
 
-        const createdSubCategory = await subCategoryService.createSubCategory(
-          newSubCategory
-        );
+        const createdSubCategory = await subCategoryService.createSubCategory(newSubCategory);
 
-        // **Manually attach the category object to the createdSubCategory**
         const subCategoryWithCategory = {
           ...createdSubCategory,
-          category: selectedCategory, // Attach the category object
+          category: selectedCategory,
         };
 
-        this.subCategories.push(subCategoryWithCategory); // Add to the local subCategories array
+        this.subCategories.push(subCategoryWithCategory);
 
         alert("Subcategory added successfully!");
 
-        this.selectedCategoryId = ""; // Reset the selected category
+        this.selectedCategoryId = ""; 
       } catch (error) {
         console.error("Error adding subcategory:", error);
         alert("Failed to add subcategory. Please try again.");
@@ -205,19 +224,16 @@ export default {
     async handleInventorySubmit() {
       try {
         const inventoryData = {
-          product: {
-            id: this.product.id, // Include the product object with its ID
-          },
+          product: { id: this.product.id }, 
           quantity: this.stockQuantity,
           vendorLocation: this.vendorLocation,
           lastUpdated: new Date().toISOString(),
         };
 
-        await inventoryService.createInventoryItem(inventoryData); // Send the updated inventoryData
+        await inventoryService.createInventoryItem(inventoryData);
 
         alert("Inventory created successfully!");
         this.resetForm();
-        this.currentStep = 1;
       } catch (error) {
         console.error("Error creating inventory:", error);
         alert("Failed to create inventory. Please try again.");
@@ -248,21 +264,19 @@ export default {
     },
     resetForm() {
       this.product = {
+        id: null,
         name: "",
         description: "",
         price: 0,
         imagePath: "",
         imageFile: null,
       };
+      this.isProductCreated = false; // Reset product creation state
       this.subCategories = [];
       this.stockQuantity = 0;
       this.vendorLocation = "";
       this.currentStep = 1;
       this.selectedCategoryId = "";
-    },
-    getCategoryName(categoryId) {
-      const category = this.categories.find((cat) => cat.id === categoryId);
-      return category ? category.name : "N/A";
     },
   },
   mounted() {
@@ -270,6 +284,7 @@ export default {
   },
 };
 </script>
+
 
 <style scoped>
 .form-container {

@@ -13,24 +13,18 @@
       <v-row>
         <v-col
           v-for="product in products"
-          :key="product.id" 
+          :key="product.id"
           cols="12"
           sm="auto"
           md="auto"
         >
-          <!-- Updated ProductCard Props to match the new data structure -->
+          <!-- Pass required props to ProductCard -->
           <product-card
-  :productId="product.id"
-  :name="product.name"
-  :description="product.description"
-  :price="product.price"
-  :inventoryItem="product.inventoryItem" 
-  :reviews="reviews" 
-  :subCategories="product.subCategories" 
-  :imagePath="product.imagePath"
-  @view-details="handleViewDetails"
-  @add-to-cart="handleAddToCart"
-/>
+            :product="product"
+            :inventoryItem="product.inventoryItem" 
+            @view-details="handleViewDetails"
+            @add-to-cart="handleAddToCart"
+          />
         </v-col>
       </v-row>
 

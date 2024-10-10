@@ -2,6 +2,21 @@
   <div class="form-container" v-if="product">
     <h1>Update Product</h1>
 
+    <!-- Stepper -->
+    <v-stepper alt-labels v-model="currentStep">
+      <v-stepper-header>
+        <v-stepper-item :complete="currentStep > 1" title="Update Product"></v-stepper-item>
+
+        <v-divider></v-divider>
+
+        <v-stepper-item :complete="currentStep > 2" title="Manage Subcategories"></v-stepper-item>
+
+        <v-divider></v-divider>
+
+        <v-stepper-item :complete="currentStep > 3" title="Update Inventory"></v-stepper-item>
+      </v-stepper-header>
+    </v-stepper>
+
     <!-- Step 1: Update Product Form -->
     <div v-if="currentStep === 1">
       <h2>Step 1: Update Product</h2>
@@ -52,14 +67,14 @@
         <h3>Subcategories:</h3>
         <ul>
           <li v-for="subCategory in safeSubCategories" :key="subCategory.id">
-            {{ (subCategory.category && subCategory.category.name) || "Unknown Category" }}
+            {{ subCategory.category?.name || "Unknown Category" }}
             <button @click="initiateDelete(subCategory.id)">Delete</button>
           </li>
         </ul>
       </div>
 
       <div class="navigation-buttons">
-        <button @click="nextStep" class="next-button" :disabled="!safeSubCategories.length">Next: Manage Inventory</button>
+        <button @click="nextStep" class="next-button" :disabled="!safeSubCategories.length">Next: Update Inventory</button>
       </div>
     </div>
 
