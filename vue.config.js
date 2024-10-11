@@ -2,11 +2,11 @@ const { defineConfig } = require('@vue/cli-service');
 const webpack = require('webpack'); // Import Webpack for the feature flags
 
 module.exports = defineConfig({
-  transpileDependencies: true,
+  transpileDependencies: [],
   devServer: {
     port: 3000,  // Change this to your desired port number
     proxy: {
-      '/store/api/users': {
+      '/store': {
         target: 'http://localhost:8080',
         ws: true,
         changeOrigin: true,

@@ -2,15 +2,32 @@
   <div class="form-container">
     <v-stepper alt-labels>
       <v-stepper-header>
-        <v-stepper-item title="Add Product" :value="1"></v-stepper-item>
+        <v-stepper-item
+          title="Add Product"
+          :value="1"
+          :complete="currentStep > 1"
+          @click="currentStep = 1"
+        ></v-stepper-item>
 
         <v-divider></v-divider>
 
-        <v-stepper-item title="Add Subcategories" :value="2"></v-stepper-item>
+        <v-stepper-item
+          title="Add Subcategories"
+          :value="2"
+          :complete="currentStep > 2"
+          @click="currentStep = 2"
+          :disabled="currentStep < 2"
+        ></v-stepper-item>
 
         <v-divider></v-divider>
 
-        <v-stepper-item title="Add Inventory" :value="3"></v-stepper-item>
+        <v-stepper-item
+          title="Add Inventory"
+          :value="3"
+          :complete="currentStep > 3"
+          @click="currentStep = 3"
+          :disabled="currentStep < 3"
+        ></v-stepper-item>
       </v-stepper-header>
     </v-stepper>
 
@@ -122,7 +139,9 @@
           <input type="text" id="vendorLocation" v-model="vendorLocation" required />
         </div>
 
-        <button type="submit" class="submit-button">Create Inventory and Complete</button>
+        <button type="submit" class="submit-button">
+          Create Inventory and Complete
+        </button>
       </form>
     </div>
   </div>
@@ -150,10 +169,10 @@ export default {
         imageFile: null,
       },
       categories: [],
-      selectedCategoryId: "", 
+      selectedCategoryId: "",
       stockQuantity: 0,
       vendorLocation: "",
-      subCategories: [], 
+      subCategories: [],
     };
   },
   computed: {
@@ -201,7 +220,7 @@ export default {
         const newSubCategory = {
           id: null,
           category: selectedCategory,
-          product: { id: this.product.id }, 
+          product: { id: this.product.id }, // Associate with created product
         };
 
         const createdSubCategory = await subCategoryService.createSubCategory(newSubCategory);
@@ -215,7 +234,7 @@ export default {
 
         alert("Subcategory added successfully!");
 
-        this.selectedCategoryId = ""; 
+        this.selectedCategoryId = ""; // Reset the selection
       } catch (error) {
         console.error("Error adding subcategory:", error);
         alert("Failed to add subcategory. Please try again.");
@@ -224,7 +243,7 @@ export default {
     async handleInventorySubmit() {
       try {
         const inventoryData = {
-          product: { id: this.product.id }, 
+          product: { id: this.product.id }, // Associate with created product
           quantity: this.stockQuantity,
           vendorLocation: this.vendorLocation,
           lastUpdated: new Date().toISOString(),
@@ -233,7 +252,9 @@ export default {
         await inventoryService.createInventoryItem(inventoryData);
 
         alert("Inventory created successfully!");
-        this.resetForm();
+
+        // Redirect to product detail page after inventory creation
+        this.$router.push(`/products/${this.product.id}`);
       } catch (error) {
         console.error("Error creating inventory:", error);
         alert("Failed to create inventory. Please try again.");
@@ -271,12 +292,8 @@ export default {
         imagePath: "",
         imageFile: null,
       };
-      this.isProductCreated = false; // Reset product creation state
-      this.subCategories = [];
-      this.stockQuantity = 0;
-      this.vendorLocation = "";
+      this.isProductCreated = false;
       this.currentStep = 1;
-      this.selectedCategoryId = "";
     },
   },
   mounted() {
@@ -284,7 +301,6 @@ export default {
   },
 };
 </script>
-
 
 <style scoped>
 .form-container {
