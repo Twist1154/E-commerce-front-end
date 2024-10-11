@@ -15,7 +15,7 @@
         <h3 class="price">R{{ product.price }}</h3>
       </div>
       <div class="product-description">
-        <!-- Display product Details-->
+        <!-- Display product Details -->
         <h3 class="description">{{ product.description }}</h3>
       </div>
       <div class="button-group">
@@ -31,14 +31,18 @@
       <!-- Display a loading message or placeholder if product is not yet loaded -->
       <p>Loading product details...</p>
     </div>
+    <!-- Review component that displays reviews for the product -->
+    <review v-if="product" :productId="product.id" />
   </div>
 </template>
 
 <script>
 import productsService from "@/services/productsService"; // Import the products service
-import heart from "@/assets/heart.svg";
+import heart from "@/assets/heart.svg"; // Import heart icon
+import Review from "@/components/Review.vue"; // Import Review component
 
 export default {
+  components: { Review }, // Register Review component
   name: "ProductDetailPage",
   data() {
     return {
@@ -62,9 +66,9 @@ export default {
       alert(`${this.product.name} added to cart!`);
       // Logic for adding product to the cart would go here
     },
-    //addWish list methods here
+    // Method to handle adding the product to the wish list
     addToWish() {
-      alert.apply(`${this.product.name} added to Wish List`);
+      alert(`${this.product.name} added to Wish List`);
     },
   },
   mounted() {
