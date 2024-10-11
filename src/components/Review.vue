@@ -1,75 +1,58 @@
 <template>
-    <v-container>
-      <h2 class="text-h5 mb-4">Product Reviews</h2>
+    <div class="reviews-container">
+      <h2>Product Reviews</h2>
   
-      <!-- Form for creating a new review -->
-      <v-form @submit.prevent="submitReview" class="mb-4">
-        <v-select
-          v-model="newReview.rating"
-          :items="[1, 2, 3, 4, 5]"
-          label="Rating"
-          required
-          :rules="[(v) => !!v || 'Rating is required']"
-          clearable
-        >
-          <template #prepend>
-            <v-icon>mdi-star</v-icon>
-          </template>
-          <template #selection>
-            <v-list-item-content>
-              <v-list-item-title>
-                <span v-if="newReview.rating">{{ newReview.rating }} Star</span>
-                <span v-else>Select Rating</span>
-              </v-list-item-title>
-            </v-list-item-content>
-          </template>
-        </v-select>
+      <form @submit.prevent="submitReview" class="review-form">
+        <div>
+          <label for="rating">Rating:</label>
+          <v-rating
+            hover
+            :length="5"
+            :size="32"
+            v-model="newReview.rating"
+            color="green"
+            active-color="primary"
+            required
+          />
+        </div>
   
-        <v-textarea
-          v-model="newReview.comment"
-          label="Comment"
-          required
-          :rules="[(v) => !!v || 'Comment is required']"
-          outlined
-          rows="4"
-        ></v-textarea>
+        <div>
+          <label for="comment">Comment:</label>
+          <textarea
+            v-model="newReview.comment"
+            class="elevation-2"
+            required
+          ></textarea>
+        </div>
   
-        <v-btn type="submit" color="primary">Submit Review</v-btn>
-      </v-form>
+        <v-btn type="submit">Submit Review</v-btn>
+      </form>
   
-      <!-- Show message if no reviews available -->
-      <v-alert v-if="reviews.length === 0" type="info">
-        No reviews available for this product.
-      </v-alert>
+      <div v-if="reviews.length === 0">
+        <p>No reviews available for this product.</p>
+      </div>
   
-      <!-- Loop through reviews and display each one -->
-      <v-list>
-        <v-list-item
-          v-for="review in reviews"
-          :key="review.id"
-          class="mb-2"
-        >
-          <v-list-item-avatar>
-            <v-avatar v-if="review.user.avatar" :src="review.user.avatar">
-            </v-avatar>
+      <div v-for="review in reviews" :key="review.id" class="review-item">
+        <v-banner color="pink-darken-1" icon="mdi-account-box" lines="two">
+          <template v-slot:prepend>
+            <v-avatar v-if="review.user.avatar" :src="review.user.avatar"></v-avatar>
             <v-avatar v-else icon="mdi-account-circle"></v-avatar>
-          </v-list-item-avatar>
-          <v-list-item-content>
-            <v-list-item-title>
-              <strong>{{ review.user.firstName }} {{ review.user.lastName }}</strong>
-            </v-list-item-title>
-            <v-list-item-subtitle>
-              <span v-if="review.rating">Rating: {{ review.rating }} / 5</span>
-              <span v-if="review.comment.length > 100">
-                {{ review.comment.substring(0, 100) + '...' }}
-                <v-btn text @click="viewFullReview(review)">Read More</v-btn>
-              </span>
-              <span v-else>{{ review.comment }}</span>
-            </v-list-item-subtitle>
-          </v-list-item-content>
-        </v-list-item>
-      </v-list>
-    </v-container>
+          </template>
+  
+          <v-banner-text>
+            <strong>{{ review.user.firstName }} {{ review.user.lastName }}</strong> <br />
+            <span v-if="review.rating">Rating: {{ review.rating }} / 5</span> <br />
+            <div class="comment-preview">
+              {{ review.comment }}
+            </div>
+          </v-banner-text>
+  
+          <v-banner-actions>
+            <v-btn @click="viewFullReview(review)">Read More</v-btn>
+          </v-banner-actions>
+        </v-banner>
+      </div>
+    </div>
   </template>
   
   <script>
@@ -85,54 +68,72 @@
     },
     data() {
       return {
-        reviews: [], // Array to store fetched reviews
+        reviews: [],
         newReview: {
-          rating: "", // Rating from the user
-          comment: "", // Comment from the user
+          rating: null,
+          comment: '',
         },
       };
     },
     methods: {
-      // Fetch reviews by product ID
       async fetchReviews() {
         try {
           const response = await reviewService.getReviewsByProduct(this.productId);
-          this.reviews = response.data; // Set the fetched reviews to the component state
+          this.reviews = response.data;
           console.log("Fetched reviews:", this.reviews);
         } catch (error) {
           console.error("Error fetching reviews:", error);
           alert("Failed to load reviews.");
         }
       },
-      // Method to create a new review
       async submitReview() {
         try {
           const response = await reviewService.createReview(this.productId, this.newReview);
           console.log("Submitted review:", response.data);
-          this.reviews.push(response.data); // Add new review to the list
-          this.newReview.rating = ""; // Reset rating
-          this.newReview.comment = ""; // Reset comment
+          this.reviews.push(response.data);
+          this.newReview.rating = null;
+          this.newReview.comment = '';
         } catch (error) {
           console.error("Error submitting review:", error);
           alert("Failed to submit review.");
         }
       },
-      // Method to view the full review
       viewFullReview(review) {
         alert(`Full review by ${review.user.firstName}: ${review.comment}`);
       },
     },
     mounted() {
-      this.fetchReviews(); // Fetch reviews once the component is mounted
+      this.fetchReviews();
     },
   };
   </script>
   
   <style scoped>
-  /* Additional styles if needed */
   .reviews-container {
     padding: 20px;
   }
+  
+  .review-form {
+    margin-bottom: 20px;
+  }
+  
+  textarea {
+    width: 100%;
+    padding: 10px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    box-sizing: border-box;
+  }
+  
+  .comment-preview {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    word-break: break-word;
+  }
+  
   .review-item {
     margin-bottom: 15px;
   }
