@@ -11,6 +11,22 @@
               </v-card-title>
               <v-card-text>
                 <v-form @submit.prevent="createUser">
+                  <!-- Avatar and Image Upload Button -->
+                  <div class="text-center mb-4">
+                    <v-avatar
+                      :src="avatarUrl || 'smirk.png'"
+                      size="80"
+                    ></v-avatar>
+                    <v-file-input
+                      v-model="selectedFile"
+                      accept="image/*"
+                      label="Upload Avatar"
+                      @change="uploadAvatar"
+                      prepend-icon="mdi-camera"
+                    ></v-file-input>
+                  </div>
+
+                  <!-- User Information Form -->
                   <v-text-field
                     label="Username"
                     v-model="registerData.username"
@@ -60,12 +76,14 @@
                     dense
                   />
                   <v-alert v-if="confirmPasswordNote" type="error" dense outlined>{{ confirmPasswordNote }}</v-alert>
+                  
+                  <!-- Submit Button -->
                   <v-btn
                     class="custom-btn"
                     :loading="isLoading"
                     block
                     type="submit"
-                    style="background-color: #0c0c0c; color: white;"  
+                    style="background-color: #0c0c0c; color: white;"
                   >
                     {{ isLoading ? 'Signing Up...' : 'Submit' }}
                   </v-btn>
@@ -79,27 +97,27 @@
   </v-app>
 </template>
 
-
 <script>
-//import navigation from '@/components/NavG.vue';
 import userService from '@/services/userService.js';
+import { uploadFileToS3 } from '@/services/awsService.js'; // AWS upload service
 
 export default {
-  //components: { navigation },
   data() {
     return {
       registerData: {
-        username: '', // Added username field
+        username: '',
         firstName: '',
         lastName: '',
         email: '',
         password: '',
-        confirmPassword: '' // Confirm password field
+        confirmPassword: ''
       },
+      avatarUrl: '', // Store the avatar URL
+      selectedFile: null, // Selected image file
       emailNote: '',
       passwordNote: '',
-      confirmPasswordNote: '', // Note for confirming passwords
-      isLoading: false, // State to track loading status
+      confirmPasswordNote: '',
+      isLoading: false,
       rules: {
         required: value => !!value || 'Required.',
         email: value => /.+@.+\..+/.test(value) || 'Invalid email.',
@@ -128,8 +146,21 @@ export default {
         ? (passwordPattern.test(this.registerData.password) ? '' : 'Password must be at least 8 characters long, include one uppercase letter, one lowercase letter, and one number.')
         : '';
     },
+    async uploadAvatar() {
+      if (!this.selectedFile) return;
+
+      try {
+        // Upload file to S3 and get the file URL
+        const avatarUrl = await uploadFileToS3(this.selectedFile);
+        this.avatarUrl = avatarUrl; // Save the avatar URL
+        alert('Avatar uploaded successfully!');
+      } catch (error) {
+        console.error('Error uploading avatar:', error);
+        alert('Failed to upload avatar');
+      }
+    },
     async createUser() {
-      this.isLoading = true; // Start loading indicator
+      this.isLoading = true;
 
       if (this.registerData.password !== this.registerData.confirmPassword) {
         this.confirmPasswordNote = 'Passwords do not match!';
@@ -138,41 +169,38 @@ export default {
       }
 
       try {
-        // Check if the user already exists
         const existingUser = await userService.getUsersByEmail(this.registerData.email);
-        
         if (existingUser && existingUser.length > 0) {
           alert('A user with this email already exists.');
         } else {
-          // If user does not exist, create the user
-          await userService.createUser(this.registerData);
+          const newUser = { ...this.registerData, avatarUrl: this.avatarUrl }; // Include avatar URL in user data
+          await userService.createUser(newUser);
           alert('User created successfully!');
-          this.$router.push('/loginpage'); // Redirect to login page after successful registration
+          this.$router.push('/loginpage');
         }
       } catch (error) {
         alert('Error creating user');
         console.error('Error:', error.message || error);
       } finally {
-        this.isLoading = false; // End loading indicator
+        this.isLoading = false;
       }
     }
   }
 };
 </script>
 
-
 <style>
 .forms {
   min-height: 100vh;
   display: flex;
-  justify-content: center; /* Center form horizontally */
-  align-items: center; /* Center form vertically */
+  justify-content: center;
+  align-items: center;
 }
 
 h2 {
   font-size: 2rem;
   text-transform: uppercase;
-  margin-bottom: 1rem; /* Decrease the margin to reduce the space */
+  margin-bottom: 1rem;
   text-align: center;
 }
 
@@ -181,7 +209,7 @@ h2 {
 }
 
 .custom-btn {
-  background-color: #0c0c0c; /* Ensure the button color is set */
-  color: white; /* Ensure text color is white */
+  background-color: #0c0c0c;
+  color: white;
 }
 </style>

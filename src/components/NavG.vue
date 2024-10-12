@@ -48,25 +48,7 @@
 
   <!-- Wishlist Modal -->
   <v-dialog v-model="wishlistDialog" max-width="500">
-    <v-card>
-      <v-card-title>Wishlist</v-card-title>
-      <v-card-text>
-        <!-- Wishlist items list -->
-        <v-list>
-          <v-list-item v-for="(item, index) in wishlistItems" :key="index">
-            <v-list-item-content>
-              <v-list-item-title>{{ item.name }}</v-list-item-title>
-              <v-list-item-subtitle>{{ item.price }}</v-list-item-subtitle>
-            </v-list-item-content>
-          </v-list-item>
-        </v-list>
-      </v-card-text>
-
-      <!-- Close Button -->
-      <v-card-actions>
-        <v-btn color="primary" text @click="toggleWishlist">Close</v-btn>
-      </v-card-actions>
-    </v-card>
+    <WishList :wishlistItems="wishlistItems" @close="toggleWishlist" />
   </v-dialog>
 
   <!-- App Sidebar Component -->
@@ -76,11 +58,13 @@
 
 <script>
 import AppSidebar from './AppSidebar.vue'; // Import AppSidebar component
+import WishList from './WishList.vue'; // Import WishList component
 
 export default {
   name: 'NavG',
   components: {
     AppSidebar, // Register the AppSidebar component
+    WishList, // Register WishList component
   },
   data() {
     return {
@@ -110,7 +94,7 @@ export default {
 };
 </script>
 
-<style>
+<style scoped>
 /* Sidebar remains relative, does not overlay content */
 .v-navigation-drawer {
   z-index: 1000;
