@@ -5,7 +5,7 @@ const BASE_URL = 'http://localhost:8080/store/review';
 const reviewService = {
   // Create a new review
   createReview(review) {
-    return axios.post(`${BASE_URL}`, review)
+    return axios.post(`${BASE_URL}/create`, review)
       .then(response => {
         console.log('Created Review:', response.data); // Log the created review data
         return response;
@@ -31,7 +31,7 @@ const reviewService = {
 
   // Get all reviews
   getAllReviews() {
-    return axios.get(`${BASE_URL}`)
+    return axios.get(`${BASE_URL}/all`)
       .then(response => {
         console.log('Fetched All Reviews:', response.data); // Log all fetched reviews
         return response;

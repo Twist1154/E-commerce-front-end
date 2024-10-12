@@ -14,13 +14,30 @@
     </div>
 
     <div class="pt-0">
-      Phasellus feugiat arcu sapien, et iaculis ipsum elementum sit amet. Mauris cursus commodo interdum. Praesent ut risus eget metus luctus accumsan id ultrices nunc. Sed at orci sed massa consectetur dignissim a sit amet dui. Duis commodo vitae velit et faucibus. Morbi vehicula lacinia malesuada. Nulla placerat augue vel ipsum ultrices, cursus iaculis dui sollicitudin. Vestibulum eu ipsum vel diam elementum tempor vel ut orci. Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus.
+      when your ready Kinzonzi Genereux Mukoko add relevent and proper content here
+      <div class="pt-4">
+      <v-btn
+        icon="mdi-email"
+        class="mx-2"
+        variant="text"
+      ></v-btn>
+      <v-btn
+        icon="mdi-phone"
+        class="mx-2"
+        variant="text"
+      ></v-btn>
+      <v-btn
+        icon="mdi-map-marker"
+        class="mx-2"
+        variant="text"
+      ></v-btn>
+    </div>
     </div>
 
     <v-divider></v-divider>
 
     <div>
-      {{ new Date().getFullYear() }} — <strong>Vuetify</strong>
+      {{ new Date().getFullYear() }} — <strong>Grp KN02</strong>
     </div>
   </v-footer>
 </template>
