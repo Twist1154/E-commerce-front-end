@@ -6,10 +6,13 @@
       color="blue"
       overlap
     >
-      <v-card class="mx-auto" max-width="200">
+      <v-card 
+      class="mx-auto" 
+      max-width="250"
+      >
         <!-- Image and product title -->
         <v-img class="align-end text-white" height="200" :src="product.imagePath" cover></v-img>
-        <v-card-title>{{ product.name }}</v-card-title>
+        <v-card-text>{{ product.name }}</v-card-text>
 
         <!-- Card content -->
         <v-card-text class="pt-1">

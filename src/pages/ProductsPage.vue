@@ -16,7 +16,7 @@
           :key="product.id"
           cols="12"
           sm="auto"
-          md="auto"
+          md="3"
         >
           <!-- Pass required props to ProductCard -->
           <product-card

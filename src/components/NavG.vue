@@ -47,18 +47,21 @@
   </v-app-bar>
 
   <!-- Wishlist Modal -->
+
   <v-dialog v-model="wishlistDialog" max-width="500">
     <WishList :wishlistItems="wishlistItems" @close="toggleWishlist" />
   </v-dialog>
 
   <!-- App Sidebar Component -->
   <AppSidebar v-model:drawer="drawer" />
-  <!--/v-app-->
+  
+
 </template>
 
 <script>
 import AppSidebar from './AppSidebar.vue'; // Import AppSidebar component
 import WishList from './WishList.vue'; // Import WishList component
+import wishListService from '@/services/wishListService';
 
 export default {
   name: 'NavG',
@@ -70,11 +73,7 @@ export default {
     return {
       drawer: false, // Drawer starts closed
       wishlistDialog: false, // Wishlist modal starts closed
-      wishlistItems: [
-        // Example wishlist items
-        { name: "Zulu Beaded Necklace", price: "R150" },
-        { name: "African Wooden Mask", price: "R500" },
-      ],
+      wishlistItems: [], // Wishlist items
     };
   },
   methods: {
@@ -83,6 +82,16 @@ export default {
     },
     toggleWishlist() {
       this.wishlistDialog = !this.wishlistDialog; // Toggle Wishlist modal
+      if (this.wishlistDialog) {
+        this.fetchWishlistItems();
+      }
+    },
+    async fetchWishlistItems() {
+      try {
+        this.wishlistItems = await wishListService.getAllWishlists();
+      } catch (error) {
+        console.error('Error fetching wishlist items:', error);
+      }
     },
     goToProfile() {
       console.log('Navigating to Profile');
@@ -98,34 +107,32 @@ export default {
 /* Sidebar remains relative, does not overlay content */
 .v-navigation-drawer {
   z-index: 1000;
-  position: relative; /* Sidebar pushes content instead of overlaying */
+  position: relative;
 }
 
 /* App Bar (Header) stays fixed at the top */
 .v-app-bar {
-  position: fixed; /* Header stays at the top */
+  position: fixed;
   top: 0;
   left: 0;
   right: 0;
-  z-index: 1100; /* Ensure it stays above other components */
+  z-index: 1100;
 }
 
 /* Adjust padding for the main content to account for the fixed header */
 .v-main {
   padding-top: 64px; /* Adjust based on app bar height */
-  padding: 16px; /* Regular content padding */
-  margin: 0 !important;
+  padding: 16px;
 }
 
 /* Ensure the v-container has no padding or margins */
 .v-container {
-  padding: 0 !important; /* Remove padding */
-  margin: 0 !important; /* Remove margin */
+  padding: 0 !important;
+  margin: 0 !important;
 }
 
-/* Reset body margin and padding */
 body {
-  margin: 0 !important; /* Reset body margin */
-  padding: 0 !important; /* Reset body padding */
+  margin: 0 !important;
+  padding: 0 !important;
 }
 </style>
