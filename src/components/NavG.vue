@@ -9,7 +9,7 @@
     <!-- Sidebar toggle button -->
     <v-app-bar-nav-icon @click="toggleDrawer"></v-app-bar-nav-icon>
 
-    <v-app-bar-title>AfricanArts&Craft</v-app-bar-title>
+    <v-app-bar-title>African Arts & Craft</v-app-bar-title>
 
     <v-spacer></v-spacer>
 
@@ -55,6 +55,7 @@
   <!-- App Sidebar Component -->
   <AppSidebar v-model:drawer="drawer" />
   
+    <!-- Main Content where route views are rendered -->
 
 </template>
 
