@@ -56,19 +56,21 @@
   <AppSidebar v-model:drawer="drawer" />
   
     <!-- Main Content where route views are rendered -->
-
+<CrumbLink />
 </template>
 
 <script>
 import AppSidebar from './AppSidebar.vue'; // Import AppSidebar component
 import WishList from './WishList.vue'; // Import WishList component
 import wishListService from '@/services/wishListService';
+import CrumbLink from './CrumbLink.vue';
 
 export default {
   name: 'NavG',
   components: {
     AppSidebar, // Register the AppSidebar component
     WishList, // Register WishList component
+    CrumbLink,
   },
   data() {
     return {

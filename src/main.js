@@ -35,6 +35,7 @@ import AdminPage from './pages/AdminPage.vue';
 import CartPage from './pages/CartPage.vue';
 import WishList from './components/WishList.vue';
 import NavG from './components/NavG.vue';
+import CrumbLink from './components/CrumbLink.vue'; // Import the Crumbs component
 
 // Define routes
 const routes = [
@@ -56,7 +57,6 @@ const routes = [
   { path: '/Admin', name: 'admin', component: AdminPage },
   { path: '/', redirect: '/products' },
 ];
-
 
 const router = VueRouter.createRouter({
   history: VueRouter.createWebHistory(), // Removed the incorrect `process.env.BASE_URL` parameter
@@ -109,4 +109,8 @@ app.use(router);
 app.use(vuetify);
 app.use(pinia); 
 app.component('font-awesome-icon', FontAwesomeIcon); // Register FontAwesome component globally
+
+// Register the Crumbs component globally if needed
+app.component('CrumbLink', CrumbLink); 
+
 app.mount('#app');
