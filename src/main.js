@@ -1,6 +1,7 @@
 import { createApp } from 'vue';
 import App from './App.vue';
 import * as VueRouter from 'vue-router';
+import { createPinia } from 'pinia';
 import 'vuetify/styles'; // Import Vuetify styles
 
 // Import Vuetify and necessary components/directives
@@ -103,8 +104,10 @@ const vuetify = createVuetify({
 
 // Create and mount the app
 const app = createApp(App);
+const pinia = createPinia();
 app.use(router);
 app.use(vuetify);
+app.use(pinia); 
 app.component('font-awesome-icon', FontAwesomeIcon); // Register FontAwesome component globally
 
 // Register the Crumbs component globally if needed
