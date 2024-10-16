@@ -24,6 +24,7 @@
 
         <button class="add-to-wish" @click="addToWish">
           <img :src="heart" alt="Heart Icon" />
+          <button-text>Add to Wish List</button-text>
         </button>
       </div>
     </div>

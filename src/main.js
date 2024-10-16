@@ -33,16 +33,20 @@ import ProductCard from './components/ProductCard.vue';
 import NotAuthorizedPage from './pages/NotAuthorizedPage.vue';
 import AdminPage from './pages/AdminPage.vue';
 import CartPage from './pages/CartPage.vue';
+import WishList from './components/WishList.vue';
+import NavG from './components/NavG.vue';
 
 // Define routes
 const routes = [
+  { path: '/navg', name: 'NavG', component: NavG },
+  { path: '/wishlist', name: 'WishList', component: WishList },
+  { path: '/products/:productId', name: 'productDetailPage', component: ProductDetailPage, props: true },  // Product Detail with productId passed as prop
   { path: '/productcard', name: 'ProductCard', component: ProductCard },
   { path: '/register', name: 'RegisterPage', component: RegisterPage },
   { path: '/loginpage', name: 'loginpage', component: LoginPage },
   { path: '/updateProducts', name: 'UpdateProducts', component: UpdateProducts },
   { path: '/updateform/:id', name: 'UpdateForm', component: ProductUpdateForm, props: true },
   { path: '/products', name: 'products', component: ProductsPage },
-  { path: '/products/:productId', name: 'productDetailPage', component: ProductDetailPage, props: true  },
   { path: '/cart', name: 'cart', component: ShoppingCartPage },
   { path: '/AddProduct', name: 'addProduct', component: AddProduct },
   { path: '/CategorySearch', name: 'categorySearch', component: CategorySearch },
@@ -52,6 +56,7 @@ const routes = [
   { path: '/Admin', name: 'admin', component: AdminPage },
   { path: '/', redirect: '/products' },
 ];
+
 
 const router = VueRouter.createRouter({
   history: VueRouter.createWebHistory(), // Removed the incorrect `process.env.BASE_URL` parameter

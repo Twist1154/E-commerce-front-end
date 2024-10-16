@@ -65,13 +65,11 @@ export default {
     };
   },
   watch: {
-    // Watch for changes in the prop and update the local state
     drawer(newVal) {
       this.localDrawer = newVal;
     },
-    // Watch for changes in the local state and emit updates
     localDrawer(newVal) {
-      this.$emit('update:drawer', newVal); // Emit the update event
+      this.$emit('update:drawer', newVal);
     },
   },
   methods: {

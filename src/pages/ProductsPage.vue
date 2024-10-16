@@ -16,14 +16,14 @@
           :key="product.id"
           cols="12"
           sm="auto"
-          md="auto"
+          md="3"
         >
           <!-- Pass required props to ProductCard -->
           <product-card
             :product="product"
             :inventoryItem="product.inventoryItem" 
-            @view-details="handleViewDetails"
-            @add-to-cart="handleAddToCart"
+            @add-to-wishlist="handleAddToWishlist"
+            @view-details="handleViewDetails" 
           />
         </v-col>
       </v-row>
@@ -68,13 +68,13 @@ export default {
         this.errorMessage = "Failed to load products. Please try again later."; // Set error message on failure
       }
     },
+    // Handle the 'Add to Wishlist' button click
+    handleAddToWishlist(productId) {
+      console.log(`Adding product ${productId} to wishlist`); // Log the addition for now (can integrate with a wishlist service)
+    },
     // Handle the 'View Details' button click
     handleViewDetails(productId) {
       this.$router.push(`/products/${productId}`); // Navigate to product details page
-    },
-    // Handle the 'Add to Cart' button click
-    handleAddToCart(productId) {
-      console.log(`Adding product ${productId} to cart`); // Log the addition for now (can integrate with a cart service)
     },
   },
 };

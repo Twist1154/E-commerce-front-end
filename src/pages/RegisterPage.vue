@@ -1,215 +1,266 @@
 <template>
-  <v-app>
-    <v-main class="register">
-      <navigation />
-      <v-container class="forms" fluid>
-        <v-row justify="center">
-          <v-col cols="12" md="6" lg="4">
-            <v-card>
-              <v-card-title class="justify-center">
-                <h2>Sign Up</h2>
-              </v-card-title>
-              <v-card-text>
-                <v-form @submit.prevent="createUser">
-                  <!-- Avatar and Image Upload Button -->
-                  <div class="text-center mb-4">
-                    <v-avatar
-                      :src="avatarUrl || 'smirk.png'"
-                      size="80"
-                    ></v-avatar>
-                    <v-file-input
-                      v-model="selectedFile"
-                      accept="image/*"
-                      label="Upload Avatar"
-                      @change="uploadAvatar"
-                      prepend-icon="mdi-camera"
-                    ></v-file-input>
-                  </div>
+  <div class="form-container">
+    <v-stepper alt-labels>
+      <v-stepper-header>
+        <v-stepper-item
+          title="User Details"
+          :value="1"
+          :complete="currentStep > 1"
+          @click="currentStep = 1"
+        ></v-stepper-item>
 
-                  <!-- User Information Form -->
-                  <v-text-field
-                    label="Username"
-                    v-model="registerData.username"
-                    :rules="[rules.required]"
-                    outlined
-                    dense
-                  />
-                  <v-text-field
-                    label="First Name"
-                    v-model="registerData.firstName"
-                    :rules="[rules.required]"
-                    outlined
-                    dense
-                  />
-                  <v-text-field
-                    label="Last Name"
-                    v-model="registerData.lastName"
-                    :rules="[rules.required]"
-                    outlined
-                    dense
-                  />
-                  <v-text-field
-                    label="Email address"
-                    v-model="registerData.email"
-                    :rules="[rules.required, rules.email]"
-                    @input="validateEmail"
-                    outlined
-                    dense
-                  />
-                  <v-alert v-if="emailNote" type="error" dense outlined>{{ emailNote }}</v-alert>
-                  <v-text-field
-                    label="Password"
-                    v-model="registerData.password"
-                    :rules="[rules.required, rules.password]"
-                    type="password"
-                    @input="validatePassword"
-                    outlined
-                    dense
-                  />
-                  <v-alert v-if="passwordNote" type="error" dense outlined>{{ passwordNote }}</v-alert>
-                  <v-text-field
-                    label="Confirm Password"
-                    v-model="registerData.confirmPassword"
-                    :rules="[rules.required, confirmPasswordMatch]"
-                    type="password"
-                    outlined
-                    dense
-                  />
-                  <v-alert v-if="confirmPasswordNote" type="error" dense outlined>{{ confirmPasswordNote }}</v-alert>
-                  
-                  <!-- Submit Button -->
-                  <v-btn
-                    class="custom-btn"
-                    :loading="isLoading"
-                    block
-                    type="submit"
-                    style="background-color: #0c0c0c; color: white;"
-                  >
-                    {{ isLoading ? 'Signing Up...' : 'Submit' }}
-                  </v-btn>
-                </v-form>
-              </v-card-text>
-            </v-card>
-          </v-col>
-        </v-row>
-      </v-container>
-    </v-main>
-  </v-app>
+        <v-divider></v-divider>
+
+        <v-stepper-item
+          title="Add Address"
+          :value="2"
+          :complete="currentStep > 2"
+          @click="currentStep = 2"
+          :disabled="currentStep < 2"
+        ></v-stepper-item>
+      </v-stepper-header>
+    </v-stepper>
+
+    <!-- Step 1: User Details Form -->
+    <div v-if="currentStep === 1">
+      <h2>Step 1: Add User Details</h2>
+      <form @submit.prevent="handleUserSubmit">
+        <div class="form-group">
+          <label for="imagePath">Upload Avatar</label>
+          <input
+            type="file"
+            id="imagePath"
+            @change="handleImageUpload"
+            accept="image/*"
+          />
+          <div class="img-preview">
+            <img
+              :src="user.avatar || 'https://placehold.co/400x400/png'"
+              alt="User Avatar"
+            />
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="firstName">First Name</label>
+          <input type="text" id="firstName" v-model="user.firstName" required />
+        </div>
+
+        <div class="form-group">
+          <label for="lastName">Last Name</label>
+          <input type="text" id="lastName" v-model="user.lastName" required />
+        </div>
+
+        <div class="form-group">
+          <label for="username">Username</label>
+          <input type="text" id="username" v-model="user.username" required />
+        </div>
+
+        <div class="form-group">
+          <label for="email">Email</label>
+          <input type="email" id="email" v-model="user.email" required />
+        </div>
+
+        <div class="form-group">
+          <label for="password">Password</label>
+          <input type="password" id="password" v-model="user.password" required />
+        </div>
+
+        <button type="submit" class="submit-button">
+          {{ isUserCreated ? "Update User" : "Create User" }}
+        </button>
+      </form>
+    </div>
+
+    <!-- Step 2: Add Address -->
+    <div v-if="currentStep === 2">
+      <h2>Step 2: Add Address</h2>
+      <form @submit.prevent="handleAddressSubmit">
+        <div class="form-group">
+          <label for="title">Title</label>
+          <input type="text" id="title" v-model="address.title" required />
+        </div>
+
+        <div class="form-group">
+          <label for="addressLine1">Address Line 1</label>
+          <input type="text" id="addressLine1" v-model="address.addressLine1" required />
+        </div>
+
+        <div class="form-group">
+          <label for="addressLine2">Address Line 2</label>
+          <input type="text" id="addressLine2" v-model="address.addressLine2" />
+        </div>
+
+        <div class="form-group">
+          <label for="city">City</label>
+          <input type="text" id="city" v-model="address.city" required />
+        </div>
+
+        <div class="form-group">
+          <label for="country">Country</label>
+          <input type="text" id="country" v-model="address.country" required />
+        </div>
+
+        <div class="form-group">
+          <label for="postalCode">Postal Code</label>
+          <input type="text" id="postalCode" v-model="address.postalCode" required />
+        </div>
+
+        <div class="form-group">
+          <label for="phoneNumber">Phone Number</label>
+          <input type="text" id="phoneNumber" v-model="address.phoneNumber" required />
+        </div>
+
+        <button type="submit" class="submit-button">Submit Address</button>
+      </form>
+    </div>
+  </div>
 </template>
 
 <script>
-import userService from '@/services/userService.js';
-import { uploadFileToS3 } from '@/services/awsService.js'; // AWS upload service
+import { uploadFileToS3 } from "@/services/awsService";
+import userService from "@/services/userService";
+import AddressService from "@/services/AddressService";
 
 export default {
+  name: "UserForm",
   data() {
     return {
-      registerData: {
-        username: '',
-        firstName: '',
-        lastName: '',
-        email: '',
-        password: '',
-        confirmPassword: ''
+      currentStep: 1,
+      isUserCreated: false,
+      user: {
+        id: null,
+        avatar: "",
+        firstName: "",
+        lastName: "",
+        username: "",
+        password: "",
+        email: "",
+        roles: []
       },
-      avatarUrl: '', // Store the avatar URL
-      selectedFile: null, // Selected image file
-      emailNote: '',
-      passwordNote: '',
-      confirmPasswordNote: '',
-      isLoading: false,
-      rules: {
-        required: value => !!value || 'Required.',
-        email: value => /.+@.+\..+/.test(value) || 'Invalid email.',
-        password: value =>
-          /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,}$/.test(value) || 'Password must be at least 8 characters long, include one uppercase letter, one lowercase letter, and one number.'
-      }
+      address: {
+        title: "",
+        addressLine1: "",
+        addressLine2: "",
+        city: "",
+        country: "",
+        postalCode: "",
+        phoneNumber: ""
+      },
     };
   },
-  computed: {
-    confirmPasswordMatch() {
-      return this.registerData.confirmPassword === this.registerData.password
-        ? ''
-        : 'Passwords do not match.';
-    }
-  },
   methods: {
-    validateEmail() {
-      const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-      this.emailNote = this.registerData.email
-        ? (emailPattern.test(this.registerData.email) ? '' : 'Invalid email address.')
-        : '';
-    },
-    validatePassword() {
-      const passwordPattern = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,}$/;
-      this.passwordNote = this.registerData.password
-        ? (passwordPattern.test(this.registerData.password) ? '' : 'Password must be at least 8 characters long, include one uppercase letter, one lowercase letter, and one number.')
-        : '';
-    },
-    async uploadAvatar() {
-      if (!this.selectedFile) return;
-
+    async handleUserSubmit() {
       try {
-        // Upload file to S3 and get the file URL
-        const avatarUrl = await uploadFileToS3(this.selectedFile);
-        this.avatarUrl = avatarUrl; // Save the avatar URL
-        alert('Avatar uploaded successfully!');
-      } catch (error) {
-        console.error('Error uploading avatar:', error);
-        alert('Failed to upload avatar');
-      }
-    },
-    async createUser() {
-      this.isLoading = true;
-
-      if (this.registerData.password !== this.registerData.confirmPassword) {
-        this.confirmPasswordNote = 'Passwords do not match!';
-        this.isLoading = false;
-        return;
-      }
-
-      try {
-        const existingUser = await userService.getUsersByEmail(this.registerData.email);
-        if (existingUser && existingUser.length > 0) {
-          alert('A user with this email already exists.');
-        } else {
-          const newUser = { ...this.registerData, avatarUrl: this.avatarUrl }; // Include avatar URL in user data
-          await userService.createUser(newUser);
-          alert('User created successfully!');
-          this.$router.push('/loginpage');
+        if (this.user.imageFile) {
+          const uploadedImageUrl = await uploadFileToS3(this.user.imageFile);
+          this.user.avatar = uploadedImageUrl;
         }
+
+        if (this.isUserCreated) {
+          await userService.updateUser(this.user.id, this.user);
+          alert("User updated successfully!");
+        } else {
+          const response = await userService.createUser(this.user);
+          this.user = response.data; // Save the returned user with the ID
+          this.isUserCreated = true;
+          alert("User created successfully!");
+        }
+
+        this.currentStep = 2; // Proceed to the next step
       } catch (error) {
-        alert('Error creating user');
-        console.error('Error:', error.message || error);
-      } finally {
-        this.isLoading = false;
+        console.error("Error during user creation or update:", error);
+        alert("Failed to process user. Please try again.");
       }
-    }
-  }
+    },
+    async handleAddressSubmit() {
+      try {
+        const addressData = {
+          ...this.address,
+          user: { id: this.user.id } // Send the created user object with the address
+        };
+
+        await AddressService.createAddress(addressData);
+        alert("Address added successfully!");
+      } catch (error) {
+        console.error("Error adding address:", error);
+        alert("Failed to add address. Please try again.");
+      }
+    },
+    handleImageUpload(event) {
+      const file = event.target.files[0];
+      if (file) {
+        this.user.imageFile = file;
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          this.user.avatar = e.target.result;
+        };
+        reader.readAsDataURL(file);
+      }
+    },
+  },
 };
 </script>
 
-<style>
-.forms {
-  min-height: 100vh;
-  display: flex;
-  justify-content: center;
-  align-items: center;
+<style scoped>
+.form-container {
+  max-width: 700px;
+  margin: 40px auto;
+  padding: 30px;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  background-color: #ffffff;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
 h2 {
-  font-size: 2rem;
-  text-transform: uppercase;
-  margin-bottom: 1rem;
+  text-align: center;
+  color: #333;
+}
+
+.form-group {
+  margin-bottom: 20px;
+}
+
+.form-group label {
+  display: block;
+  font-weight: bold;
+  margin-bottom: 8px;
+}
+
+.form-group input,
+.form-group textarea {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.img-preview {
+  margin-top: 10px;
   text-align: center;
 }
 
-.v-alert {
-  margin-bottom: 1rem;
+.img-preview img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 8px;
 }
 
-.custom-btn {
-  background-color: #0c0c0c;
-  color: white;
+.submit-button {
+  width: 100%;
+  padding: 12px;
+  background-color: rgba(19,84,122,.8);
+  border: none;
+  border-radius: 6px;
+  color: #fff;
+  font-size: 16px;
+  cursor: pointer;
+  margin-top: 10px;
+  transition: background-color 0.3s ease;
+}
+
+.submit-button:hover {
+  background-color: rgba(128,208,199,.8);
 }
 </style>
