@@ -24,9 +24,10 @@
     </v-btn>
 
     <!-- Cart Button -->
-    <v-btn icon>
-      <v-icon>mdi-cart</v-icon>
+    <v-btn icon @click="goToCart">
+    <v-icon>mdi-cart</v-icon>
     </v-btn>
+
 
     <!-- Profile and Settings Dropdown -->
     <v-menu offset-y>
@@ -100,6 +101,9 @@ export default {
     goToSettings() {
       console.log('Navigating to Settings');
     },
+    goToCart() {
+      this.$router.push({ path: '/cart' }); // This navigates to the cart page
+    }
   },
 };
 </script>

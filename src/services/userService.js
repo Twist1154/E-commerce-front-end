@@ -103,30 +103,27 @@ const userService = {
   },
 
   // Validate user credentials
-validateUser(email, password) {
-  return apiClient.post('/validate', null, {
-    params: {
+  validateUser(email, password) {
+    return apiClient.post('/validate', {
       email: email,
       password: password
-    }
-  })
-  .then(response => {
-    // Handle success (HTTP 200)
-    return response.data;  // User is valid
-  })
-  .catch(error => {
-    // Handle failure
-    console.error('Error validating user:', error.response ? error.response.data : error.message);
-    
-    if (error.response && error.response.status === 401) {
-      // User is invalid (HTTP 401)
-      throw new Error("Invalid email or password");
-    }
-    
-    // Other errors
-    throw error;
-  });
-}
+    })
+    .then(response => {
+      return response.data;  // User is valid
+    })
+    .catch(error => {
+      console.error('Error validating user:', error.response ? error.response.data : error.message);
+      
+      if (error.response && error.response.status === 401) {
+        throw new Error("Invalid email or password");
+      }
+      
+      throw error;
+    });
+  }
+  
+  
+  
 
 
 };

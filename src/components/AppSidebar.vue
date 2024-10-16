@@ -22,7 +22,7 @@
             />
           </v-list-item-avatar>
           <v-list-item-content>
-            <v-list-item-title>{{ authStore.getCurrentUser?.name || 'Guest' }}</v-list-item-title>
+            <v-list-item-title>{{ authStore.getCurrentUser?.username || 'Guest' }}</v-list-item-title>
             <v-list-item-subtitle>{{ authStore.getCurrentUser?.email || 'No email provided' }}</v-list-item-subtitle>
           </v-list-item-content>
         </v-list-item>
@@ -30,9 +30,9 @@
         <v-divider></v-divider>
 
         <!-- Options -->
-        <v-list-item prepend-icon="mdi-view-dashboard" title="Dashboard"></v-list-item>
-        <v-list-item prepend-icon="mdi-account-box" title="Account"></v-list-item>
-        <v-list-item prepend-icon="mdi-gavel" title="Admin"></v-list-item>
+        <v-list-item prepend-icon="mdi-view-dashboard" title="Home" @click = "goHome"></v-list-item>
+        <v-list-item prepend-icon="mdi-account-box" title="Profile"></v-list-item>
+        <v-list-item prepend-icon="mdi-gavel" title="settings"></v-list-item>
 
         <v-spacer></v-spacer> <!-- Pushes logout/login button to the bottom -->
 
@@ -90,6 +90,9 @@ export default {
     login() {
       this.$router.push('/loginPage'); // Redirect to login page
     },
+    goHome(){
+      this.$router.push('/');
+    }
   },
 };
 </script>

@@ -113,34 +113,52 @@ export default {
 
 
       try {
-        await userService.validateUser(this.loginData.email, this.loginData.password);
-        const user = await userService.getUsersByEmail(this.loginData.email);
+    this.isLoading = true; // Start loading state
+    await userService.validateUser(this.loginData.email, this.loginData.password);
+    const users = await userService.getUsersByEmail(this.loginData.email);
 
+    if (users && users.length > 0) {
+        const user = users[0];
         this.authStore.setCurrentUser(user);
+    } else {
+        console.error("Error: No users found");
+    }
+
+    // Access the user using the getter
+    const user = this.authStore.getCurrentUser; // Ensure this is accessing the getter
+    console.log('Fetched User:', user); // Log the user object to inspect
+
+    // Check if the user object is defined and has firstName property
+    if (user && typeof user.firstName === 'string') {
+        alert('Welcome, ' + user.firstName + ' ' + user.lastName); // Adjusted to use firstName and lastName
         this.$router.push('/');
-      } catch (error) {
-        // Handle the error with better specificity
-        if (error.response) {
-          switch (error.response.status) {
+    } else {
+        console.error('User data is missing', user); // Log the user object if data is missing
+    }
+} catch (error) {
+    // Handle the error with better specificity
+    if (error.response) {
+        switch (error.response.status) {
             case 401:
-              this.errorMessage = 'Invalid email or password';
-              break;
+                this.errorMessage = 'Invalid email or password';
+                break;
             case 400:
-              this.errorMessage = 'Bad request. Please check your input.';
-              break;
+                this.errorMessage = 'Bad request. Please check your input.';
+                break;
             case 404:
-              this.errorMessage = 'Endpoint not found';
-              break;
+                this.errorMessage = 'Endpoint not found';
+                break;
             default:
-              this.errorMessage = 'An error occurred';
-          }
-        } else {
-          this.errorMessage = 'An error occurred';
-          console.error('Error:', error);
+                this.errorMessage = 'An error occurred';
         }
-      } finally {
-        this.isLoading = false;
-      }
+    } else {
+        this.errorMessage = 'An error occurred';
+        console.error('Error:', error);
+    }
+} finally {
+    this.isLoading = false; // End loading state
+}
+
     },
     validateEmail() {
       this.emailIsValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(this.loginData.email);
