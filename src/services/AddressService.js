@@ -1,7 +1,8 @@
 // src/services/addressService.js
 import axiosInstance from '../axiosConfig';
 
-const BASE_URL = 'http://localhost:8080/Store/address';
+const BASE_URL = '/address';
+
 
 // Function to create a new Address
 export const createAddress = async (address) => {
