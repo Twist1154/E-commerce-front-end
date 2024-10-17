@@ -120,7 +120,7 @@
 <script>
 import { uploadFileToS3 } from "@/services/awsService";
 import userService from "@/services/userService";
-import AddressService from "@/services/AddressService";
+import {createAddress} from "@/services/AddressService";
 
 export default {
   name: "UserForm",
@@ -180,7 +180,7 @@ export default {
           user: { id: this.user.id } // Send the created user object with the address
         };
 
-        await AddressService.createAddress(addressData);
+        await createAddress(addressData);
         alert("Address added successfully!");
       } catch (error) {
         console.error("Error adding address:", error);
