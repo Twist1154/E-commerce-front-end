@@ -19,7 +19,9 @@
                     outlined
                     dense
                   />
-                  <v-alert v-if="!emailIsValid" type="error" dense outlined>Invalid email address</v-alert>
+                  <v-alert v-if="!emailIsValid" type="error" dense outlined>
+                    Invalid email address
+                  </v-alert>
 
                   <v-text-field
                     label="Password"
@@ -30,19 +32,37 @@
                     outlined
                     dense
                   />
-                  <v-alert v-if="!passwordIsValid" type="error" dense outlined>Password must be at least 6 characters</v-alert>
+                  <v-alert v-if="!passwordIsValid" type="error" dense outlined>
+                    Password must be at least 6 characters
+                  </v-alert>
 
                   <v-btn
                     class="custom-btn"
                     :loading="isLoading"
                     block
                     type="submit"
+                    :disabled="isLoading"
                     style="background-color: #0c0c0c; color: white;"
                   >
                     {{ isLoading ? 'Logging in...' : 'Login' }}
                   </v-btn>
                 </v-form>
-                <router-link to="/reset-password" class="forgot-password">Forgot Password?</router-link>
+
+                <!-- Link for Forgot Password and Sign Up -->
+                <div class="links">
+                  <router-link to="/reset-password" class="forgot-password">
+                    Forgot Password?
+                  </router-link>
+                  <span class="link-separator"> | </span> <!-- Optional separator -->
+                  <router-link to="/register" class="sign-up">
+                    Sign Up
+                  </router-link>
+                </div>
+
+                <!-- Display error messages in an alert if login fails -->
+                <v-alert v-if="errorMessage" type="error" dense outlined>
+                  {{ errorMessage }}
+                </v-alert>
               </v-card-text>
             </v-card>
           </v-col>
@@ -53,11 +73,14 @@
 </template>
 
 <script>
-//import navigation from '@/components/NavG.vue';
+import { useAuthStore } from '@/stores/authStore';
 import userService from '@/services/userService.js';
 
 export default {
-  //components: { navigation },
+  setup() {
+    const authStore = useAuthStore();
+    return { authStore };
+  },
   data() {
     return {
       loginData: {
@@ -67,6 +90,7 @@ export default {
       isLoading: false,
       emailIsValid: true,
       passwordIsValid: true,
+      errorMessage: '',
       rules: {
         required: value => !!value || 'Required.',
         email: value => /.+@.+\..+/.test(value) || 'Invalid email.',
@@ -76,39 +100,43 @@ export default {
   },
   methods: {
     async validateUser() {
+      this.validateEmail();
+      this.validatePassword();
+
       if (!this.emailIsValid || !this.passwordIsValid) {
-        alert('Please correct the errors before submitting.');
+        this.errorMessage = 'Please correct the errors before submitting.';
         return;
       }
 
       this.isLoading = true;
+      this.errorMessage = ''; // Reset error message on new attempt
+
 
       try {
         await userService.validateUser(this.loginData.email, this.loginData.password);
         const user = await userService.getUsersByEmail(this.loginData.email);
-        localStorage.setItem('currentUser', JSON.stringify(user));
-        localStorage.setItem('authToken', 'some-token');
-        localStorage.setItem('role', 'customer');
-        alert('Login successful');
+
+        this.authStore.setCurrentUser(user);
         this.$router.push('/');
       } catch (error) {
+        // Handle the error with better specificity
         if (error.response) {
           switch (error.response.status) {
             case 401:
-              alert('Invalid email or password');
+              this.errorMessage = 'Invalid email or password';
               break;
             case 400:
-              alert('Bad request. Please check your input.');
+              this.errorMessage = 'Bad request. Please check your input.';
               break;
             case 404:
-              alert('Endpoint not found');
+              this.errorMessage = 'Endpoint not found';
               break;
             default:
-              alert('An error occurred');
+              this.errorMessage = 'An error occurred';
           }
         } else {
+          this.errorMessage = 'An error occurred';
           console.error('Error:', error);
-          alert('An error occurred');
         }
       } finally {
         this.isLoading = false;
@@ -139,12 +167,26 @@ h2 {
   text-align: center;
 }
 
-.forgot-password {
-  display: block;
-  text-align: center;
+.links {
+  display: flex;
+  justify-content: center;
+  margin-top: 1rem;
+}
+
+.forgot-password,
+.sign-up {
   color: #A67245;
   text-decoration: none;
   font-size: 1rem;
-  margin-top: 1rem;
+  margin: 0 10px; /* Add margin to create space between links */
+}
+
+.link-separator {
+  margin: 0 10px; /* Add margin to the separator for spacing */
+}
+
+.forgot-password:hover,
+.sign-up:hover {
+  text-decoration: underline;
 }
 </style>
