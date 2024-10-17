@@ -1,21 +1,30 @@
 <template>
-  <v-breadcrumbs :items="breadcrumbs" divider-icon="mdi-chevron-right">
-    <template v-slot:title="{ item, index }">
-      <!-- Active breadcrumb link -->
-      <router-link
-        v-if="index !== breadcrumbs.length - 1"  <!-- Active links (not last one) -->
-        :to="item.to"
-        class="breadcrumb-link active-link"
-      >
-        {{ item.title.toUpperCase() }}
-      </router-link>
-      
-      <!-- Inactive breadcrumb (last one) -->
-      <span v-else class="breadcrumb-link inactive-link">
-        {{ item.title.toUpperCase() }}
-      </span>
-    </template>
-  </v-breadcrumbs>
+  <!-- Breadcrumbs (Below Navbar) -->
+  <v-container class="breadcrumbs-container" fluid>
+    <!-- Breadcrumbs with custom dividers and link behavior -->
+    <v-breadcrumbs :items="breadcrumbs">
+      <template v-slot:divider>
+        <v-icon icon="mdi-chevron-right"></v-icon> <!-- Chevron right divider -->
+      </template>
+
+      <!-- Custom breadcrumb items -->
+      <template v-slot:title="{ item, index }">
+        <!-- Active breadcrumb links -->
+        <router-link
+          v-if="index !== breadcrumbs.length - 1"  
+          :to="item.to"
+          class="breadcrumb-link active-link"
+        >
+          {{ item.title }}
+        </router-link>
+        
+        <!-- Last breadcrumb (inactive) -->
+        <span v-else class="breadcrumb-link inactive-link">
+          {{ item.title }}
+        </span>
+      </template>
+    </v-breadcrumbs>
+  </v-container>
 </template>
 
 <script>
@@ -28,47 +37,50 @@ export default {
   },
   methods: {
     generateBreadcrumbs() {
+      // Generate breadcrumbs based on the current route
       this.breadcrumbs = this.$route.matched.map((route) => ({
-        title: route.meta.title || route.name,
-        to: route.path,
+        title: route.meta.title || route.name, // Use meta title or fallback to route name
+        to: route.path, // Path of the route
       }));
     },
   },
   watch: {
+    // Watch for route changes and regenerate breadcrumbs when the route changes
     '$route': 'generateBreadcrumbs',
   },
   mounted() {
-    this.generateBreadcrumbs();
+    this.generateBreadcrumbs(); // Generate breadcrumbs when the component is mounted
   },
 };
 </script>
 
 <style scoped>
 /* Breadcrumbs container styling */
-.v-breadcrumbs {
-  color: #333; /* Default text color */
+.breadcrumbs-container {
+  padding: 0;
+  background-color: #004d40; /* Teal Darken 4 background */
+  color: white;
 }
 
-/* Active breadcrumb link styling */
+/* Styling for active breadcrumb links */
 .breadcrumb-link.active-link {
-  color: #000; /* Dark color for active links */
+  color: #000; /* Black color for active links */
   text-decoration: none;
   font-weight: bold;
 }
 
-/* Inactive breadcrumb link (last link) styling */
+.breadcrumb-link.active-link:hover {
+  text-decoration: underline; /* Underline on hover */
+}
+
+/* Styling for inactive breadcrumb link (last item) */
 .breadcrumb-link.inactive-link {
   color: #bdbdbd; /* Gray color for inactive last link */
   cursor: default;
 }
 
-/* Add hover effect to active breadcrumb links */
-.breadcrumb-link.active-link:hover {
-  text-decoration: underline;
-}
-
-/* Custom color for the divider icon (arrows) */
+/* Custom color for the divider icon */
 .v-icon {
-  color: black; /* Black arrows */
+  color: black; /* Color for divider icons (arrows) */
 }
 </style>
