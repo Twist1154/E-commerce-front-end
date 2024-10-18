@@ -22,7 +22,7 @@
             />
           </v-list-item-avatar>
           <v-list-item-content>
-            <v-list-item-title>{{ authStore.getCurrentUser?.name || 'Guest' }}</v-list-item-title>
+            <v-list-item-title>{{ authStore.getCurrentUser?.username || 'Guest' }}</v-list-item-title>
             <v-list-item-subtitle>{{ authStore.getCurrentUser?.email || 'No email provided' }}</v-list-item-subtitle>
           </v-list-item-content>
         </v-list-item>
@@ -30,10 +30,19 @@
         <v-divider></v-divider>
 
         <!-- Options -->
-        <v-list-item prepend-icon="mdi-view-dashboard" title="Dashboard"></v-list-item>
-        <v-list-item prepend-icon="mdi-account-box" title="Account"></v-list-item>
-        <v-list-item prepend-icon="mdi-gavel" title="Admin"></v-list-item>
+        <v-list-item prepend-icon="mdi-view-dashboard" title="Home" @click = "goHome"></v-list-item>
+        <v-list-item prepend-icon="mdi-account-box" title="Profile"></v-list-item>
+        <v-list-item prepend-icon="mdi-gavel" title="settings"></v-list-item>
 
+        <v-spacer></v-spacer> <!-- Pushes logout/login button to the bottom -->
+
+        <!-- Conditional Button for Logout or Login -->
+        <v-btn block @click="handleAuthAction">
+          {{ authStore.getCurrentUser ? 'Logout' : 'Log In' }}
+        </v-btn>
+      </v-list>
+    </v-navigation-drawer>
+  </div>
         <v-spacer></v-spacer> <!-- Pushes logout/login button to the bottom -->
 
         <!-- Conditional Button for Logout or Login -->
@@ -49,8 +58,12 @@
 import { useAuthStore } from '@/stores/authStore'; // Assuming Pinia is used for user state
 import NavG from '@/components/NavG.vue'; // Importing the NavG component
 
+import { useAuthStore } from '@/stores/authStore'; // Assuming Pinia is used for user state
+import NavG from '@/components/NavG.vue'; // Importing the NavG component
+
 export default {
   name: 'AppSidebar',
+  components: { NavG },
   components: { NavG },
   props: {
     drawer: {
@@ -61,6 +74,7 @@ export default {
   data() {
     return {
       localDrawer: this.drawer, // Create a local copy of the drawer prop
+      authStore: useAuthStore(), // Access Pinia authStore
       authStore: useAuthStore(), // Access Pinia authStore
     };
   },
@@ -80,6 +94,13 @@ export default {
         this.login(); // If user is not logged in, redirect to login
       }
     },
+    handleAuthAction() {
+      if (this.authStore.getCurrentUser) {
+        this.logout(); // If user is logged in, log out
+      } else {
+        this.login(); // If user is not logged in, redirect to login
+      }
+    },
     logout() {
       alert('Logging out...');
       console.log('Logging out...');
@@ -90,13 +111,25 @@ export default {
     login() {
       this.$router.push('/loginPage'); // Redirect to login page
     },
+    goHome(){
+      this.$router.push('/');
+    }
   },
 };
 </script>
 
 <style scoped>
 /* Sidebar starts below the header (64px is a common header height) */
+/* Sidebar starts below the header (64px is a common header height) */
 .v-navigation-drawer {
+  z-index: 1000; /* Ensure drawer overlays content */
+}
+
+.user-avatar {
+  width: 40px; /* Set width of the avatar */
+  height: 40px; /* Set height of the avatar */
+  border-radius: 50%; /* Make it round */
+  overflow: hidden; /* Ensure the image fits within the bounds */
   z-index: 1000; /* Ensure drawer overlays content */
 }
 

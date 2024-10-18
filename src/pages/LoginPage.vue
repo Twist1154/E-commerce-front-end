@@ -22,6 +22,9 @@
                   <v-alert v-if="!emailIsValid" type="error" dense outlined>
                     Invalid email address
                   </v-alert>
+                  <v-alert v-if="!emailIsValid" type="error" dense outlined>
+                    Invalid email address
+                  </v-alert>
 
                   <v-text-field
                     label="Password"
@@ -35,6 +38,9 @@
                   <v-alert v-if="!passwordIsValid" type="error" dense outlined>
                     Password must be at least 6 characters
                   </v-alert>
+                  <v-alert v-if="!passwordIsValid" type="error" dense outlined>
+                    Password must be at least 6 characters
+                  </v-alert>
 
                   <v-btn
                     class="custom-btn"
@@ -42,11 +48,28 @@
                     block
                     type="submit"
                     :disabled="isLoading"
+                    :disabled="isLoading"
                     style="background-color: #0c0c0c; color: white;"
                   >
                     {{ isLoading ? 'Logging in...' : 'Login' }}
                   </v-btn>
                 </v-form>
+
+                <!-- Link for Forgot Password and Sign Up -->
+                <div class="links">
+                  <router-link to="/reset-password" class="forgot-password">
+                    Forgot Password?
+                  </router-link>
+                  <span class="link-separator"> | </span> <!-- Optional separator -->
+                  <router-link to="/register" class="sign-up">
+                    Sign Up
+                  </router-link>
+                </div>
+
+                <!-- Display error messages in an alert if login fails -->
+                <v-alert v-if="errorMessage" type="error" dense outlined>
+                  {{ errorMessage }}
+                </v-alert>
 
                 <!-- Link for Forgot Password and Sign Up -->
                 <div class="links">
@@ -74,9 +97,14 @@
 
 <script>
 import { useAuthStore } from '@/stores/authStore';
+import { useAuthStore } from '@/stores/authStore';
 import userService from '@/services/userService.js';
 
 export default {
+  setup() {
+    const authStore = useAuthStore();
+    return { authStore };
+  },
   setup() {
     const authStore = useAuthStore();
     return { authStore };
@@ -91,6 +119,7 @@ export default {
       emailIsValid: true,
       passwordIsValid: true,
       errorMessage: '',
+      errorMessage: '',
       rules: {
         required: value => !!value || 'Required.',
         email: value => /.+@.+\..+/.test(value) || 'Invalid email.',
@@ -103,7 +132,11 @@ export default {
       this.validateEmail();
       this.validatePassword();
 
+      this.validateEmail();
+      this.validatePassword();
+
       if (!this.emailIsValid || !this.passwordIsValid) {
+        this.errorMessage = 'Please correct the errors before submitting.';
         this.errorMessage = 'Please correct the errors before submitting.';
         return;
       }
@@ -111,36 +144,56 @@ export default {
       this.isLoading = true;
       this.errorMessage = ''; // Reset error message on new attempt
 
+      this.errorMessage = ''; // Reset error message on new attempt
+
 
       try {
-        await userService.validateUser(this.loginData.email, this.loginData.password);
-        const user = await userService.getUsersByEmail(this.loginData.email);
+    this.isLoading = true; // Start loading state
+    await userService.validateUser(this.loginData.email, this.loginData.password);
+    const users = await userService.getUsersByEmail(this.loginData.email);
 
+    if (users && users.length > 0) {
+        const user = users[0];
         this.authStore.setCurrentUser(user);
+    } else {
+        console.error("Error: No users found");
+    }
+
+    // Access the user using the getter
+    const user = this.authStore.getCurrentUser; // Ensure this is accessing the getter
+    console.log('Fetched User:', user); // Log the user object to inspect
+
+    // Check if the user object is defined and has firstName property
+    if (user && typeof user.firstName === 'string') {
+        alert('Welcome, ' + user.firstName + ' ' + user.lastName); // Adjusted to use firstName and lastName
         this.$router.push('/');
-      } catch (error) {
-        // Handle the error with better specificity
-        if (error.response) {
-          switch (error.response.status) {
+    } else {
+        console.error('User data is missing', user); // Log the user object if data is missing
+    }
+} catch (error) {
+    // Handle the error with better specificity
+    if (error.response) {
+        switch (error.response.status) {
             case 401:
-              this.errorMessage = 'Invalid email or password';
-              break;
+                this.errorMessage = 'Invalid email or password';
+                break;
             case 400:
-              this.errorMessage = 'Bad request. Please check your input.';
-              break;
+                this.errorMessage = 'Bad request. Please check your input.';
+                break;
             case 404:
-              this.errorMessage = 'Endpoint not found';
-              break;
+                this.errorMessage = 'Endpoint not found';
+                break;
             default:
-              this.errorMessage = 'An error occurred';
-          }
-        } else {
-          this.errorMessage = 'An error occurred';
-          console.error('Error:', error);
+                this.errorMessage = 'An error occurred';
         }
-      } finally {
-        this.isLoading = false;
-      }
+    } else {
+        this.errorMessage = 'An error occurred';
+        console.error('Error:', error);
+    }
+} finally {
+    this.isLoading = false; // End loading state
+}
+
     },
     validateEmail() {
       this.emailIsValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(this.loginData.email);
@@ -175,9 +228,27 @@ h2 {
 
 .forgot-password,
 .sign-up {
+.links {
+  display: flex;
+  justify-content: center;
+  margin-top: 1rem;
+}
+
+.forgot-password,
+.sign-up {
   color: #A67245;
   text-decoration: none;
   font-size: 1rem;
+  margin: 0 10px; /* Add margin to create space between links */
+}
+
+.link-separator {
+  margin: 0 10px; /* Add margin to the separator for spacing */
+}
+
+.forgot-password:hover,
+.sign-up:hover {
+  text-decoration: underline;
   margin: 0 10px; /* Add margin to create space between links */
 }
 
