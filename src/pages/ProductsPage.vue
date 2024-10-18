@@ -9,22 +9,35 @@
 
     <!-- Grid container for displaying products -->
     <v-container>
-      <!-- Display Products -->
       <v-row>
-        <v-col
-          v-for="product in products"
-          :key="product.id"
-          cols="12"
-          sm="auto"
-          md="3"
-        >
-          <!-- Pass required props to ProductCard -->
-          <product-card
-            :product="product"
-            :inventoryItem="product.inventoryItem" 
-            @add-to-wishlist="handleAddToWishlist"
-            @view-details="handleViewDetails" 
-          />
+        <v-col cols="12">
+          <v-row>
+            <!-- Display Products -->
+            <v-col
+              v-for="product in paginatedProducts"
+              :key="product.id"
+              cols="12"
+              sm="6"
+              md="4"
+              lg="3"
+              class="d-flex justify-center"
+            >
+              <!-- Pass required props to ProductCard -->
+              <product-card
+                :product="product"
+                :inventoryItem="product.inventoryItem" 
+                @add-to-wishlist="handleAddToWishlist"
+                @view-details="handleViewDetails" 
+              />
+            </v-col>
+          </v-row>
+
+          <!-- Pagination Component -->
+          <v-pagination
+            v-model="page"
+            :length="totalPages"
+            class="my-4"
+          ></v-pagination>
         </v-col>
       </v-row>
 
@@ -51,7 +64,18 @@ export default {
     return {
       products: [], // Holds the list of products fetched from the service
       errorMessage: null, // Error message state
+      page: 1, // Current pagination page
+      itemsPerPage: 12, // Items per page (4 columns x 3 rows)
     };
+  },
+  computed: {
+    totalPages() {
+      return Math.ceil(this.products.length / this.itemsPerPage);
+    },
+    paginatedProducts() {
+      const start = (this.page - 1) * this.itemsPerPage;
+      return this.products.slice(start, start + this.itemsPerPage);
+    },
   },
   created() {
     this.fetchProducts(); // Fetch products on component creation
@@ -91,5 +115,11 @@ h1 {
 /* Style for the error message container */
 .error-message {
   margin-top: 20px;
+}
+
+/* Ensure all product cards are the same size */
+.product-card {
+  width: 250px;
+  height: 350px;
 }
 </style>

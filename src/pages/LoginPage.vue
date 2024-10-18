@@ -22,6 +22,9 @@
                   <v-alert v-if="!emailIsValid" type="error" dense outlined>
                     Invalid email address
                   </v-alert>
+                  <v-alert v-if="!emailIsValid" type="error" dense outlined>
+                    Invalid email address
+                  </v-alert>
 
                   <v-text-field
                     label="Password"
@@ -35,6 +38,9 @@
                   <v-alert v-if="!passwordIsValid" type="error" dense outlined>
                     Password must be at least 6 characters
                   </v-alert>
+                  <v-alert v-if="!passwordIsValid" type="error" dense outlined>
+                    Password must be at least 6 characters
+                  </v-alert>
 
                   <v-btn
                     class="custom-btn"
@@ -42,11 +48,28 @@
                     block
                     type="submit"
                     :disabled="isLoading"
+                    :disabled="isLoading"
                     style="background-color: #0c0c0c; color: white;"
                   >
                     {{ isLoading ? 'Logging in...' : 'Login' }}
                   </v-btn>
                 </v-form>
+
+                <!-- Link for Forgot Password and Sign Up -->
+                <div class="links">
+                  <router-link to="/reset-password" class="forgot-password">
+                    Forgot Password?
+                  </router-link>
+                  <span class="link-separator"> | </span> <!-- Optional separator -->
+                  <router-link to="/register" class="sign-up">
+                    Sign Up
+                  </router-link>
+                </div>
+
+                <!-- Display error messages in an alert if login fails -->
+                <v-alert v-if="errorMessage" type="error" dense outlined>
+                  {{ errorMessage }}
+                </v-alert>
 
                 <!-- Link for Forgot Password and Sign Up -->
                 <div class="links">
@@ -74,9 +97,14 @@
 
 <script>
 import { useAuthStore } from '@/stores/authStore';
+import { useAuthStore } from '@/stores/authStore';
 import userService from '@/services/userService.js';
 
 export default {
+  setup() {
+    const authStore = useAuthStore();
+    return { authStore };
+  },
   setup() {
     const authStore = useAuthStore();
     return { authStore };
@@ -91,6 +119,7 @@ export default {
       emailIsValid: true,
       passwordIsValid: true,
       errorMessage: '',
+      errorMessage: '',
       rules: {
         required: value => !!value || 'Required.',
         email: value => /.+@.+\..+/.test(value) || 'Invalid email.',
@@ -103,12 +132,18 @@ export default {
       this.validateEmail();
       this.validatePassword();
 
+      this.validateEmail();
+      this.validatePassword();
+
       if (!this.emailIsValid || !this.passwordIsValid) {
+        this.errorMessage = 'Please correct the errors before submitting.';
         this.errorMessage = 'Please correct the errors before submitting.';
         return;
       }
 
       this.isLoading = true;
+      this.errorMessage = ''; // Reset error message on new attempt
+
       this.errorMessage = ''; // Reset error message on new attempt
 
 
@@ -193,9 +228,27 @@ h2 {
 
 .forgot-password,
 .sign-up {
+.links {
+  display: flex;
+  justify-content: center;
+  margin-top: 1rem;
+}
+
+.forgot-password,
+.sign-up {
   color: #A67245;
   text-decoration: none;
   font-size: 1rem;
+  margin: 0 10px; /* Add margin to create space between links */
+}
+
+.link-separator {
+  margin: 0 10px; /* Add margin to the separator for spacing */
+}
+
+.forgot-password:hover,
+.sign-up:hover {
+  text-decoration: underline;
   margin: 0 10px; /* Add margin to create space between links */
 }
 
