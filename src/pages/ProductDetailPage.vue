@@ -64,6 +64,7 @@
 <script>
 import productsService from "@/services/productsService"; // Import the products service
 import Review from "@/components/Review.vue"; // Import Review component
+import CartService from "@/services/CartService";
 
 export default {
   components: { Review }, // Register Review component
@@ -94,9 +95,15 @@ export default {
         console.error("Failed to fetch product details:", error); // Handle any errors
       }
     },
-    // Method to handle adding the product to the cart
-    addToCart() {
-      alert(`${this.product.name} added to cart!`);
+        // Method to handle adding the product to the cart
+        async addToCart() {
+      try {
+        await CartService.createCart(this.product.id); 
+        console.log(this.product);// Call the cart service to add the product
+        alert(`${this.product.name} added to cart!`); // Notify the user
+      } catch (error) {
+        alert("Failed to add to cart. Please try again."); // Handle error
+      }
     },
     // Method to handle adding the product to the wish list
     addToWish() {
