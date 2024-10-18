@@ -43,27 +43,27 @@
 
         <div class="form-group">
           <label for="firstName">First Name</label>
-          <input type="text" id="firstName" v-model="user.firstName" required />
+          <input type="text" id="firstName" v-model="user.firstName" required placeholder="Enter First Name" />
         </div>
 
         <div class="form-group">
           <label for="lastName">Last Name</label>
-          <input type="text" id="lastName" v-model="user.lastName" required />
+          <input type="text" id="lastName" v-model="user.lastName" required placeholder="Enter Last Name" />
         </div>
 
         <div class="form-group">
           <label for="username">Username</label>
-          <input type="text" id="username" v-model="user.username" required />
+          <input type="text" id="username" v-model="user.username" required placeholder="Enter Username" />
         </div>
 
         <div class="form-group">
           <label for="email">Email</label>
-          <input type="email" id="email" v-model="user.email" required />
+          <input type="email" id="email" v-model="user.email" required placeholder="you@example.com" />
         </div>
 
         <div class="form-group">
           <label for="password">Password</label>
-          <input type="password" id="password" v-model="user.password" required />
+          <input type="password" id="password" v-model="user.password" required placeholder="Enter Password" />
         </div>
 
         <button type="submit" class="submit-button">
@@ -78,37 +78,37 @@
       <form @submit.prevent="handleAddressSubmit">
         <div class="form-group">
           <label for="title">Title</label>
-          <input type="text" id="title" v-model="address.title" required />
+          <input type="text" id="title" v-model="address.title" required placeholder="Home / Work" />
         </div>
 
         <div class="form-group">
           <label for="addressLine1">Address Line 1</label>
-          <input type="text" id="addressLine1" v-model="address.addressLine1" required />
+          <input type="text" id="addressLine1" v-model="address.addressLine1" required placeholder="Enter Address Line 1" />
         </div>
 
         <div class="form-group">
           <label for="addressLine2">Address Line 2</label>
-          <input type="text" id="addressLine2" v-model="address.addressLine2" />
+          <input type="text" id="addressLine2" v-model="address.addressLine2" placeholder="Enter Address Line 2" />
         </div>
 
         <div class="form-group">
           <label for="city">City</label>
-          <input type="text" id="city" v-model="address.city" required />
+          <input type="text" id="city" v-model="address.city" required placeholder="Enter City" />
         </div>
 
         <div class="form-group">
           <label for="country">Country</label>
-          <input type="text" id="country" v-model="address.country" required />
+          <input type="text" id="country" v-model="address.country" required placeholder="Enter Country" />
         </div>
 
         <div class="form-group">
           <label for="postalCode">Postal Code</label>
-          <input type="text" id="postalCode" v-model="address.postalCode" required />
+          <input type="text" id="postalCode" v-model="address.postalCode" required placeholder="Enter Postal Code" />
         </div>
 
         <div class="form-group">
           <label for="phoneNumber">Phone Number</label>
-          <input type="text" id="phoneNumber" v-model="address.phoneNumber" required />
+          <input type="text" id="phoneNumber" v-model="address.phoneNumber" required placeholder="Enter Phone Number" />
         </div>
 
         <button type="submit" class="submit-button">Submit Address</button>
@@ -179,7 +179,7 @@ export default {
       try {
         const addressData = {
           ...this.address,
-          user: this.user.id // Send the created user object with the address
+          user: this.user // Send the created user object with the address
         };
 
         await createAddress(addressData);
@@ -267,7 +267,7 @@ h2 {
 .submit-button {
   width: 100%;
   padding: 12px;
-  background-color: rgba(19, 84, 122, .8);
+  background-color: rgba(0, 0, 0, 0.8);
   border: none;
   border-radius: 6px;
   color: #fff;
@@ -278,6 +278,6 @@ h2 {
 }
 
 .submit-button:hover {
-  background-color: rgba(128, 208, 199, .8);
+  background-image: linear-gradient(rgba(19,84,122,.8), rgba(128,208,199,.8));
 }
 </style>

@@ -43,7 +43,7 @@
         <!-- Card actions for adding to wishlist -->
         <v-card-actions>
           <v-btn color="blue" @click.stop="addToWishlist(product.id)"> <!-- Prevent click event from bubbling up -->
-            <font-awesome-icon :icon="['fas', 'heart']" /> <!-- Icon for wishlist -->
+            <font-awesome-icon :icon="['fasds', 'hand-holding-heart']" />
             <span>Add to Wishlist</span>
           </v-btn>
         </v-card-actions>

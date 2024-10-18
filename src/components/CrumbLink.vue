@@ -1,23 +1,26 @@
 <template>
   <!-- Breadcrumbs (Below Navbar) -->
+  <v-spacer></v-spacer>
+  
+  <v-divider></v-divider>
   <v-container class="breadcrumbs-container" fluid>
     <!-- Breadcrumbs with custom dividers and link behavior -->
-    <v-breadcrumbs :items="breadcrumbs">
+    <v-breadcrumbs :items="breadcrumbs" :key="breadcrumbs.length">
       <template v-slot:divider>
-        <v-icon icon="mdi-chevron-right"></v-icon> <!-- Chevron right divider -->
+        <v-icon>mdi-chevron-right</v-icon> <!-- Chevron right divider -->
       </template>
-
+      
       <!-- Custom breadcrumb items -->
       <template v-slot:title="{ item, index }">
         <!-- Active breadcrumb links -->
         <router-link
-          v-if="index !== breadcrumbs.length - 1"  
+          v-if="index !== breadcrumbs.length - 1"
           :to="item.to"
           class="breadcrumb-link active-link"
         >
           {{ item.title }}
         </router-link>
-        
+
         <!-- Last breadcrumb (inactive) -->
         <span v-else class="breadcrumb-link inactive-link">
           {{ item.title }}
@@ -32,16 +35,34 @@ export default {
   name: "CrumbLink",
   data() {
     return {
-      breadcrumbs: [],
+      breadcrumbs: [
+        { title: "Home", to: "/" }, // Always start with 'Home'
+      ],
     };
   },
   methods: {
     generateBreadcrumbs() {
-      // Generate breadcrumbs based on the current route
-      this.breadcrumbs = this.$route.matched.map((route) => ({
+      const currentRoute = this.$route.matched.map((route) => ({
         title: route.meta.title || route.name, // Use meta title or fallback to route name
         to: route.path, // Path of the route
       }));
+
+      const isHomeOrProductsPage = this.$route.name === "Home" || this.$route.name === "products";
+
+      if (isHomeOrProductsPage) {
+        this.breadcrumbs = [{ title: "Home", to: "/" }];
+      } else {
+        // Generate breadcrumbs including Home and current route
+        this.breadcrumbs = [
+          { title: "Home", to: "/" },
+          ...currentRoute,
+        ];
+      }
+
+      // Ensure Vue updates the DOM with breadcrumb changes
+      this.$nextTick(() => {
+        console.log("Breadcrumbs updated:", this.breadcrumbs);
+      });
     },
   },
   watch: {
@@ -55,16 +76,10 @@ export default {
 </script>
 
 <style scoped>
-/* Breadcrumbs container styling */
-.breadcrumbs-container {
-  padding: 0;
-  background-color: #004d40; /* Teal Darken 4 background */
-  color: white;
-}
 
 /* Styling for active breadcrumb links */
 .breadcrumb-link.active-link {
-  color: #000; /* Black color for active links */
+  color: #80d0c7; /* Light teal color (matches gradient) */
   text-decoration: none;
   font-weight: bold;
 }
@@ -75,12 +90,9 @@ export default {
 
 /* Styling for inactive breadcrumb link (last item) */
 .breadcrumb-link.inactive-link {
-  color: #bdbdbd; /* Gray color for inactive last link */
+  color: rgba(0, 0, 0, 0.8); /* Semi-transparent teal (matches gradient) */
   cursor: default;
 }
 
-/* Custom color for the divider icon */
-.v-icon {
-  color: black; /* Color for divider icons (arrows) */
-}
+
 </style>

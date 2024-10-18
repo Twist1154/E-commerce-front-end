@@ -10,7 +10,7 @@
                 <h2>Login</h2>
               </v-card-title>
               <v-card-text>
-                <v-form @submit.prevent="validateUser">
+                <v-form @submit.prevent="validateUser ">
                   <v-text-field
                     label="Email Address"
                     v-model="loginData.email"
@@ -53,7 +53,7 @@
                   <router-link to="/reset-password" class="forgot-password">
                     Forgot Password?
                   </router-link>
-                  <span class="link-separator"> | </span> <!-- Optional separator -->
+                  <span class="link-separator"> | </span>
                   <router-link to="/register" class="sign-up">
                     Sign Up
                   </router-link>
@@ -99,7 +99,7 @@ export default {
     };
   },
   methods: {
-    async validateUser() {
+    async validateUser () {
       this.validateEmail();
       this.validatePassword();
 
@@ -111,15 +111,19 @@ export default {
       this.isLoading = true;
       this.errorMessage = ''; // Reset error message on new attempt
 
-
       try {
-        await userService.validateUser(this.loginData.email, this.loginData.password);
-        const user = await userService.getUsersByEmail(this.loginData.email);
+        await userService.validateUser (this.loginData.email, this.loginData.password);
+        const users = await userService.getUsersByEmail(this.loginData.email);
 
-        this.authStore.setCurrentUser(user);
-        this.$router.push('/');
+        if (users && users.length > 0) {
+          const user = users[0];
+          this.authStore.setCurrentUser (user);
+          alert('Welcome, ' + user.firstName + ' ' + user.lastName);
+          this.$router.push('/');
+        } else {
+          console.error("Error: No users found");
+        }
       } catch (error) {
-        // Handle the error with better specificity
         if (error.response) {
           switch (error.response.status) {
             case 401:
@@ -139,11 +143,11 @@ export default {
           console.error('Error:', error);
         }
       } finally {
-        this.isLoading = false;
+        this.isLoading = false; // End loading state
       }
     },
     validateEmail() {
-      this.emailIsValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(this.loginData.email);
+      this.emailIsValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(this.loginData.email );
     },
     validatePassword() {
       this.passwordIsValid = this.loginData.password.length >= 6;
@@ -178,11 +182,11 @@ h2 {
   color: #A67245;
   text-decoration: none;
   font-size: 1rem;
-  margin: 0 10px; /* Add margin to create space between links */
+  margin: 0 10px;
 }
 
 .link-separator {
-  margin: 0 10px; /* Add margin to the separator for spacing */
+  margin: 0 10px;
 }
 
 .forgot-password:hover,
