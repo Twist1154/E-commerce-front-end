@@ -47,30 +47,43 @@
   </v-app-bar>
 
   <!-- Wishlist Modal -->
+  <v-dialog v-model="wishlistDialog" max-width="600">
+    <v-card>
+      <v-card-title>
+        Wishlist
+        <v-spacer></v-spacer>
+        <v-btn icon @click="toggleWishlist">
+          <v-icon>mdi-close</v-icon>
+        </v-btn>
+      </v-card-title>
+      <v-divider></v-divider>
 
-  <v-dialog v-model="wishlistDialog" max-width="500">
-    <WishList :wishlistItems="wishlistItems" @close="toggleWishlist" />
+      <v-card-text class="wishlist-dialog-container">
+        <!-- WishList component integrated with scrollable content -->
+        <div class="wishlist-items">
+          <WishList :wishlistItems="wishlistItems" />
+        </div>
+      </v-card-text>
+    </v-card>
   </v-dialog>
 
   <!-- App Sidebar Component -->
   <AppSidebar v-model:drawer="drawer" />
-  
-    <!-- Main Content where route views are rendered -->
-<CrumbLink />
+
+  <!-- Main Content -->
+
 </template>
 
 <script>
 import AppSidebar from './AppSidebar.vue'; // Import AppSidebar component
 import WishList from './WishList.vue'; // Import WishList component
 import wishListService from '@/services/wishListService';
-import CrumbLink from './CrumbLink.vue';
 
 export default {
   name: 'NavG',
   components: {
     AppSidebar, // Register the AppSidebar component
     WishList, // Register WishList component
-    CrumbLink,
   },
   data() {
     return {
@@ -122,9 +135,10 @@ export default {
   z-index: 1100;
 }
 
-/* Adjust padding for the main content to account for the fixed header */
+/* Adjust padding for the main content to account for the fixed header and breadcrumbs */
 .v-main {
-  padding-top: 64px; /* Adjust based on app bar height */
+  padding-top: 120px;
+  /* Adjust based on app bar + breadcrumbs height */
   padding: 16px;
 }
 
@@ -137,5 +151,18 @@ export default {
 body {
   margin: 0 !important;
   padding: 0 !important;
+}
+
+/* Wishlist Dialog - Ensure scrollable content */
+.wishlist-dialog-container {
+  max-height: 400px;
+  /* Adjust height as needed */
+  overflow-y: auto;
+  /* Enable vertical scrolling */
+}
+
+/* Ensure the cards inside the dialog maintain full width */
+.wishlist-items .v-card {
+  width: 100%;
 }
 </style>

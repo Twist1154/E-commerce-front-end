@@ -120,7 +120,7 @@
 <script>
 import { uploadFileToS3 } from "@/services/awsService";
 import userService from "@/services/userService";
-import AddressService from "@/services/AddressService";
+import { createAddress } from "@/services/AddressService";
 
 export default {
   name: "UserForm",
@@ -129,7 +129,7 @@ export default {
       currentStep: 1,
       isUserCreated: false,
       user: {
-        id: null,
+        id: "",
         avatar: "",
         firstName: "",
         lastName: "",
@@ -161,9 +161,10 @@ export default {
           await userService.updateUser(this.user.id, this.user);
           alert("User updated successfully!");
         } else {
-          const response = await userService.createUser(this.user);
-          this.user = response.data; // Save the returned user with the ID
+          const data = await userService.createUser(this.user);
+          this.user = data; // Save the returned user with the ID
           this.isUserCreated = true;
+          console.log("User created successfully!", this.user);
           alert("User created successfully!");
         }
 
@@ -173,20 +174,36 @@ export default {
         alert("Failed to process user. Please try again.");
       }
     },
+
     async handleAddressSubmit() {
       try {
         const addressData = {
           ...this.address,
-          user: { id: this.user.id } // Send the created user object with the address
+          user: this.user.id // Send the created user object with the address
         };
 
-        await AddressService.createAddress(addressData);
+        await createAddress(addressData);
+        console.log("Address added successfully!", addressData);
         alert("Address added successfully!");
+        this.resetAddressForm(); // Reset the address form after submission
       } catch (error) {
         console.error("Error adding address:", error);
         alert("Failed to add address. Please try again.");
       }
     },
+
+    resetAddressForm() {
+      this.address = {
+        title: "",
+        addressLine1: "",
+        addressLine2: "",
+        city: "",
+        country: "",
+        postalCode: "",
+        phoneNumber: ""
+      };
+    },
+
     handleImageUpload(event) {
       const file = event.target.files[0];
       if (file) {
@@ -250,7 +267,7 @@ h2 {
 .submit-button {
   width: 100%;
   padding: 12px;
-  background-color: rgba(19,84,122,.8);
+  background-color: rgba(19, 84, 122, .8);
   border: none;
   border-radius: 6px;
   color: #fff;
@@ -261,6 +278,6 @@ h2 {
 }
 
 .submit-button:hover {
-  background-color: rgba(128,208,199,.8);
+  background-color: rgba(128, 208, 199, .8);
 }
 </style>
