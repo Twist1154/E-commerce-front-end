@@ -38,6 +38,7 @@
 </template>
 
 <script>
+import { useCartStore } from '@/stores/cartStore';
 import productsService from "@/services/productsService"; // Import the products service
 import heart from "@/assets/heart.svg"; // Import heart icon
 import Review from "@/components/Review.vue"; // Import Review component
@@ -64,11 +65,15 @@ export default {
     },
     // Method to handle adding the product to the cart
     addToCart() {
+      if (!this.product) return; // Ensure product is loaded before trying to add it to the cart
+      
+      const cartStore = useCartStore(); // Access Cart Store
+      cartStore.addToCart(this.product); // Add product to cart
       alert(`${this.product.name} added to cart!`);
-      // Logic for adding product to the cart would go here
     },
     // Method to handle adding the product to the wish list
     addToWish() {
+      if (!this.product) return; // Ensure product is loaded before adding to wish list
       alert(`${this.product.name} added to Wish List`);
     },
   },
