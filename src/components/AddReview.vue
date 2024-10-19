@@ -58,6 +58,7 @@
 
 <script>
 import reviewService from "@/services/reviewService"; // Import your review service
+import { useAuthStore } from "@/stores/authStore"; // Import the auth store
 
 export default {
   name: "ProductReviews",

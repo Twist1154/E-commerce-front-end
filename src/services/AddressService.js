@@ -7,7 +7,7 @@ const BASE_URL = '/address';
 // Function to create a new Address
 export const createAddress = async (address) => {
   console.log('Sending address for creation:', address);
-  const response = await axiosInstance.post(`${BASE_URL}/`, address); // Create address
+  const response = await axiosInstance.post(`${BASE_URL}`, address); // Create address
   console.log('Created address:', response.data);
   return response.data;
 };

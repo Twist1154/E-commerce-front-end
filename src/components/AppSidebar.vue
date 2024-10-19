@@ -14,10 +14,9 @@
         <!-- User Details Section at the top -->
         <v-list-item>
           <v-list-item-avatar>
-            <!-- Adding a class for styling -->
             <v-img
-              :src="authStore.getCurrentUser?.avatar || 'https://www.google.com/url?sa=i&url=https%3A%2F%2Fuxwing.com%2Fno-profile-picture-icon%2F&psig=AOvVaw297_euzi07Wz5Q2_wDyCNM&ust=1729074362807000&source=images&cd=vfe&opi=89978449&ved=0CBEQjRxqFwoTCKir9ZKWkIkDFQAAAAAdAAAAABAE'"
-              alt="User Avatar"
+              :src="userAvatar"
+              alt="User  Avatar"
               class="user-avatar" 
             />
           </v-list-item-avatar>
@@ -38,7 +37,7 @@
 
         <!-- Conditional Button for Logout or Login -->
         <v-btn block @click="handleAuthAction">
-          {{ authStore.getCurrentUser ? 'Logout' : 'Log In' }}
+          {{ authStore.getCurrentUser  ? 'Logout' : 'Log In' }}
         </v-btn>
       </v-list>
     </v-navigation-drawer>
@@ -47,7 +46,7 @@
 
 <script>
 import { useAuthStore } from '@/stores/authStore'; // Assuming Pinia is used for user state
-import NavG from '@/components/NavG.vue'; // Importing the NavG component
+import NavG from '@/components/NavigationBar.vue'; // Importing the NavG component
 
 export default {
   name: 'AppSidebar',
@@ -72,9 +71,20 @@ export default {
       this.$emit('update:drawer', newVal);
     },
   },
+  computed: {
+    userAvatar() {
+      return this.authStore.getCurrentUser?.avatar || 'https://www.google.com/url?sa=i&url=https%3A%2F%2Fuxwing.com%2Fno-profile-picture-icon%2F&psig=AOvVaw297_euzi07Wz5Q2_wDyCNM&ust=1729074362807000&source=images&cd=vfe&opi=89978449&ved=0CBEQjRxqFwoTCKir9ZKWkIkDFQAAAAAdAAAAABAE';
+    },
+    username() {
+      return this.authStore.getCurrentUser?.username || 'Guest';
+    },
+    email() {
+      return this.authStore.getCurrentUser?.email || 'No email provided';
+    },
+  },
   methods: {
     handleAuthAction() {
-      if (this.authStore.getCurrentUser) {
+      if (this.authStore.getCurrentUser ) {
         this.logout(); // If user is logged in, log out
       } else {
         this.login(); // If user is not logged in, redirect to login
@@ -84,7 +94,7 @@ export default {
       alert('Logging out...');
       console.log('Logging out...');
       this.localDrawer = false; // Close the drawer after logging out
-      this.authStore.setCurrentUser(null); // Clear user data in authStore
+      this.authStore.setCurrentUser (null); // Clear user data in authStore
       this.$router.push('/loginPage'); // Redirect to login
     },
     login() {

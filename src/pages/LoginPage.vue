@@ -10,7 +10,7 @@
                 <h2>Login</h2>
               </v-card-title>
               <v-card-text>
-                <v-form @submit.prevent="validateUser">
+                <v-form @submit.prevent="validateUser ">
                   <v-text-field
                     label="Email Address"
                     v-model="loginData.email"
@@ -76,6 +76,22 @@
                     Forgot Password?
                   </router-link>
                   <span class="link-separator"> | </span> <!-- Optional separator -->
+                  <router-link to="/register" class="sign-up">
+                    Sign Up
+                  </router-link>
+                </div>
+
+                <!-- Display error messages in an alert if login fails -->
+                <v-alert v-if="errorMessage" type="error" dense outlined>
+                  {{ errorMessage }}
+                </v-alert>
+
+                <!-- Link for Forgot Password and Sign Up -->
+                <div class="links">
+                  <router-link to="/reset-password" class="forgot-password">
+                    Forgot Password?
+                  </router-link>
+                  <span class="link-separator"> | </span>
                   <router-link to="/register" class="sign-up">
                     Sign Up
                   </router-link>
@@ -189,7 +205,7 @@ export default {
 
     },
     validateEmail() {
-      this.emailIsValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(this.loginData.email);
+      this.emailIsValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(this.loginData.email );
     },
     validatePassword() {
       this.passwordIsValid = this.loginData.password.length >= 6;
@@ -224,7 +240,7 @@ h2 {
   color: #A67245;
   text-decoration: none;
   font-size: 1rem;
-  margin: 0 10px; /* Add margin to create space between links */
+  margin: 0 10px;
 }
 
 .link-separator {
@@ -239,6 +255,16 @@ h2 {
 
 .link-separator {
   margin: 0 10px; /* Add margin to the separator for spacing */
+}
+
+.forgot-password:hover,
+.sign-up:hover {
+  text-decoration: underline;
+  margin: 0 10px; /* Add margin to create space between links */
+}
+
+.link-separator {
+  margin: 0 10px;
 }
 
 .forgot-password:hover,

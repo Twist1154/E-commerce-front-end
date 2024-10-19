@@ -15,8 +15,8 @@ import '@mdi/font/css/materialdesignicons.css'; // Ensure MDI icons are availabl
 // Import FontAwesome Icons
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
-import { faShoppingCart, faPlus, faEdit, faTags } from '@fortawesome/free-solid-svg-icons';
-library.add(faShoppingCart, faPlus, faEdit, faTags);
+import { faShoppingCart, faPlus, faEdit, faTags,faHeart,faHandHoldingHeart } from '@fortawesome/free-solid-svg-icons';
+library.add(faShoppingCart, faPlus, faEdit, faTags,faHeart,faHandHoldingHeart);
 
 // Import components for different pages
 import ShoppingCartPage from './pages/ShoppingCartPage.vue';
@@ -34,12 +34,12 @@ import NotAuthorizedPage from './pages/NotAuthorizedPage.vue';
 import AdminPage from './pages/AdminPage.vue';
 import CartPage from './pages/CartPage.vue';
 import WishList from './components/WishList.vue';
-import NavG from './components/NavG.vue';
+import NavigationBar from './components/NavigationBar.vue';
 import CrumbLink from './components/CrumbLink.vue'; // Import the Crumbs component
 
 // Define routes
 const routes = [
-  { path: '/navg', name: 'NavG', component: NavG },
+  { path: '/navigation', name: 'NavigationBar', component: NavigationBar },
   { path: '/wishlist', name: 'WishList', component: WishList },
   { path: '/products/:productId', name: 'productDetailPage', component: ProductDetailPage, props: true },  // Product Detail with productId passed as prop
   { path: '/productcard', name: 'ProductCard', component: ProductCard },

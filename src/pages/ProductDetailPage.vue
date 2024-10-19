@@ -20,9 +20,32 @@
         <!-- Product Name -->
         <h1>{{ product.name }}</h1>
 
+        <!-- Product Description -->
+        <v-divider class="my-4"></v-divider>
+        <p>{{ product.description }}</p>
+        <v-card-text
+          v-model="product.description"
+          outlined
+          rows="3"
+          label="Product Description"
+          disabled
+        ></v-card-text>
+        <v-spacer></v-spacer>
+
+        <!-- Shipping and Inventory Info -->
+        <v-divder class="my-4"></v-divder><v-divider />
+        <v-card-text>
+          <p>Vendor Location: {{ product.inventoryItem.vendorLocation }}</p>
+          <p>In Stock: {{ product.inventoryItem.quantity }}</p>
+          <p>Last Updated: {{ formattedDate }}</p>
+        </v-card-text>
+
+        <v-spacer></v-spacer>
+
         <!-- Product Price -->
         <h2 class="price my-4">R{{ product.price }}</h2>
 
+        <v-divider class="my-4"></v-divider>
         <!-- Add to Cart and Wishlist Buttons -->
         <v-btn block color="black" class="white--text mb-3" @click="addToCart">
           ADD TO CART
@@ -31,20 +54,6 @@
           <v-icon>mdi-heart</v-icon>
           ADD TO WISHLIST
         </v-btn>
-
-        <!-- Product Description -->
-        <v-divider class="my-4"></v-divider>
-        <p>{{ product.description }}</p>
-        <v-divider />
-        <!-- Shipping and Inventory Info -->
-        <v-divider></v-divider>
-
-        <v-divider />
-        <div class="my-4">
-          <p>Vendor Location: {{ product.inventoryItem.vendorLocation }}</p>
-          <p>In Stock: {{ product.inventoryItem.quantity }}</p>
-          <p>Last Updated: {{ formattedDate }}</p>
-        </div>
       </v-col>
     </v-row>
 
@@ -56,15 +65,17 @@
     </v-row>
   </v-container>
 
-        <!-- Reviews Section -->
-        <v-divider class="my-4"></v-divider>
-        <review v-if="product" :productId="product.id" />
+  <!-- Reviews Section -->
+  <v-divider class="my-4"></v-divider>
+  <review v-if="product" :productId="product.id" />
 </template>
 
 <script>
-import { useCartStore } from '@/stores/cartStore';
+import { useCartStore } from "@/stores/cartStore";
+import { useAuthStore } from "@/stores/authStore"; // Import the auth store
 import productsService from "@/services/productsService"; // Import the products service
 import Review from "@/components/Review.vue"; // Import Review component
+import wishlistService from "@/services/wishlistService"; // Import the wishlist service
 
 export default {
   components: { Review }, // Register Review component
@@ -95,18 +106,51 @@ export default {
         console.error("Failed to fetch product details:", error); // Handle any errors
       }
     },
+
     // Method to handle adding the product to the cart
     addToCart() {
       if (!this.product) return; // Ensure product is loaded before trying to add it to the cart
-      
+      const authStore = useAuthStore(); // Access Auth Store
+      const user = authStore.user; // Get the current authenticated user
+
+      if (!user) {
+        alert("Please log in to add items to your Cart.");
+        return;
+      }
+
       const cartStore = useCartStore(); // Access Cart Store
       cartStore.addToCart(this.product); // Add product to cart
       alert(`${this.product.name} added to cart!`);
     },
+
     // Method to handle adding the product to the wish list
-    addToWish() {
+    async addToWish() {
       if (!this.product) return; // Ensure product is loaded before adding to wish list
-      alert(`${this.product.name} added to Wish List`);
+
+      const authStore = useAuthStore(); // Access Auth Store
+      const user = authStore.user; // Get the current authenticated user
+
+      if (!user) {
+        alert("Please log in to add items to your wishlist.");
+        return;
+      }
+
+      // Construct the wishlist object as expected by the backend
+      const wishlist = {
+        id: '', // Default ID for new wishlist entry
+        user: user, // Use the current authenticated user
+        product: this.product, // Add the current product
+        createdAt: new Date().toISOString(), // Add current date in ISO format
+      };
+
+      try {
+        // Call the wishlist service to add the product to the wishlist
+        const response = await wishlistService.createWishlist(wishlist);
+        console.log("Product added to wishlist", response.data);
+        alert(`${this.product.name} added to Wish List!`);
+      } catch (error) {
+        console.error("Failed to add product to wishlist:", error); // Handle any errors
+      }
     },
   },
   mounted() {
@@ -142,7 +186,7 @@ h1 {
 /* Styling for price */
 .price {
   font-weight: bold;
-  text-align: center;
+  text-align: left;
 }
 
 /* Wishlist and Cart button styles */

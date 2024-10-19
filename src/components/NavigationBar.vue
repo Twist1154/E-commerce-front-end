@@ -25,9 +25,8 @@
 
     <!-- Cart Button -->
     <v-btn icon @click="goToCart">
-    <v-icon>mdi-cart</v-icon>
+      <v-icon>mdi-cart</v-icon>
     </v-btn>
-
 
     <!-- Profile and Settings Dropdown -->
     <v-menu offset-y>
@@ -46,6 +45,7 @@
       </v-list>
     </v-menu>
   </v-app-bar>
+
 
   <!-- Wishlist Modal -->
   <v-dialog v-model="wishlistDialog" max-width="600">
@@ -71,20 +71,33 @@
   <!-- App Sidebar Component -->
   <AppSidebar v-model:drawer="drawer" />
 
-  <!-- Main Content -->
-
+  <!-- Main Content where route views are rendered -->
+  <v-main>
+      
+  <!-- Breadcrumbs Component (Below App Bar, Above Content) -->
+  <v-container class="breadcrumbs-container">
+    <CrumbLink />
+  </v-container>
+  
+    <v-container>
+      <router-view></router-view>
+      <!-- Routes are displayed here -->
+    </v-container>
+  </v-main>
 </template>
 
 <script>
-import AppSidebar from './AppSidebar.vue'; // Import AppSidebar component
-import WishList from './WishList.vue'; // Import WishList component
-import wishListService from '@/services/wishListService';
+import AppSidebar from "./AppSidebar.vue"; // Import AppSidebar component
+import WishList from "./WishList.vue"; // Import WishList component
+import wishlistService from "@/services/wishlistService";
+import CrumbLink from "./CrumbLink.vue";
 
 export default {
-  name: 'NavG',
+  name: "NavG",
   components: {
     AppSidebar, // Register the AppSidebar component
     WishList, // Register WishList component
+    CrumbLink,
   },
   data() {
     return {
@@ -105,20 +118,20 @@ export default {
     },
     async fetchWishlistItems() {
       try {
-        this.wishlistItems = await wishListService.getAllWishlists();
+        this.wishlistItems = await wishlistService.getAllWishlists();
       } catch (error) {
-        console.error('Error fetching wishlist items:', error);
+        console.error("Error fetching wishlist items:", error);
       }
     },
     goToProfile() {
-      console.log('Navigating to Profile');
+      console.log("Navigating to Profile");
     },
     goToSettings() {
-      console.log('Navigating to Settings');
+      console.log("Navigating to Settings");
     },
     goToCart() {
-      this.$router.push({ path: '/cart' }); // This navigates to the cart page
-    }
+      this.$router.push({ path: "/cart" }); // This navigates to the cart page
+    },
   },
 };
 </script>
