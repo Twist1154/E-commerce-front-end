@@ -72,8 +72,10 @@
 
 <script>
 import { useCartStore } from "@/stores/cartStore";
+import { useAuthStore } from "@/stores/authStore"; // Import the auth store
 import productsService from "@/services/productsService"; // Import the products service
 import Review from "@/components/Review.vue"; // Import Review component
+import wishlistService from "@/services/wishlistService"; // Import the wishlist service
 
 export default {
   components: { Review }, // Register Review component
@@ -108,15 +110,47 @@ export default {
     // Method to handle adding the product to the cart
     addToCart() {
       if (!this.product) return; // Ensure product is loaded before trying to add it to the cart
+      const authStore = useAuthStore(); // Access Auth Store
+      const user = authStore.user; // Get the current authenticated user
+
+      if (!user) {
+        alert("Please log in to add items to your Cart.");
+        return;
+      }
 
       const cartStore = useCartStore(); // Access Cart Store
       cartStore.addToCart(this.product); // Add product to cart
       alert(`${this.product.name} added to cart!`);
     },
+
     // Method to handle adding the product to the wish list
-    addToWish() {
+    async addToWish() {
       if (!this.product) return; // Ensure product is loaded before adding to wish list
-      alert(`${this.product.name} added to Wish List`);
+
+      const authStore = useAuthStore(); // Access Auth Store
+      const user = authStore.user; // Get the current authenticated user
+
+      if (!user) {
+        alert("Please log in to add items to your wishlist.");
+        return;
+      }
+
+      // Construct the wishlist object as expected by the backend
+      const wishlist = {
+        id: '', // Default ID for new wishlist entry
+        user: user, // Use the current authenticated user
+        product: this.product, // Add the current product
+        createdAt: new Date().toISOString(), // Add current date in ISO format
+      };
+
+      try {
+        // Call the wishlist service to add the product to the wishlist
+        const response = await wishlistService.createWishlist(wishlist);
+        console.log("Product added to wishlist", response.data);
+        alert(`${this.product.name} added to Wish List!`);
+      } catch (error) {
+        console.error("Failed to add product to wishlist:", error); // Handle any errors
+      }
     },
   },
   mounted() {

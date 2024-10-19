@@ -89,7 +89,7 @@
 <script>
 import AppSidebar from "./AppSidebar.vue"; // Import AppSidebar component
 import WishList from "./WishList.vue"; // Import WishList component
-import wishListService from "@/services/wishListService";
+import wishlistService from "@/services/wishlistService";
 import CrumbLink from "./CrumbLink.vue";
 
 export default {
@@ -118,7 +118,7 @@ export default {
     },
     async fetchWishlistItems() {
       try {
-        this.wishlistItems = await wishListService.getAllWishlists();
+        this.wishlistItems = await wishlistService.getAllWishlists();
       } catch (error) {
         console.error("Error fetching wishlist items:", error);
       }

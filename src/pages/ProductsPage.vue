@@ -25,9 +25,9 @@
               <!-- Pass required props to ProductCard -->
               <product-card
                 :product="product"
-                :inventoryItem="product.inventoryItem" 
+                :inventoryItem="product.inventoryItem"
                 @add-to-wishlist="handleAddToWishlist"
-                @view-details="handleViewDetails" 
+                @view-details="handleViewDetails"
               />
             </v-col>
           </v-row>
@@ -54,6 +54,8 @@
 <script>
 import ProductCard from "@/components/ProductCard.vue";
 import productsService from "@/services/productsService";
+import wishlistService from "@/services/wishlistService";
+import { useAuthStore } from "@/stores/authStore"; // Import Pinia store
 
 export default {
   components: {
@@ -93,8 +95,33 @@ export default {
       }
     },
     // Handle the 'Add to Wishlist' button click
-    handleAddToWishlist(productId) {
-      console.log(`Adding product ${productId} to wishlist`); // Log the addition for now (can integrate with a wishlist service)
+    async handleAddToWishlist(productId) {
+      const authStore = useAuthStore(); // Access the auth store
+
+      if (!authStore.getCurrentUser) {
+        alert("Please log in to add items to your wishlist.");
+        return;
+      }
+
+      const selectedProduct = this.products.find((p) => p.id === productId);
+      if (!selectedProduct) return;
+
+      const wishlist = {
+        id: 0, // Assuming this is auto-generated
+        user: authStore.getCurrentUser, // Use the current authenticated user from the store
+        product: selectedProduct, // Add the selected product object
+        createdAt: new Date().toISOString(), // Add current date in ISO format
+      };
+
+      try {
+        // Call the wishlist service to add the product to the wishlist
+        const response = await wishlistService.createWishlist(wishlist);
+        console.log("Product added to wishlist", response.data);
+        alert(`${selectedProduct.name} added to Wish List!`);
+      } catch (error) {
+        console.error("Failed to add product to wishlist:", error); // Handle any errors
+        alert("Failed to add product to wishlist. Please try again.");
+      }
     },
     // Handle the 'View Details' button click
     handleViewDetails(productId) {

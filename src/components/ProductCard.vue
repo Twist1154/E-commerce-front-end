@@ -8,7 +8,8 @@
     >
       <v-card 
         class="mx-auto" 
-        max-width="250"
+        width="250"
+        height="400"
         @click="viewDetails(product.id)"
       >
         <!-- Image and product title -->
