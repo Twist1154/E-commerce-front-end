@@ -48,7 +48,6 @@
                     block
                     type="submit"
                     :disabled="isLoading"
-                    :disabled="isLoading"
                     style="background-color: #0c0c0c; color: white;"
                   >
                     {{ isLoading ? 'Logging in...' : 'Login' }}
@@ -97,14 +96,9 @@
 
 <script>
 import { useAuthStore } from '@/stores/authStore';
-import { useAuthStore } from '@/stores/authStore';
 import userService from '@/services/userService.js';
 
 export default {
-  setup() {
-    const authStore = useAuthStore();
-    return { authStore };
-  },
   setup() {
     const authStore = useAuthStore();
     return { authStore };
@@ -118,7 +112,6 @@ export default {
       isLoading: false,
       emailIsValid: true,
       passwordIsValid: true,
-      errorMessage: '',
       errorMessage: '',
       rules: {
         required: value => !!value || 'Required.',
@@ -220,14 +213,6 @@ h2 {
   text-align: center;
 }
 
-.links {
-  display: flex;
-  justify-content: center;
-  margin-top: 1rem;
-}
-
-.forgot-password,
-.sign-up {
 .links {
   display: flex;
   justify-content: center;

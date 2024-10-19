@@ -43,27 +43,14 @@
       </v-list>
     </v-navigation-drawer>
   </div>
-        <v-spacer></v-spacer> <!-- Pushes logout/login button to the bottom -->
-
-        <!-- Conditional Button for Logout or Login -->
-        <v-btn block @click="handleAuthAction">
-          {{ authStore.getCurrentUser ? 'Logout' : 'Log In' }}
-        </v-btn>
-      </v-list>
-    </v-navigation-drawer>
-  </div>
 </template>
 
 <script>
 import { useAuthStore } from '@/stores/authStore'; // Assuming Pinia is used for user state
 import NavG from '@/components/NavG.vue'; // Importing the NavG component
 
-import { useAuthStore } from '@/stores/authStore'; // Assuming Pinia is used for user state
-import NavG from '@/components/NavG.vue'; // Importing the NavG component
-
 export default {
   name: 'AppSidebar',
-  components: { NavG },
   components: { NavG },
   props: {
     drawer: {
@@ -74,7 +61,6 @@ export default {
   data() {
     return {
       localDrawer: this.drawer, // Create a local copy of the drawer prop
-      authStore: useAuthStore(), // Access Pinia authStore
       authStore: useAuthStore(), // Access Pinia authStore
     };
   },
@@ -87,13 +73,6 @@ export default {
     },
   },
   methods: {
-    handleAuthAction() {
-      if (this.authStore.getCurrentUser) {
-        this.logout(); // If user is logged in, log out
-      } else {
-        this.login(); // If user is not logged in, redirect to login
-      }
-    },
     handleAuthAction() {
       if (this.authStore.getCurrentUser) {
         this.logout(); // If user is logged in, log out
