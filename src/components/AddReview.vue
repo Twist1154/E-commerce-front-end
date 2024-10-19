@@ -1,6 +1,6 @@
 <template>
   <div class="reviews-container">
-    <h2>Product Reviews</h2>
+    <h3>Submit a Review</h3>
 
     <form @submit.prevent="submitReview" class="review-form">
       <div>
@@ -10,8 +10,8 @@
           :length="5"
           :size="32"
           v-model="newReview.rating"
-          color="green"
-          active-color="primary"
+          color="teal"
+          active-color="teal"
           required
         />
       </div>
@@ -25,7 +25,7 @@
         ></textarea>
       </div>
 
-      <v-btn type="submit">Submit Review</v-btn>
+      <v-btn :style="{ backgroundColor: 'rgba(19,84,122,.8)', color: 'white' }" type="submit">Submit Review</v-btn>
     </form>
 
     <div v-if="reviews.length === 0">
@@ -33,24 +33,43 @@
     </div>
 
     <div v-for="review in reviews" :key="review.id" class="review-item">
-      <v-banner color="pink-darken-1" icon="mdi-account-box" lines="two">
-        <template v-slot:prepend>
-          <!-- If user has an avatar, display it; otherwise, show the placeholder icon -->
-          <v-avatar v-if="review.user.avatar" :src="review.user.avatar"></v-avatar>
-          <v-avatar v-else icon="mdi-account-circle"></v-avatar>
-        </template>
+      <v-banner>
+        <v-row class="review-content-row" align="center">
+          <!-- Avatar Section -->
+          <v-col class="avatar-col" cols="auto">
+            <v-avatar :size="80">
+              <img :src="review.user.avatar" class="avatar-image" />
+            </v-avatar>
+          </v-col>
 
-        <v-banner-text>
-          <strong>{{ review.user.firstName }} {{ review.user.lastName }}</strong> <br />
-          <span v-if="review.rating">Rating: {{ review.rating }} / 5</span> <br />
-          <div class="comment-preview">
-            {{ review.comment }}
-          </div>
-        </v-banner-text>
+          <!-- Text Section -->
+          <v-col class="text-col">
+            <v-banner-text>
+              <strong>{{ review.user.firstName }} {{ review.user.lastName }}</strong> <br />
+              <v-rating 
+                v-model="review.rating" 
+                :length="5" 
+                :readonly="true" 
+                size="20" 
+                color="teal" 
+                active-color="teal"
+              /> <br />
+              <div class="comment-preview" v-if="!review.expanded">
+                {{ review.comment }}
+              </div>
+              <div v-else>
+                {{ review.comment }}
+              </div>
+            </v-banner-text>
+          </v-col>
 
-        <v-banner-actions>
-          <v-btn @click="viewFullReview(review)">Read More</v-btn>
-        </v-banner-actions>
+          <!-- Button Section -->
+          <v-col class="read-more-btn-col" cols="auto">
+            <v-btn :style="{ backgroundColor: 'rgba(19,84,122,.8)', color: 'white' }" @click="toggleReviewExpansion(review)">
+              {{ review.expanded ? 'Read Less' : 'Read More' }}
+            </v-btn>
+          </v-col>
+        </v-row>
       </v-banner>
     </div>
   </div>
@@ -72,16 +91,20 @@ export default {
     return {
       reviews: [],
       newReview: {
-          rating: null,
-          comment: '',
+        rating: null,
+        comment: '',
       },
+      userId: null, // Store the current user's ID here
     };
   },
   methods: {
     async fetchReviews() {
       try {
         const response = await reviewService.getReviewsByProduct(this.productId);
-        this.reviews = response.data;
+        this.reviews = response.data.map(review => ({
+          ...review,
+          expanded: false // Add expanded flag to each review for toggling view
+        }));
         console.log("Fetched reviews:", this.reviews);
       } catch (error) {
         console.error("Error fetching reviews:", error);
@@ -90,9 +113,12 @@ export default {
     },
     async submitReview() {
       try {
+        // Assuming you have a method to get the logged-in user's ID
+        this.userId = useAuthStore().user.id;
+
         // Add product and user details to the newReview object
-        this.newReview.product = { id: this.productId }; // Replace with actual product object
-        this.newReview.user = { id: this.userId }; // Replace with actual user object
+        this.newReview.product = { id: this.productId };
+        this.newReview.user = { id: this.userId };
         this.newReview.createdAt = new Date().toISOString(); // Current timestamp
 
         const response = await reviewService.createReview(this.productId, this.newReview);
@@ -105,8 +131,8 @@ export default {
         alert("Failed to submit review.");
       }
     },
-    viewFullReview(review) {
-      alert(`Full review by ${review.user.firstName}: ${review.comment}`);
+    toggleReviewExpansion(review) {
+      review.expanded = !review.expanded; // Toggle expanded state of the review
     },
   },
   mounted() {
@@ -144,4 +170,34 @@ textarea {
 .review-item {
   margin-bottom: 15px;
 }
+
+.avatar-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover; /* Ensures the avatar fills the container without distortion */
+  border-radius: 50%; /* Keeps the avatar circular */
+}
+
+/* Flexbox to ensure row layout */
+.review-content-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.avatar-col {
+  max-width: 80px;
+  flex-grow: 0;
+}
+
+.text-col {
+  flex-grow: 1;
+  padding-left: 20px;
+}
+
+.read-more-btn-col {
+  flex-grow: 0;
+  padding-left: 20px;
+}
+
 </style>
