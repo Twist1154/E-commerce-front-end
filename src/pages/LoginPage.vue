@@ -69,38 +69,6 @@
                 <v-alert v-if="errorMessage" type="error" dense outlined>
                   {{ errorMessage }}
                 </v-alert>
-
-                <!-- Link for Forgot Password and Sign Up -->
-                <div class="links">
-                  <router-link to="/reset-password" class="forgot-password">
-                    Forgot Password?
-                  </router-link>
-                  <span class="link-separator"> | </span> <!-- Optional separator -->
-                  <router-link to="/register" class="sign-up">
-                    Sign Up
-                  </router-link>
-                </div>
-
-                <!-- Display error messages in an alert if login fails -->
-                <v-alert v-if="errorMessage" type="error" dense outlined>
-                  {{ errorMessage }}
-                </v-alert>
-
-                <!-- Link for Forgot Password and Sign Up -->
-                <div class="links">
-                  <router-link to="/reset-password" class="forgot-password">
-                    Forgot Password?
-                  </router-link>
-                  <span class="link-separator"> | </span>
-                  <router-link to="/register" class="sign-up">
-                    Sign Up
-                  </router-link>
-                </div>
-
-                <!-- Display error messages in an alert if login fails -->
-                <v-alert v-if="errorMessage" type="error" dense outlined>
-                  {{ errorMessage }}
-                </v-alert>
               </v-card-text>
             </v-card>
           </v-col>
