@@ -21,17 +21,17 @@
             />
           </v-list-item-avatar>
           <v-list-item-content>
-          <v-list-item-title>{{ username }}</v-list-item-title>
-          <v-list-item-subtitle>{{ email }}</v-list-item-subtitle>
+            <v-list-item-title>{{ authStore.getCurrentUser?.username || 'Guest' }}</v-list-item-title>
+            <v-list-item-subtitle>{{ authStore.getCurrentUser?.email || 'No email provided' }}</v-list-item-subtitle>
           </v-list-item-content>
         </v-list-item>
 
         <v-divider></v-divider>
 
         <!-- Options -->
-        <v-list-item prepend-icon="mdi-view-dashboard" title="Home" @click="goHome"></v-list-item>
+        <v-list-item prepend-icon="mdi-view-dashboard" title="Home" @click = "goHome"></v-list-item>
         <v-list-item prepend-icon="mdi-account-box" title="Profile"></v-list-item>
-        <v-list-item prepend-icon="mdi-gavel" title="Settings"></v-list-item>
+        <v-list-item prepend-icon="mdi-gavel" title="settings"></v-list-item>
 
         <v-spacer></v-spacer> <!-- Pushes logout/login button to the bottom -->
 
@@ -100,7 +100,7 @@ export default {
     login() {
       this.$router.push('/loginPage'); // Redirect to login page
     },
-    goHome() {
+    goHome(){
       this.$router.push('/');
     }
   },
@@ -108,7 +108,17 @@ export default {
 </script>
 
 <style scoped>
+/* Sidebar starts below the header (64px is a common header height) */
+/* Sidebar starts below the header (64px is a common header height) */
 .v-navigation-drawer {
+  z-index: 1000; /* Ensure drawer overlays content */
+}
+
+.user-avatar {
+  width: 40px; /* Set width of the avatar */
+  height: 40px; /* Set height of the avatar */
+  border-radius: 50%; /* Make it round */
+  overflow: hidden; /* Ensure the image fits within the bounds */
   z-index: 1000; /* Ensure drawer overlays content */
 }
 
