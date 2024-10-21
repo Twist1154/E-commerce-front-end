@@ -1,7 +1,7 @@
 // src/services/categoriesService.js
-import axiosInstance from "../axiosConfig";
+import axiosInstance from '../axiosConfig';
 
-const BASE_URL = "http://localhost:8080/store/categories";
+const BASE_URL = 'http://localhost:8080/store/categories';
 
 export const getAllCategories = async () => {
   const response = await axiosInstance.get(`${BASE_URL}/getAll`); // Fetch categories
@@ -19,9 +19,6 @@ export const createCategory = async (category) => {
 };
 
 export const updateCategory = async (category) => {
-  const response = await axiosInstance.put(
-    `${BASE_URL}/${category.id}`,
-    category,
-  ); // Update category
+  const response = await axiosInstance.put(`${BASE_URL}/${category.id}`, category); // Update category
   return response.data;
 };

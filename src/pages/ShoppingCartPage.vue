@@ -11,9 +11,7 @@
           <h3>{{ item.name }}</h3>
           <p>Price: {{ item.price }}</p>
         </div>
-        <button class="remove-button" @click="removeCartItem(item.id)">
-          Remove
-        </button>
+        <button class="remove-button" @click="removeCartItem(item.id)">Remove</button>
       </div>
       <button class="checkout-button" @click="checkout">Checkout</button>
     </div>
@@ -21,7 +19,7 @@
 </template>
 
 <script>
-import CartService from "@/services/CartService"; // Adjust the path as needed
+import CartService from '@/services/CartService'; // Adjust the path as needed
 
 export default {
   name: "ShoppingCartPage",
@@ -45,20 +43,19 @@ export default {
     async removeCartItem(cartItemId) {
       try {
         await CartService.deleteCartItem(cartItemId); // Delete the cart item
-        this.cartItems = this.cartItems.filter(
-          (item) => item.id !== cartItemId,
-        ); // Update the cart items list
+        this.cartItems = this.cartItems.filter(item => item.id !== cartItemId); // Update the cart items list
       } catch (error) {
         console.error("Error removing cart item:", error);
       }
     },
     checkout() {
       // Implement checkout logic
-      alert("Proceeding to checkout!");
+      alert('Proceeding to checkout!');
     },
   },
 };
 </script>
+
 
 <style scoped>
 h1 {

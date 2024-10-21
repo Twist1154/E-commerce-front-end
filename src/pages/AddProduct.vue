@@ -58,11 +58,7 @@
 
         <div class="form-group">
           <label for="description">Description</label>
-          <textarea
-            id="description"
-            v-model="product.description"
-            required
-          ></textarea>
+          <textarea id="description" v-model="product.description" required></textarea>
         </div>
 
         <div class="form-group">
@@ -140,12 +136,7 @@
 
         <div class="form-group">
           <label for="vendorLocation">Vendor Location</label>
-          <input
-            type="text"
-            id="vendorLocation"
-            v-model="vendorLocation"
-            required
-          />
+          <input type="text" id="vendorLocation" v-model="vendorLocation" required />
         </div>
 
         <button type="submit" class="submit-button">
@@ -223,7 +214,7 @@ export default {
         }
 
         const selectedCategory = this.categories.find(
-          (cat) => cat.id === this.selectedCategoryId,
+          (cat) => cat.id === this.selectedCategoryId
         );
 
         const newSubCategory = {
@@ -232,8 +223,7 @@ export default {
           product: { id: this.product.id }, // Associate with created product
         };
 
-        const createdSubCategory =
-          await subCategoryService.createSubCategory(newSubCategory);
+        const createdSubCategory = await subCategoryService.createSubCategory(newSubCategory);
 
         const subCategoryWithCategory = {
           ...createdSubCategory,

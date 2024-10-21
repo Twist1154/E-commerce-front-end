@@ -1,6 +1,5 @@
 const { defineConfig } = require('@vue/cli-service');
 const webpack = require('webpack'); // Import Webpack for the feature flags
-const ProgressPlugin = require('progress-webpack-plugin'); // Import ProgressPlugin
 
 module.exports = defineConfig({
   transpileDependencies: [],
@@ -26,9 +25,6 @@ module.exports = defineConfig({
 
         // Enable hydration mismatch details (fixes your warning)
         __VUE_PROD_HYDRATION_MISMATCH_DETAILS__: true
-      }),
-      new ProgressPlugin({
-        format: 'minimal', // Example of a valid option
       })
     ]
   }

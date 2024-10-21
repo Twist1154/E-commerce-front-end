@@ -5,24 +5,15 @@
     <!-- Stepper -->
     <v-stepper alt-labels v-model="currentStep">
       <v-stepper-header>
-        <v-stepper-item
-          :complete="currentStep > 1"
-          title="Update Product"
-        ></v-stepper-item>
+        <v-stepper-item :complete="currentStep > 1" title="Update Product"></v-stepper-item>
 
         <v-divider></v-divider>
 
-        <v-stepper-item
-          :complete="currentStep > 2"
-          title="Manage Subcategories"
-        ></v-stepper-item>
+        <v-stepper-item :complete="currentStep > 2" title="Manage Subcategories"></v-stepper-item>
 
         <v-divider></v-divider>
 
-        <v-stepper-item
-          :complete="currentStep > 3"
-          title="Update Inventory"
-        ></v-stepper-item>
+        <v-stepper-item :complete="currentStep > 3" title="Update Inventory"></v-stepper-item>
       </v-stepper-header>
     </v-stepper>
 
@@ -32,17 +23,9 @@
       <form @submit.prevent="handleProductSubmit">
         <div class="form-group">
           <label for="imagePath">Upload Image</label>
-          <input
-            type="file"
-            id="imagePath"
-            @change="handleImageUpload"
-            accept="image/*"
-          />
+          <input type="file" id="imagePath" @change="handleImageUpload" accept="image/*" />
           <div class="img-preview">
-            <img
-              :src="product.imagePath || 'https://placehold.co/400x400/png'"
-              alt="Product Image"
-            />
+            <img :src="product.imagePath || 'https://placehold.co/400x400/png'" alt="Product Image" />
           </div>
         </div>
 
@@ -53,22 +36,12 @@
 
         <div class="form-group">
           <label for="description">Description</label>
-          <textarea
-            id="description"
-            v-model="product.description"
-            required
-          ></textarea>
+          <textarea id="description" v-model="product.description" required></textarea>
         </div>
 
         <div class="form-group">
           <label for="price">Price</label>
-          <input
-            type="number"
-            step="0.01"
-            id="price"
-            v-model.number="product.price"
-            required
-          />
+          <input type="number" step="0.01" id="price" v-model.number="product.price" required />
         </div>
 
         <button type="submit" class="submit-button">Update Product</button>
@@ -83,13 +56,7 @@
           <label for="category">Select Category</label>
           <select id="category" v-model="selectedCategoryId" required>
             <option disabled value="">Select a category</option>
-            <option
-              v-for="category in categories"
-              :key="category.id"
-              :value="category.id"
-            >
-              {{ category.name }}
-            </option>
+            <option v-for="category in categories" :key="category.id" :value="category.id">{{ category.name }}</option>
           </select>
         </div>
 
@@ -107,13 +74,7 @@
       </div>
 
       <div class="navigation-buttons">
-        <button
-          @click="nextStep"
-          class="next-button"
-          :disabled="!safeSubCategories.length"
-        >
-          Next: Update Inventory
-        </button>
+        <button @click="nextStep" class="next-button" :disabled="!safeSubCategories.length">Next: Update Inventory</button>
       </div>
     </div>
 
@@ -123,23 +84,12 @@
       <form @submit.prevent="handleInventorySubmit">
         <div class="form-group">
           <label for="stockQuantity">Stock Quantity</label>
-          <input
-            type="number"
-            id="stockQuantity"
-            v-model.number="stockQuantity"
-            required
-            min="0"
-          />
+          <input type="number" id="stockQuantity" v-model.number="stockQuantity" required min="0" />
         </div>
 
         <div class="form-group">
           <label for="vendorLocation">Vendor Location</label>
-          <input
-            type="text"
-            id="vendorLocation"
-            v-model="vendorLocation"
-            required
-          />
+          <input type="text" id="vendorLocation" v-model="vendorLocation" required />
         </div>
 
         <button type="submit" class="submit-button">Update Inventory</button>
@@ -182,10 +132,7 @@ export default {
           this.product.imagePath = uploadedImageUrl;
         }
 
-        const response = await productsService.updateProduct(
-          this.product.id,
-          this.product,
-        );
+        const response = await productsService.updateProduct(this.product.id, this.product);
         this.product = response.data;
         alert("Product updated successfully!");
         this.currentStep = 2;
@@ -201,16 +148,10 @@ export default {
           return;
         }
 
-        const selectedCategory = this.categories.find(
-          (cat) => cat.id === this.selectedCategoryId,
-        );
-        const newSubCategory = {
-          category: selectedCategory,
-          product: { id: this.product.id },
-        };
+        const selectedCategory = this.categories.find(cat => cat.id === this.selectedCategoryId);
+        const newSubCategory = { category: selectedCategory, product: { id: this.product.id } };
 
-        const response =
-          await subCategoryService.createSubCategory(newSubCategory);
+        const response = await subCategoryService.createSubCategory(newSubCategory);
         this.subCategories.push(response.data);
         alert("Subcategory added successfully!");
         this.selectedCategoryId = "";
@@ -220,20 +161,13 @@ export default {
       }
     },
     async initiateDelete(subCategoryId) {
-      this.deleteTimeoutId = setTimeout(
-        () => this.deleteSubCategory(subCategoryId),
-        30000,
-      );
-      alert(
-        "Subcategory will be deleted in 30 seconds. Click again to confirm.",
-      );
+      this.deleteTimeoutId = setTimeout(() => this.deleteSubCategory(subCategoryId), 30000);
+      alert("Subcategory will be deleted in 30 seconds. Click again to confirm.");
     },
     async deleteSubCategory(subCategoryId) {
       try {
         await subCategoryService.deleteSubCategory(subCategoryId);
-        this.subCategories = this.subCategories.filter(
-          (sub) => sub.id !== subCategoryId,
-        );
+        this.subCategories = this.subCategories.filter(sub => sub.id !== subCategoryId);
         alert("Subcategory deleted successfully.");
       } catch (error) {
         console.error("Error deleting subcategory:", error);
@@ -261,9 +195,7 @@ export default {
       if (file) {
         this.product.imageFile = file;
         const reader = new FileReader();
-        reader.onload = (e) => {
-          this.product.imagePath = e.target.result;
-        };
+        reader.onload = e => { this.product.imagePath = e.target.result; };
         reader.readAsDataURL(file);
       }
     },
@@ -289,8 +221,7 @@ export default {
     },
     async fetchSubCategories() {
       try {
-        const subCategories =
-          await subCategoryService.getSubCategoriesByProduct(this.product.id);
+        const subCategories = await subCategoryService.getSubCategoriesByProduct(this.product.id);
         this.subCategories = subCategories;
       } catch (error) {
         console.error("Error fetching subcategories:", error);
@@ -299,8 +230,7 @@ export default {
     },
     async fetchInventory() {
       try {
-        const inventoryItems =
-          await inventoryService.getInventoryItemsByProductId(this.product.id);
+        const inventoryItems = await inventoryService.getInventoryItemsByProductId(this.product.id);
         if (inventoryItems && inventoryItems.length) {
           const latestInventory = inventoryItems[0];
           this.stockQuantity = latestInventory.quantity;
@@ -331,6 +261,7 @@ export default {
 };
 </script>
 
+
 <style scoped>
 .form-container {
   max-width: 600px;
@@ -341,8 +272,7 @@ export default {
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
-h1,
-h2 {
+h1, h2 {
   text-align: center;
   color: #333;
 }
@@ -393,8 +323,7 @@ textarea {
   border: 1px solid #ddd;
 }
 
-.submit-button,
-.next-button {
+.submit-button, .next-button {
   display: block;
   width: 100%;
   padding: 10px 0;
@@ -407,8 +336,7 @@ textarea {
   text-align: center;
 }
 
-.submit-button:hover,
-.next-button:hover {
+.submit-button:hover, .next-button:hover {
   background-color: #0056b3;
 }
 
@@ -474,8 +402,7 @@ textarea {
     padding: 15px;
   }
 
-  .submit-button,
-  .next-button {
+  .submit-button, .next-button {
     font-size: 14px;
   }
 
@@ -485,3 +412,4 @@ textarea {
   }
 }
 </style>
+

@@ -1,31 +1,27 @@
 // src/stores/cartStore.js
-import { defineStore } from "pinia";
+import { defineStore } from 'pinia';
 
-export const useCartStore = defineStore("cart", {
+export const useCartStore = defineStore('cart', {
   state: () => ({
     cartItems: [],
   }),
   actions: {
     addToCart(product) {
-      const existingProduct = this.cartItems.find(
-        (item) => item.productId === product.id,
-      );
+      const existingProduct = this.cartItems.find(item => item.productId === product.id);
       if (existingProduct) {
         existingProduct.quantity++;
       } else {
-        this.cartItems.push({
-          productId: product.id,
-          name: product.name,
-          price: product.price,
+        this.cartItems.push({ 
+          productId: product.id, 
+          name: product.name, 
+          price: product.price, 
           quantity: 1,
-          imagePath: product.imagePath,
+          imagePath: product.imagePath
         });
       }
     },
     removeFromCart(productId) {
-      this.cartItems = this.cartItems.filter(
-        (item) => item.productId !== productId,
-      );
+      this.cartItems = this.cartItems.filter(item => item.productId !== productId);
     },
     clearCart() {
       this.cartItems = [];

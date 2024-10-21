@@ -31,9 +31,9 @@
                     :loading="isLoading"
                     block
                     type="submit"
-                    style="background-color: #0c0c0c; color: white"
+                    style="background-color: #0c0c0c; color: white;"
                   >
-                    {{ isLoading ? "Logging in..." : "Login" }}
+                    {{ isLoading ? 'Logging in...' : 'Login' }}
                   </v-btn>
                 </v-form>
               </v-card-text>
@@ -54,19 +54,19 @@ export default {
   data() {
     return {
       loginData: {
-        user: "",
-        password: "",
+        user: '',
+        password: ''
       },
       isLoading: false,
       rules: {
-        required: (value) => !!value || "Required.",
-      },
+        required: value => !!value || 'Required.',
+      }
     };
   },
   methods: {
     async validateUser() {
       if (!this.loginData.user || !this.loginData.password) {
-        alert("Username and password are required");
+        alert('Username and password are required');
         return;
       }
 
@@ -76,30 +76,27 @@ export default {
         const user = this.loginData.user;
         const password = this.loginData.password;
 
-        console.log("Attempting login with user:", user);
+        console.log('Attempting login with user:', user);
 
         // Hardcoded admin check
-        if (user === "admin" && password === "password") {
-          localStorage.setItem(
-            "currentUser",
-            JSON.stringify({
-              authToken: "some-token",
-              role: "admin",
-            }),
-          );
-          alert("Login successful");
-          this.$router.push("/AddProduct");
+        if (user === 'admin' && password === 'password') {
+          localStorage.setItem('currentUser', JSON.stringify({
+            authToken: 'some-token',
+            role: 'admin',
+          }));
+          alert('Login successful');
+          this.$router.push('/AddProduct');
         } else {
-          alert("Invalid username or password");
+          alert('Invalid username or password');
         }
       } catch (error) {
-        console.error("Error:", error);
-        alert("An error occurred");
+        console.error('Error:', error);
+        alert('An error occurred');
       } finally {
         this.isLoading = false;
       }
-    },
-  },
+    }
+  }
 };
 </script>
 

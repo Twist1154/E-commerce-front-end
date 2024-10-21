@@ -1,16 +1,15 @@
 <template>
   <!-- Breadcrumbs (Below Navbar) -->
   <v-spacer></v-spacer>
-
+  
   <v-divider></v-divider>
   <v-container class="breadcrumbs-container" fluid>
     <!-- Breadcrumbs with custom dividers and link behavior -->
     <v-breadcrumbs :items="breadcrumbs" :key="breadcrumbs.length">
       <template v-slot:divider>
-        <v-icon>mdi-chevron-right</v-icon>
-        <!-- Chevron right divider -->
+        <v-icon>mdi-chevron-right</v-icon> <!-- Chevron right divider -->
       </template>
-
+      
       <!-- Custom breadcrumb items -->
       <template v-slot:title="{ item, index }">
         <!-- Active breadcrumb links -->
@@ -48,14 +47,16 @@ export default {
         to: route.path, // Path of the route
       }));
 
-      const isHomeOrProductsPage =
-        this.$route.name === "Home" || this.$route.name === "products";
+      const isHomeOrProductsPage = this.$route.name === "Home" || this.$route.name === "products";
 
       if (isHomeOrProductsPage) {
         this.breadcrumbs = [{ title: "Home", to: "/" }];
       } else {
         // Generate breadcrumbs including Home and current route
-        this.breadcrumbs = [{ title: "Home", to: "/" }, ...currentRoute];
+        this.breadcrumbs = [
+          { title: "Home", to: "/" },
+          ...currentRoute,
+        ];
       }
 
       // Ensure Vue updates the DOM with breadcrumb changes
@@ -66,7 +67,7 @@ export default {
   },
   watch: {
     // Watch for route changes and regenerate breadcrumbs when the route changes
-    $route: "generateBreadcrumbs",
+    '$route': 'generateBreadcrumbs',
   },
   mounted() {
     this.generateBreadcrumbs(); // Generate breadcrumbs when the component is mounted
@@ -75,6 +76,7 @@ export default {
 </script>
 
 <style scoped>
+
 /* Styling for active breadcrumb links */
 .breadcrumb-link.active-link {
   color: #80d0c7; /* Light teal color (matches gradient) */
@@ -91,4 +93,6 @@ export default {
   color: rgba(0, 0, 0, 0.8); /* Semi-transparent teal (matches gradient) */
   cursor: default;
 }
+
+
 </style>
