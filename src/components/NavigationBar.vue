@@ -89,7 +89,7 @@
 <script>
 import AppSidebar from "./AppSidebar.vue"; // Import AppSidebar component
 import WishList from "./WishList.vue"; // Import WishList component
-import wishListService from "@/services/wishListService";
+import wishListService from "@/services/wishlistService";
 import CrumbLink from "./CrumbLink.vue";
 
 export default {
