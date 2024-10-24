@@ -33,13 +33,23 @@
 </template>
 
 <script>
-import { useCartStore } from '@/stores/cartStore'; // Import the Cart Store
+import { useCartStore } from '@/stores/cartStore'; 
+import { computed, onMounted } from 'vue'; // Import onMounted to run a hook after component is rendered
 
 export default {
   setup() {
     const cartStore = useCartStore();
+    
+    // Use computed to make cartItems reactive
+    const cartItems = computed(() => cartStore.cartItems);
+
+    // Log the cartItems after the component is mounted
+    onMounted(() => {
+      console.log('Cart items in cart page:', cartItems.value);
+    });
+
     return {
-      cartItems: cartStore.cartItems,
+      cartItems,
       removeFromCart: cartStore.removeFromCart,
       handleCheckout() {
         console.log('Proceeding to checkout');

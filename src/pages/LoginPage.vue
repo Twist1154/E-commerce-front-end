@@ -22,6 +22,9 @@
                   <v-alert v-if="!emailIsValid" type="error" dense outlined>
                     Invalid email address
                   </v-alert>
+                  <v-alert v-if="!emailIsValid" type="error" dense outlined>
+                    Invalid email address
+                  </v-alert>
 
                   <v-text-field
                     label="Password"
@@ -32,6 +35,9 @@
                     outlined
                     dense
                   />
+                  <v-alert v-if="!passwordIsValid" type="error" dense outlined>
+                    Password must be at least 6 characters
+                  </v-alert>
                   <v-alert v-if="!passwordIsValid" type="error" dense outlined>
                     Password must be at least 6 characters
                   </v-alert>
@@ -53,7 +59,7 @@
                   <router-link to="/reset-password" class="forgot-password">
                     Forgot Password?
                   </router-link>
-                  <span class="link-separator"> | </span>
+                  <span class="link-separator"> | </span> <!-- Optional separator -->
                   <router-link to="/register" class="sign-up">
                     Sign Up
                   </router-link>
@@ -99,11 +105,15 @@ export default {
     };
   },
   methods: {
-    async validateUser () {
+    async validateUser() {
+      this.validateEmail();
+      this.validatePassword();
+
       this.validateEmail();
       this.validatePassword();
 
       if (!this.emailIsValid || !this.passwordIsValid) {
+        this.errorMessage = 'Please correct the errors before submitting.';
         this.errorMessage = 'Please correct the errors before submitting.';
         return;
       }
@@ -111,40 +121,56 @@ export default {
       this.isLoading = true;
       this.errorMessage = ''; // Reset error message on new attempt
 
-      try {
-        await userService.validateUser (this.loginData.email, this.loginData.password);
-        const users = await userService.getUsersByEmail(this.loginData.email);
+      this.errorMessage = ''; // Reset error message on new attempt
 
-        if (users && users.length > 0) {
-          const user = users[0];
-          this.authStore.setCurrentUser (user);
-          alert('Welcome, ' + user.firstName + ' ' + user.lastName);
-          this.$router.push('/');
-        } else {
-          console.error("Error: No users found");
-        }
-      } catch (error) {
-        if (error.response) {
-          switch (error.response.status) {
+
+      try {
+    this.isLoading = true; // Start loading state
+    await userService.validateUser(this.loginData.email, this.loginData.password);
+    const users = await userService.getUsersByEmail(this.loginData.email);
+
+    if (users && users.length > 0) {
+        const user = users[0];
+        this.authStore.setCurrentUser(user);
+    } else {
+        console.error("Error: No users found");
+    }
+
+    // Access the user using the getter
+    const user = this.authStore.getCurrentUser; // Ensure this is accessing the getter
+    console.log('Fetched User:', user); // Log the user object to inspect
+
+    // Check if the user object is defined and has firstName property
+    if (user && typeof user.firstName === 'string') {
+        alert('Welcome, ' + user.firstName + ' ' + user.lastName); // Adjusted to use firstName and lastName
+        this.$router.push('/');
+    } else {
+        console.error('User data is missing', user); // Log the user object if data is missing
+    }
+} catch (error) {
+    // Handle the error with better specificity
+    if (error.response) {
+        switch (error.response.status) {
             case 401:
-              this.errorMessage = 'Invalid email or password';
-              break;
+                this.errorMessage = 'Invalid email or password';
+                break;
             case 400:
-              this.errorMessage = 'Bad request. Please check your input.';
-              break;
+                this.errorMessage = 'Bad request. Please check your input.';
+                break;
             case 404:
-              this.errorMessage = 'Endpoint not found';
-              break;
+                this.errorMessage = 'Endpoint not found';
+                break;
             default:
-              this.errorMessage = 'An error occurred';
-          }
-        } else {
-          this.errorMessage = 'An error occurred';
-          console.error('Error:', error);
+                this.errorMessage = 'An error occurred';
         }
-      } finally {
-        this.isLoading = false; // End loading state
-      }
+    } else {
+        this.errorMessage = 'An error occurred';
+        console.error('Error:', error);
+    }
+} finally {
+    this.isLoading = false; // End loading state
+}
+
     },
     validateEmail() {
       this.emailIsValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(this.loginData.email );
@@ -183,6 +209,26 @@ h2 {
   text-decoration: none;
   font-size: 1rem;
   margin: 0 10px;
+}
+
+.link-separator {
+  margin: 0 10px; /* Add margin to the separator for spacing */
+}
+
+.forgot-password:hover,
+.sign-up:hover {
+  text-decoration: underline;
+  margin: 0 10px; /* Add margin to create space between links */
+}
+
+.link-separator {
+  margin: 0 10px; /* Add margin to the separator for spacing */
+}
+
+.forgot-password:hover,
+.sign-up:hover {
+  text-decoration: underline;
+  margin: 0 10px; /* Add margin to create space between links */
 }
 
 .link-separator {

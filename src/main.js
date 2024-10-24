@@ -36,6 +36,8 @@ import CartPage from './pages/CartPage.vue';
 import WishList from './components/WishList.vue';
 import NavigationBar from './components/NavigationBar.vue';
 import CrumbLink from './components/CrumbLink.vue'; // Import the Crumbs component
+import OrderPage from './pages/OrderPage.vue'; // Import OrderPage component
+import OrderDetails from './pages/OrderDetails.vue'; // Import OrderDetails component
 
 // Define routes
 const routes = [
@@ -55,11 +57,13 @@ const routes = [
   { path: '/cart', name: 'cart', component: CartPage }, 
   { path: '/not-authorized', name: 'notAuthorized', component: NotAuthorizedPage },
   { path: '/Admin', name: 'admin', component: AdminPage },
+  { path: '/orders', name: 'orders', component: OrderPage }, // Add OrderPage route
+  { path: '/orderDetails/:id', name: 'orderDetails', component: OrderDetails, props: true }, // Add OrderDetails route
   { path: '/', redirect: '/products' },
 ];
 
 const router = VueRouter.createRouter({
-  history: VueRouter.createWebHistory(), // Removed the incorrect `process.env.BASE_URL` parameter
+  history: VueRouter.createWebHistory(), // Removed the incorrect process.env.BASE_URL parameter
   routes,
 });
 
