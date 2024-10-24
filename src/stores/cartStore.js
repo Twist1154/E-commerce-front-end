@@ -1,9 +1,8 @@
-// src/stores/cartStore.js
-import { defineStore } from 'pinia';
+import { defineStore } from 'pinia'; // Make sure to import defineStore
 
 export const useCartStore = defineStore('cart', {
   state: () => ({
-    cartItems: [],
+    cartItems: JSON.parse(localStorage.getItem('cartItems')) || [], // Load from localStorage if available
   }),
   actions: {
     addToCart(product) {
@@ -19,12 +18,18 @@ export const useCartStore = defineStore('cart', {
           imagePath: product.imagePath
         });
       }
+      // Save to localStorage
+      localStorage.setItem('cartItems', JSON.stringify(this.cartItems));
     },
     removeFromCart(productId) {
       this.cartItems = this.cartItems.filter(item => item.productId !== productId);
+      // Update localStorage
+      localStorage.setItem('cartItems', JSON.stringify(this.cartItems));
     },
     clearCart() {
       this.cartItems = [];
+      // Clear from localStorage
+      localStorage.removeItem('cartItems');
     },
   },
 });
