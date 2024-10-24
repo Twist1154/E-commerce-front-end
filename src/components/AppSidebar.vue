@@ -14,15 +14,14 @@
         <!-- User Details Section at the top -->
         <v-list-item>
           <v-list-item-avatar>
-            <v-img
-              :src="userAvatar"
-              alt="User  Avatar"
-              class="user-avatar" 
-            />
+            <!-- Updated to match the style from review -->
+            <v-avatar :size="80">
+              <img :src="userAvatar" alt="User Avatar" class="avatar-image" />
+            </v-avatar>
           </v-list-item-avatar>
           <v-list-item-content>
-          <v-list-item-title>{{ username }}</v-list-item-title>
-          <v-list-item-subtitle>{{ email }}</v-list-item-subtitle>
+            <v-list-item-title>{{ authStore.getCurrentUser?.username || 'Guest' }}</v-list-item-title>
+            <v-list-item-subtitle>{{ authStore.getCurrentUser?.email || 'No email provided' }}</v-list-item-subtitle>
           </v-list-item-content>
         </v-list-item>
 
@@ -37,7 +36,7 @@
 
         <!-- Conditional Button for Logout or Login -->
         <v-btn block @click="handleAuthAction">
-          {{ authStore.getCurrentUser  ? 'Logout' : 'Log In' }}
+          {{ authStore.getCurrentUser ? 'Logout' : 'Log In' }}
         </v-btn>
       </v-list>
     </v-navigation-drawer>
@@ -73,7 +72,7 @@ export default {
   },
   computed: {
     userAvatar() {
-      return this.authStore.getCurrentUser?.avatar || 'https://www.google.com/url?sa=i&url=https%3A%2F%2Fuxwing.com%2Fno-profile-picture-icon%2F&psig=AOvVaw297_euzi07Wz5Q2_wDyCNM&ust=1729074362807000&source=images&cd=vfe&opi=89978449&ved=0CBEQjRxqFwoTCKir9ZKWkIkDFQAAAAAdAAAAABAE';
+      return this.authStore.getCurrentUser?.avatar || 'https://uxwing.com/wp-content/themes/uxwing/download/peoples-avatars/no-profile-picture-icon.png';
     },
     username() {
       return this.authStore.getCurrentUser?.username || 'Guest';
@@ -84,7 +83,7 @@ export default {
   },
   methods: {
     handleAuthAction() {
-      if (this.authStore.getCurrentUser ) {
+      if (this.authStore.getCurrentUser) {
         this.logout(); // If user is logged in, log out
       } else {
         this.login(); // If user is not logged in, redirect to login
@@ -94,7 +93,7 @@ export default {
       alert('Logging out...');
       console.log('Logging out...');
       this.localDrawer = false; // Close the drawer after logging out
-      this.authStore.setCurrentUser (null); // Clear user data in authStore
+      this.authStore.setCurrentUser(null); // Clear user data in authStore
       this.$router.push('/loginPage'); // Redirect to login
     },
     login() {
@@ -108,14 +107,16 @@ export default {
 </script>
 
 <style scoped>
+/* Sidebar starts below the header (64px is a common header height) */
 .v-navigation-drawer {
   z-index: 1000; /* Ensure drawer overlays content */
 }
 
-.user-avatar {
-  width: 40px; /* Set width of the avatar */
-  height: 40px; /* Set height of the avatar */
-  border-radius: 50%; /* Make it round */
-  overflow: hidden; /* Ensure the image fits within the bounds */
+/* Updated avatar style to match the review component */
+.avatar-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover; /* Ensures the avatar fills the container without distortion */
+  border-radius: 50%; /* Keeps the avatar circular */
 }
 </style>
