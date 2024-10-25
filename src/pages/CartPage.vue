@@ -43,9 +43,12 @@ export default {
     // Use computed to make cartItems reactive
     const cartItems = computed(() => cartStore.cartItems);
 
-    // Log the cartItems after the component is mounted
+    // Log the cartItems after the component is mounted with better logging
     onMounted(() => {
-      console.log('Cart items in cart page:', cartItems.value);
+      console.log('Cart items in cart page:', JSON.stringify(cartItems.value, null, 2)); // JSON.stringify for better readability
+      cartItems.value.forEach(item => {
+        console.log('Cart item:', item); // Log each cart item separately
+      });
     });
 
     return {
