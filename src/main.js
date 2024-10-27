@@ -32,11 +32,13 @@ import RegisterPage from './pages/RegisterPage.vue';
 import ProductCard from './components/ProductCard.vue';
 import NotAuthorizedPage from './pages/NotAuthorizedPage.vue';
 import AdminPage from './pages/AdminPage.vue';
+import AdminWelcome from './pages/welcomeAdmin.vue';
 import CartPage from './pages/CartPage.vue';
 import WishList from './components/WishList.vue';
 import NavigationBar from './components/NavigationBar.vue';
 import CrumbLink from './components/CrumbLink.vue'; // Import the Crumbs component
 import OrderPage from './pages/OrderPage.vue'; // Import OrderPage component
+import AdminCustomer from './pages/AdminCustomer.vue';
 import OrderDetails from './pages/OrderDetails.vue'; // Import OrderDetails component
 
 // Define routes
@@ -57,7 +59,9 @@ const routes = [
   { path: '/cart', name: 'cart', component: CartPage }, 
   { path: '/not-authorized', name: 'notAuthorized', component: NotAuthorizedPage },
   { path: '/Admin', name: 'admin', component: AdminPage },
+  { path: '/AdminWlcome', name: 'landingPage', component: AdminWelcome ,},
   { path: '/orders', name: 'orders', component: OrderPage }, // Add OrderPage route
+  { path: '/AdminCustomer', name: 'AdminCustomer', component: AdminCustomer },
   { path: '/orderDetails/:id', name: 'orderDetails', component: OrderDetails, props: true }, // Add OrderDetails route
   { path: '/', redirect: '/products' },
 ];

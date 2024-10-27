@@ -109,19 +109,24 @@ export default {
 
     // Method to handle adding the product to the cart
     addToCart() {
-      if (!this.product) return; // Ensure product is loaded before trying to add it to the cart
-      const authStore = useAuthStore(); // Access Auth Store
-      const user = authStore.user; // Get the current authenticated user
+  if (!this.product) return;
+  
+  const authStore = useAuthStore(); 
+  const user = authStore.getCurrentUser;
 
-      if (!user) {
-        alert("Please log in to add items to your Cart.");
-        return;
-      }
+  if (!user) {
+    alert("Please log in to add items to your Cart.");
+    return;
+  }
 
-      const cartStore = useCartStore(); // Access Cart Store
-      cartStore.addToCart(this.product); // Add product to cart
-      alert(`${this.product.name} added to cart!`);
-    },
+  const cartStore = useCartStore();
+  
+  // Debugging: Check product details before adding to cart
+  console.log('Adding product to cart:', this.product);
+
+  cartStore.addToCart(this.product); 
+  alert(`${this.product.name} added to cart!`);
+},
 
     // Method to handle adding the product to the wish list
     async addToWish() {
@@ -134,7 +139,7 @@ export default {
         alert("Please log in to add items to your wishlist.");
         return;
       }
-
+      
       // Construct the wishlist object as expected by the backend
       const wishlist = {
         id: '', // Default ID for new wishlist entry

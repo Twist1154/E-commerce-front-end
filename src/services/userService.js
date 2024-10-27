@@ -42,25 +42,26 @@ const userService = {
       });
   },
 
-  // Delete a user by ID
-  deleteUser(id) {
-    return apiClient.delete(`/${id}`)
-      .then(() => {})
-      .catch(error => {
-        console.error(`Error deleting user with ID ${id}:`, error);
-        throw error;
-      });
-  },
+ // Fetch all users
+ getAllUsers() {
+  return apiClient.get('/getall') // Ensure it matches the correct path
+    .then(response => response.data)
+    .catch(error => {
+      console.error('Error fetching all users:', error.response?.data || error);
+      throw error;
+    });
+},
 
-  // Get all users
-  getAllUsers() {
-    return apiClient.get('/')
-      .then(response => response.data)
-      .catch(error => {
-        console.error('Error fetching all users:', error);
-        throw error;
-      });
-  },
+// Delete a user by ID
+deleteUser(id) {
+  return apiClient.delete(`/${id}`) // Ensure this endpoint matches your backend
+    .then(() => {})
+    .catch(error => {
+      console.error(`Error deleting user with ID ${id}:`, error.response?.data || error);
+      throw error;
+    });
+},
+
 
   // Get users by username
   getUsersByUsername(username) {

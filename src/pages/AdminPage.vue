@@ -1,7 +1,7 @@
 <template>
+  <!-- Main Admin Login Page Layout -->
   <v-app>
     <v-main class="login">
-      <navigation />
       <v-container class="forms" fluid>
         <v-row justify="center">
           <v-col cols="12" md="6" lg="4">
@@ -46,11 +46,10 @@
 </template>
 
 <script>
-//import navigation from '@/components/NavG.vue';
-//import { useRouter } from 'vue-router';
+//import AdminNav from '@/components/AdminNav.vue';
 
 export default {
-  //components: { navigation },
+  //components: { AdminNav },
   data() {
     return {
       loginData: {
@@ -79,13 +78,9 @@ export default {
         console.log('Attempting login with user:', user);
 
         // Hardcoded admin check
-        if (user === 'admin' && password === 'password') {
-          localStorage.setItem('currentUser', JSON.stringify({
-            authToken: 'some-token',
-            role: 'admin',
-          }));
+        if (user === 'admin@Auth.co' && password === 'root@1324') {
           alert('Login successful');
-          this.$router.push('/AddProduct');
+          this.$router.push('/AdminWlcome');
         } else {
           alert('Invalid username or password');
         }
@@ -96,7 +91,7 @@ export default {
         this.isLoading = false;
       }
     }
-  }
+  },
 };
 </script>
 
