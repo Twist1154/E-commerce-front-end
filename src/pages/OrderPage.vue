@@ -1,4 +1,3 @@
-// src/pages/OrderPage.vue
 <template>
   <div>
     <navigation />
@@ -8,19 +7,21 @@
       <h1>My Orders</h1>
 
       <!-- Orders List -->
-      <v-row v-if="orders.length" class="my-4">
-        <v-col v-for="order in orders" :key="order.id" cols="12" md="6" lg="4">
+      <v-row v-if="ordersFetched.length" class="my-4">
+        <v-col v-for="order in paginatedOrders" :key="order.id" cols="12" md="6" lg="4">
           <v-card>
             <v-card-title>
               <h2>Order #{{ order.id }}</h2>
             </v-card-title>
 
-            <v-card-subtitle>Placed on: {{ order.date }}</v-card-subtitle>
+            <v-card-subtitle>Placed on: {{ formatDate(order.orderDate) }}</v-card-subtitle>
             <v-divider></v-divider>
 
             <v-card-text>
-              <div class="text-h5">Total: R{{ order.total }}</div>
-              <v-list class="mt-2">
+              <div class="text-h5">Total: R{{ order.totalPrice }}</div>
+              <div>Status: {{ order.status }}</div>
+
+              <v-list v-if="order.items && order.items.length" class="mt-2">
                 <v-subheader>Items:</v-subheader>
                 <v-list-item v-for="item in order.items" :key="item.id">
                   <v-list-item-content>
@@ -31,15 +32,12 @@
                   </v-list-item-content>
                 </v-list-item>
               </v-list>
+              <div v-else>No items available.</div>
             </v-card-text>
 
             <v-card-actions>
-              <v-btn @click="viewOrder(order.id)" color="primary" block
-                >View Details</v-btn
-              >
-              <v-btn @click="cancelOrder(order.id)" color="error" block
-                >Cancel Order</v-btn
-              >
+              <v-btn @click="viewOrder(order.id)" color="primary" block>View Details</v-btn>
+              <v-btn v-if="order.status === 'Pending'" @click="cancelOrder(order.id)" color="error" block>Cancel Order</v-btn>
             </v-card-actions>
           </v-card>
         </v-col>
@@ -48,10 +46,7 @@
       <!-- Loading State -->
       <v-row v-else>
         <v-col class="text-center">
-          <v-progress-circular
-            indeterminate
-            color="primary"
-          ></v-progress-circular>
+          <v-progress-circular indeterminate color="primary"></v-progress-circular>
           <p>Loading your orders...</p>
         </v-col>
       </v-row>
@@ -60,39 +55,55 @@
 </template>
 
 <script>
-import ordersService from "@/services/orderService"; // Import the orders service
+import orderService from "@/services/orderService"; // Import the orders service
 
 export default {
   name: "OrdersPage",
   data() {
     return {
-      orders: [], // Array to hold orders
+      ordersFetched: [], // Holds the list of orders fetched from the service
+      errorMessage: null, // Error message state
+      page: 1, // Current pagination page
+      itemsPerPage: 12, // Items per page (4 columns x 3 rows)
     };
   },
+  computed: {
+    totalPages() {
+      return Math.ceil(this.ordersFetched.length / this.itemsPerPage);
+    },
+    paginatedOrders() {
+      const start = (this.page - 1) * this.itemsPerPage;
+      return this.ordersFetched.slice(start, start + this.itemsPerPage);
+    },
+  },
   methods: {
-    // Method to fetch orders from the backend
+    formatDate(date) {
+      const options = { year: "numeric", month: "long", day: "numeric", hour: "numeric" , minute: "numeric",seconds: "numeric"};
+      return new Date(date).toLocaleDateString(undefined, options);
+    },
     async fetchOrders() {
+      // Fetch all orders from the API
       try {
-        const response = await ordersService.getAllOrders(); // Fetch orders from service
-        this.orders = response.data; // Set the orders data from the response
+        const response = await orderService.getAllOrders();
+        this.ordersFetched = response.data; // Populate the orders array
+        this.errorMessage = null; // Reset error message on success
       } catch (error) {
-        console.error("Failed to fetch orders:", error); // Handle any errors
+        console.error("There was an error fetching the orders!", error);
+        this.errorMessage = "Failed to load orders. Please try again later."; // Set error message on failure
       }
     },
-
     // Method to handle viewing order details
     viewOrder(orderId) {
       this.$router.push(`/orderDetails/${orderId}`);
     },
-
     // Method to handle cancelling an order
     cancelOrder(orderId) {
       alert(`Order #${orderId} has been canceled.`);
       // Logic for cancelling the order would go here
     },
   },
-  mounted() {
-    this.fetchOrders(); // Fetch orders when the component is mounted
+  async created() {
+    await this.fetchOrders(); // Fetch orders when the component is created
   },
 };
 </script>

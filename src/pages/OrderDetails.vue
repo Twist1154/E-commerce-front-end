@@ -22,14 +22,39 @@
               <!-- Order Items List -->
               <v-list class="mt-2">
                 <v-subheader>Items:</v-subheader>
-                <v-list-item v-for="item in orderItems" :key="item.id">
-                  <v-list-item-content>
-                    <v-list-item-title>{{ item.name }}</v-list-item-title>
-                    <v-list-item-subtitle>
-                      R{{ item.price }} (Qty: {{ item.quantity }})
-                    </v-list-item-subtitle>
-                  </v-list-item-content>
-                </v-list-item>
+                <v-row class="ms-6">
+            <!-- Product Image on the Left with Padding -->
+            <v-col cols="3" class="d-flex align-center justify-center pa-2">
+              <v-avatar class="ma-3" rounded="0" size="125">
+                <v-img :src="item.product.imagePath"></v-img>
+              </v-avatar>
+            </v-col>
+
+            <!-- Product and User Info on the Right with Padding -->
+            <v-col cols="9" class="pa-2">
+              <!-- Product Name -->
+              <v-card-text class="text-h5">
+                {{ item.product.name }}
+              </v-card-text>
+
+              <!-- Price and Username -->
+              <v-card-subtitle>
+                {{ item.product.price }} | Added by: {{ item.user.username }}
+              </v-card-subtitle>
+
+              <!-- Product Created Date -->
+              <v-card-subtitle>
+                Added on: {{ formatDate(item.createdAt) }}
+              </v-card-subtitle>
+
+              <!-- Action Button -->
+              <v-card-actions>
+                <v-btn class="ms-2" size="small" variant="outlined" @click="viewProduct(item.product.id)">
+                  View Product
+                </v-btn>
+              </v-card-actions>
+            </v-col>
+          </v-row>
               </v-list>
             </v-card-text>
 
