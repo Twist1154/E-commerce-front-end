@@ -1,4 +1,4 @@
-<!-- src/pages/PaymentPage.vue
+//src/pages/PaymentPage.vue
 <template>
   <div>
     <navigation />
@@ -104,4 +104,4 @@ h1 {
 v-card {
   margin-bottom: 24px;
 }
-</style> -->
+</style>
